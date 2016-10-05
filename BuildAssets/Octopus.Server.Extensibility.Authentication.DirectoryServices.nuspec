@@ -20,6 +20,6 @@
     <developmentDependency>true</developmentDependency>
   </metadata>
   <files>
-    <file src="*" target="lib\net45" />
+    <file src="*" target="tools" />
   </files>
 </package>
