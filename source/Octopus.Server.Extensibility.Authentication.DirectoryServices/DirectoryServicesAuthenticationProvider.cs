@@ -34,15 +34,16 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
         public AuthenticationProviderElement GetAuthenticationProviderElement(string siteBaseUri)
         {
-            return new AuthenticationProviderElement
+            var authenticationProviderElement = new AuthenticationProviderElement
             {
                 Name = IdentityProviderName,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
                 FormsUsernameIdentifier = @"\",
-                FormsAuthenticateUri = AuthenticateUri,
-                AuthenticateUri = ChallengeUri,
                 LinkHtml = LinkHtml()
             };
+            authenticationProviderElement.Links.Add(AuthenticationProviderElement.FormsAuthenticateLinkName, AuthenticateUri);
+            authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, ChallengeUri);
+            return authenticationProviderElement;
         }
 
         public AuthenticationProviderThatSupportsGroups GetGroupLookupElement()
