@@ -52,7 +52,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 return null;
             }
 
-            if (username == null) throw new ArgumentNullException("username");
+            if (username == null) throw new ArgumentNullException(nameof(username));
 
             log.Verbose($"Validating credentials provided for '{username}'...");
 
@@ -106,7 +106,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 if (principal == null)
                 {
                     var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
-                    throw new ArgumentException(string.Format("A principal identifiable by '{0}' was not found in '{1}'", username, searchedContext));
+                    throw new ArgumentException($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
                 }
 
                 return GetOrCreateUser(principal, username, domain ?? Environment.UserDomainName);
@@ -117,11 +117,16 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         {
             var name = credentialNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
 
-            return userStore.GetOrCreateUser(
+            return userStore.CreateOrUpdate(
                 name,
                 string.IsNullOrWhiteSpace(principal.DisplayName) ? principal.Name : principal.DisplayName,
                 principal.EmailAddress,
-                principal.SamAccountName);
+                principal.SamAccountName,
+                null,
+                true,
+                null,
+                false,
+                new string[0]);
         }
 
 
