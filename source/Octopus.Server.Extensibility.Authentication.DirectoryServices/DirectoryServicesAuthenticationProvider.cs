@@ -23,13 +23,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public string AuthenticateUri => DirectoryServicesApi.ApiUsersAuthenticate;
         string ChallengeUri => DirectoryServicesConstants.ChallengePath;
 
-        string LinkHtml()
+        string LinkHtml(string siteBaseUri)
         {
-            if (configurationStore.GetAllowFormsAuthenticationForDomainUsers())
-            {
-                return "<div class=\"text-center margin-top-20\">Or, <a href=\"{{authenticateLink}}\"> sign in with your Microsoft Windows domain account</a></div>";
-            }
-            return "<div class=\"text-center\"><a href=\"{{authenticateLink}}\">Sign in with your Microsoft Windows domain account <i class=\"fa fa-arrow-circle-right\"></i></a></div>";
+            return $"<a href='{{{{authenticateLink}}}}'><div class=\"external-provider-button ds-button\"><img src=\"{siteBaseUri}/images/directory_services_signin_buttons/microsoft-logo.svg\"><div>Sign in with a domain account</div></div></a>";
         }
 
         public AuthenticationProviderElement GetAuthenticationProviderElement(string siteBaseUri)
@@ -39,7 +35,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 Name = IdentityProviderName,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
                 FormsUsernameIdentifier = @"\",
-                LinkHtml = LinkHtml()
+                LinkHtml = LinkHtml(siteBaseUri)
             };
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.FormsAuthenticateLinkName, AuthenticateUri);
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, ChallengeUri);

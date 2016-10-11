@@ -5,6 +5,7 @@ using Octopus.Server.Extensibility.Authentication.DirectoryServices.Web;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Contracts.Authentication;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
 using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
@@ -44,6 +45,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
             builder.RegisterType<ListSecurityGroupsAction>().AsSelf().InstancePerDependency();
             builder.RegisterType<UserLoginAction>().AsSelf().InstancePerDependency();
+
+            builder.RegisterType<DirectoryServicesCSSContributor>().As<IContributesCSS>().InstancePerDependency();
+            builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesAuthenticationProvider>()
                 .As<IAuthenticationProvider>()
