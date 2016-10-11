@@ -60,7 +60,16 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 
             var userResult = credentialValidator.ValidateCredentials(attemptedUsername, model.Password);
             if (!userResult.Succeeded)
+            {
+                loginTracker.RecordFailure(attemptedUsername, requestUserHostAddress);
+
+                if (action == InvalidLoginAction.Slow)
+                {
+                    sleep.For(1000);
+                }
+
                 return responseCreator.BadRequest(userResult.FailureReason);
+            }
 
             var user = userResult.User;
             if (user == null || !user.IsActive || user.IsService)

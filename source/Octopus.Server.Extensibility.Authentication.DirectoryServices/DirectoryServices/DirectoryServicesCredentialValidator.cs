@@ -49,7 +49,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             if (!configurationStore.GetIsEnabled() || 
                 !configurationStore.GetAllowFormsAuthenticationForDomainUsers())
             {
-                return null;
+                return new UserCreateOrUpdateResult("Directory services forms authentication is not enabled");
             }
 
             if (username == null) throw new ArgumentNullException(nameof(username));
@@ -67,7 +67,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 {
                     var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
                     log.Info($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
-                    return null;
+                    return new UserCreateOrUpdateResult($"Username not found");
                 }
 
                 var hToken = IntPtr.Zero;
@@ -81,7 +81,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         var error = new Win32Exception();
                         log.Warn(error, $"Principal '{logon}' (Domain: '{domain}') could not be logged on via WIN32: 0x{error.NativeErrorCode:X8}.");
 
-                        return null;
+                        return new UserCreateOrUpdateResult("Active directory login error");
                     }
                 }
                 finally
