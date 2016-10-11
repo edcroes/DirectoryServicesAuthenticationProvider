@@ -1,14 +1,14 @@
 ﻿
 .ds-button {
-    background-color: #000000;
+    background-color: #ffffff;
 }
 
 .ds-button:hover {
-    background-color: #4a4a4a;
+    background-color: #eeeeee;
 }
 
 .ds-button a {
-    color: #ffffff;
+    color: #000000;
 }
 
 .ds-button img {
@@ -22,4 +22,6 @@
     margin-top: 10px;
     display: inline-block;
     margin-left: 5px;
+    margin-right: 10px;
+    color: #000000;
 }
