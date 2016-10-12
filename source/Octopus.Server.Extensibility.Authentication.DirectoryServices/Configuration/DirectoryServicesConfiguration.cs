@@ -1,11 +1,18 @@
 ﻿using System.Net;
-using Octopus.Server.Extensibility.HostServices.Model;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DirectoryServicesConfiguration : IId
+    public class DirectoryServicesConfiguration : ExtensionConfigurationDocument
     {
-        public string Id { get; set; }
+        protected DirectoryServicesConfiguration()
+        {
+        }
+
+        public DirectoryServicesConfiguration(string name, string extensionAuthor) : base(name, extensionAuthor)
+        {
+            Id = DirectoryServicesConfigurationStore.SingletonId;
+        }
 
         public bool IsEnabled { get; set; }
 
