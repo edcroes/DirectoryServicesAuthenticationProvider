@@ -114,7 +114,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             var authenticationScheme = settings.Get("Octopus.WebPortal.AuthenticationScheme", AuthenticationSchemes.Ntlm);
             var allowFormsAuth = settings.Get("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", true);
 
-            var doc = new DirectoryServicesConfiguration("DirectoryServices", "OctopusDeploy")
+            var doc = new DirectoryServicesConfiguration("DirectoryServices", "Octopus Deploy")
             {
                 IsEnabled = authenticationConfigurationStore.GetAuthenticationMode() == "Domain" || authenticationConfigurationStore.GetAuthenticationMode() == "1",
                 ActiveDirectoryContainer = activeDirectoryContainer,
