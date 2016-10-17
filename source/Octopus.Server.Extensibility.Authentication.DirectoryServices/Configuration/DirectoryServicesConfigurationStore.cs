@@ -12,7 +12,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
 {
     public class DirectoryServicesConfigurationStore : IDirectoryServicesConfigurationStore, IAuthenticationSchemeProvider, IHasConfigurationSettings
     {
-        public static string SingletonId = "authentication-directorservices";
+        public static string SingletonId = "authentication-directoryservices";
 
         readonly ILog log;
         readonly IKeyValueStore settings;
