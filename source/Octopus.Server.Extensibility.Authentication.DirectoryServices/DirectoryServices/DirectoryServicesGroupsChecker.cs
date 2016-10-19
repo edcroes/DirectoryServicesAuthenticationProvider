@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Octopus.Data.Model.User;
+using Octopus.Data.Storage.User;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Server.Extensibility.Extensions.Contracts.Authentication;
-using Octopus.Server.Extensibility.HostServices.Diagnostics;
-using Octopus.Server.Extensibility.HostServices.Model;
+using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {

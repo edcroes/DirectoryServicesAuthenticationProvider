@@ -1,5 +1,5 @@
-using Octopus.Server.Extensibility.HostServices.Model;
-using Octopus.Server.Extensibility.HostServices.Time;
+using Octopus.Data.Model.User;
+using Octopus.Time;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {

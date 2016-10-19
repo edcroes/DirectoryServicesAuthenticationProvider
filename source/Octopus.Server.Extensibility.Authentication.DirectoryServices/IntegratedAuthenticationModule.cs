@@ -1,8 +1,8 @@
 using Nancy;
 using Nancy.Responses;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
-using Octopus.Server.Extensibility.HostServices.Authentication;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {

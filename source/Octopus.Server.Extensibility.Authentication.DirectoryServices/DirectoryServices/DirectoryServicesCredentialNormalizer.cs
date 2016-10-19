@@ -1,6 +1,6 @@
 using System;
 using System.DirectoryServices.AccountManagement;
-using Octopus.Server.Extensibility.HostServices.Diagnostics;
+using Octopus.Diagnostics;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {

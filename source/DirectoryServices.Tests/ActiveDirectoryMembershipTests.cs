@@ -1,7 +1,7 @@
 ﻿using NSubstitute;
 using NUnit.Framework;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Server.Extensibility.HostServices.Diagnostics;
 
 namespace DirectoryServices.Tests
 {

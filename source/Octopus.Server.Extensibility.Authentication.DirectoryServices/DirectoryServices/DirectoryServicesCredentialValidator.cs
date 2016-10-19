@@ -2,9 +2,9 @@ using System;
 using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Runtime.InteropServices;
+using Octopus.Data.Storage.User;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Server.Extensibility.HostServices.Diagnostics;
-using Octopus.Server.Extensibility.HostServices.Model;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {

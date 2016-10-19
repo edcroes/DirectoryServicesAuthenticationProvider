@@ -1,4 +1,4 @@
-using Octopus.Server.Extensibility.HostServices.Model;
+using Octopus.Data.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {

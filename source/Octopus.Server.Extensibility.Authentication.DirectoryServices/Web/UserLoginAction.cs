@@ -3,11 +3,11 @@ using System.Globalization;
 using Nancy;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.HostServices;
+using Octopus.Server.Extensibility.Authentication.Resources;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
-using Octopus.Server.Extensibility.HostServices.Authentication;
-using Octopus.Server.Extensibility.HostServices.Time;
 using Octopus.Server.Extensibility.HostServices.Web;
-using Octopus.Server.Extensibility.HostServices.Web.Commands;
+using Octopus.Time;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {

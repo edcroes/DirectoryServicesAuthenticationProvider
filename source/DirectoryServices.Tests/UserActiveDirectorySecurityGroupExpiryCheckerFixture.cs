@@ -1,9 +1,9 @@
 ﻿using System;
 using NSubstitute;
 using NUnit.Framework;
+using Octopus.Data.Model.User;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Server.Extensibility.HostServices.Model;
-using Octopus.Server.Extensibility.HostServices.Time;
+using Octopus.Time;
 
 namespace DirectoryServices.Tests
 {

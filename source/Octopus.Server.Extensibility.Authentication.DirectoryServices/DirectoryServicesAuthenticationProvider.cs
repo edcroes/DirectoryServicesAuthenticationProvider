@@ -1,7 +1,7 @@
 ﻿using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Server.Extensibility.Extensions.Contracts.Authentication;
-using Octopus.Server.Extensibility.Extensions.Infrastructure.Resources;
+using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.Resources;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
