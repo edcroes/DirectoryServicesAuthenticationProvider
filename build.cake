@@ -19,6 +19,7 @@ var configuration = Argument("configuration", "Release");
 var publishDir = "./publish";
 var artifactsDir = "./artifacts";
 var assetDir = "./BuildAssets";
+var localPackagesDir = "../LocalPackages";
 var globalAssemblyFile = "./source/Solution Items/VersionInfo.cs";
 var extensionName = "Octopus.Server.Extensibility.Authentication.DirectoryServices";
 var solutionToBuild = "./source/" + extensionName + ".sln";
