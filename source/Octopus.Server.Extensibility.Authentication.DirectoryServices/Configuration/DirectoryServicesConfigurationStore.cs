@@ -106,21 +106,21 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             configurationStore.Update(doc);
         }
 
-        public bool GetAreSecurityGroupsDisabled()
+        public bool GetAreSecurityGroupsEnabled()
         {
             var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId);
             if (doc != null)
-                return doc.AreSecurityGroupsDisabled;
+                return doc.AreSecurityGroupsEnabled;
 
             doc = MoveSettingsToDatabase();
 
-            return doc.AreSecurityGroupsDisabled;
+            return doc.AreSecurityGroupsEnabled;
         }
 
-        public void SetAreSecurityGroupsDisabled(bool areSecurityGroupsDisabled)
+        public void SetAreSecurityGroupsEnabled(bool areSecurityGroupsEnabled)
         {
             var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId) ?? MoveSettingsToDatabase();
-            doc.AreSecurityGroupsDisabled = areSecurityGroupsDisabled;
+            doc.AreSecurityGroupsEnabled = areSecurityGroupsEnabled;
             configurationStore.Update(doc);
         }
 
@@ -139,7 +139,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
                 ActiveDirectoryContainer = activeDirectoryContainer,
                 AuthenticationScheme = authenticationScheme,
                 AllowFormsAuthenticationForDomainUsers = allowFormsAuth,
-                AreSecurityGroupsDisabled = areSecurityGroupsDisabled
+                AreSecurityGroupsEnabled = !areSecurityGroupsDisabled
             };
 
             configurationStore.Create(doc);
@@ -160,7 +160,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryContainer", GetActiveDirectoryContainer(), GetIsEnabled() && !string.IsNullOrWhiteSpace(GetActiveDirectoryContainer()), "Active Directory Container");
             yield return new ConfigurationValue("Octopus.WebPortal.AuthenticationScheme", GetAuthenticationScheme().ToString(), GetIsEnabled(), "Authentication Scheme");
             yield return new ConfigurationValue("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", GetAllowFormsAuthenticationForDomainUsers().ToString(), GetIsEnabled(), "Allow forms authentication");
-            yield return new ConfigurationValue("Octopus.WebPortal.ExternalSecurityGroupsDisabled", GetAreSecurityGroupsDisabled().ToString(), GetIsEnabled(), "Security groups disabled");
+            yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectorySecurityGroupsEnabled", GetAreSecurityGroupsEnabled().ToString(), GetIsEnabled(), "Security groups enabled");
         }
     }
 }

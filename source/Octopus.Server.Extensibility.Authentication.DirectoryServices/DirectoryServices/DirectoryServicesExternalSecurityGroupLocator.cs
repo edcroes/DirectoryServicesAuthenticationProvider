@@ -29,7 +29,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public IList<ExternalSecurityGroup> FindGroups(string name)
         {
-            if (configurationStore.GetAreSecurityGroupsDisabled())
+            if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new List<ExternalSecurityGroup>();
 
             var results = new List<ExternalSecurityGroup>();
@@ -68,7 +68,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         {
             if (username == null) throw new ArgumentNullException("username");
 
-            if (configurationStore.GetAreSecurityGroupsDisabled())
+            if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());
 
             log.Verbose($"Finding external security groups for '{username}'...");

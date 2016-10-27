@@ -12,6 +12,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
         public DirectoryServicesConfiguration(string name, string extensionAuthor) : base(name, extensionAuthor)
         {
             Id = DirectoryServicesConfigurationStore.SingletonId;
+            AllowFormsAuthenticationForDomainUsers = true;
+            AreSecurityGroupsEnabled = true;
         }
 
         public bool IsEnabled { get; set; }
@@ -34,6 +36,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
         /// <summary>
         /// Gets or sets whether to allow the use of security groups from AD.
         /// </summary>
-        public bool AreSecurityGroupsDisabled { get; set; }
+        public bool AreSecurityGroupsEnabled { get; set; }
     }
 }
