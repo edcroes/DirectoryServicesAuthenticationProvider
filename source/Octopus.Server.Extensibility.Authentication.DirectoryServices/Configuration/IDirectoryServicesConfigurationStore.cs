@@ -13,5 +13,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
 
         bool GetAllowFormsAuthenticationForDomainUsers();
         void SetAllowFormsAuthenticationForDomainUsers(bool allowFormAuth);
+
+        bool GetAreSecurityGroupsDisabled();
+        void SetAreSecurityGroupsDisabled(bool allowFormAuth);
     }
 }

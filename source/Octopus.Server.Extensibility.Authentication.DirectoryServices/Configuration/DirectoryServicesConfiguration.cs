@@ -30,5 +30,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
         /// Gets or sets the when the HTML-based username/password form will be presented for domain users. Defaults to true. 
         /// </summary>
         public bool AllowFormsAuthenticationForDomainUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to allow the use of security groups from AD.
+        /// </summary>
+        public bool AreSecurityGroupsDisabled { get; set; }
     }
 }
