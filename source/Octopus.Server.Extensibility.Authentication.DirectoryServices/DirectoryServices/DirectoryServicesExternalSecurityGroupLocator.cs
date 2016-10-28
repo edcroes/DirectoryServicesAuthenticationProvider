@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -12,19 +13,25 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         readonly ILog log;
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesCredentialNormalizer credentialNormalizer;
+        readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesExternalSecurityGroupLocator(
             ILog log,
             IDirectoryServicesContextProvider contextProvider,
-            IDirectoryServicesCredentialNormalizer credentialNormalizer)
+            IDirectoryServicesCredentialNormalizer credentialNormalizer,
+            IDirectoryServicesConfigurationStore configurationStore)
         {
             this.log = log;
             this.contextProvider = contextProvider;
             this.credentialNormalizer = credentialNormalizer;
+            this.configurationStore = configurationStore;
         }
 
         public IList<ExternalSecurityGroup> FindGroups(string name)
         {
+            if (!configurationStore.GetAreSecurityGroupsEnabled())
+                return new List<ExternalSecurityGroup>();
+
             var results = new List<ExternalSecurityGroup>();
             string domain;
             string username;
@@ -60,6 +67,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string username)
         {
             if (username == null) throw new ArgumentNullException("username");
+
+            if (!configurationStore.GetAreSecurityGroupsEnabled())
+                return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());
 
             log.Verbose($"Finding external security groups for '{username}'...");
 

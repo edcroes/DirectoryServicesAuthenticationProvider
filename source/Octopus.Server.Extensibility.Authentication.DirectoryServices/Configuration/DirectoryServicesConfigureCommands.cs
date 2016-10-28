@@ -44,6 +44,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
                 activeDirectoryConfiguration.SetAllowFormsAuthenticationForDomainUsers(allowFormsAuthenticationForDomainUsers);
                 log.Info("Allow forms authentication for domain users: " + allowFormsAuthenticationForDomainUsers);
             });
+            yield return new ConfigureCommandOption("activeDirectorySecurityGroupsEnabled=", "When Domain authentication is used, specifies whether to support security groups from AD.", v =>
+            {
+                var externalSecurityGroupsEnabled = bool.Parse(v);
+                activeDirectoryConfiguration.SetAreSecurityGroupsEnabled(externalSecurityGroupsEnabled);
+                log.Info("Active Directory security groups enabled: " + externalSecurityGroupsEnabled);
+            });
 
         }
 

@@ -106,6 +106,24 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             configurationStore.Update(doc);
         }
 
+        public bool GetAreSecurityGroupsEnabled()
+        {
+            var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId);
+            if (doc != null)
+                return doc.AreSecurityGroupsEnabled;
+
+            doc = MoveSettingsToDatabase();
+
+            return doc.AreSecurityGroupsEnabled;
+        }
+
+        public void SetAreSecurityGroupsEnabled(bool areSecurityGroupsEnabled)
+        {
+            var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId) ?? MoveSettingsToDatabase();
+            doc.AreSecurityGroupsEnabled = areSecurityGroupsEnabled;
+            configurationStore.Update(doc);
+        }
+
         DirectoryServicesConfiguration MoveSettingsToDatabase()
         {
             log.Info("Moving Octopus.WebPortal.ActiveDirectoryContainer/AuthenticationScheme/AllowFormsAuthenticationForDomainUsers from config file to DB");
@@ -113,13 +131,15 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             var activeDirectoryContainer = settings.Get("Octopus.WebPortal.ActiveDirectoryContainer", string.Empty);
             var authenticationScheme = settings.Get("Octopus.WebPortal.AuthenticationScheme", AuthenticationSchemes.Ntlm);
             var allowFormsAuth = settings.Get("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", true);
+            var areSecurityGroupsDisabled = settings.Get("Octopus.WebPortal.ExternalSecurityGroupsDisabled", false);
 
             var doc = new DirectoryServicesConfiguration("DirectoryServices", "Octopus Deploy")
             {
                 IsEnabled = authenticationConfigurationStore.GetAuthenticationMode() == "Domain" || authenticationConfigurationStore.GetAuthenticationMode() == "1",
                 ActiveDirectoryContainer = activeDirectoryContainer,
                 AuthenticationScheme = authenticationScheme,
-                AllowFormsAuthenticationForDomainUsers = allowFormsAuth
+                AllowFormsAuthenticationForDomainUsers = allowFormsAuth,
+                AreSecurityGroupsEnabled = !areSecurityGroupsDisabled
             };
 
             configurationStore.Create(doc);
@@ -127,6 +147,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             settings.Remove("Octopus.WebPortal.ActiveDirectoryContainer");
             settings.Remove("Octopus.WebPortal.AuthenticationScheme");
             settings.Remove("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers");
+            settings.Remove("Octopus.WebPortal.ExternalSecurityGroupsDisabled");
             settings.Save();
 
             return doc;
@@ -139,6 +160,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryContainer", GetActiveDirectoryContainer(), GetIsEnabled() && !string.IsNullOrWhiteSpace(GetActiveDirectoryContainer()), "Active Directory Container");
             yield return new ConfigurationValue("Octopus.WebPortal.AuthenticationScheme", GetAuthenticationScheme().ToString(), GetIsEnabled(), "Authentication Scheme");
             yield return new ConfigurationValue("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", GetAllowFormsAuthenticationForDomainUsers().ToString(), GetIsEnabled(), "Allow forms authentication");
+            yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectorySecurityGroupsEnabled", GetAreSecurityGroupsEnabled().ToString(), GetIsEnabled(), "Security groups enabled");
         }
     }
 }
