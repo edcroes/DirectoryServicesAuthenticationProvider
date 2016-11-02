@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Octopus.Configuration;
 using Octopus.Data.Storage.Configuration;
@@ -124,6 +125,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             configurationStore.Update(doc);
         }
 
+        readonly string[] legacyModes = {"Domain", "1"};
+
         DirectoryServicesConfiguration MoveSettingsToDatabase()
         {
             log.Info("Moving Octopus.WebPortal.ActiveDirectoryContainer/AuthenticationScheme/AllowFormsAuthenticationForDomainUsers from config file to DB");
@@ -133,9 +136,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             var allowFormsAuth = settings.Get("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", true);
             var areSecurityGroupsDisabled = settings.Get("Octopus.WebPortal.ExternalSecurityGroupsDisabled", false);
 
+            var authenticationMode = authenticationConfigurationStore.GetAuthenticationMode();
             var doc = new DirectoryServicesConfiguration("DirectoryServices", "Octopus Deploy")
             {
-                IsEnabled = authenticationConfigurationStore.GetAuthenticationMode() == "Domain" || authenticationConfigurationStore.GetAuthenticationMode() == "1",
+                IsEnabled = legacyModes.Contains(authenticationMode.Replace("\"", "")),
                 ActiveDirectoryContainer = activeDirectoryContainer,
                 AuthenticationScheme = authenticationScheme,
                 AllowFormsAuthenticationForDomainUsers = allowFormsAuth,
