@@ -5,9 +5,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {
     public class DirectoryServicesCSSContributor : IContributesCSS
     {
-        public IEnumerable<string> GetCSSUris(string siteBaseUri)
+        public IEnumerable<string> GetCSSUris(string requestDirectoryPath)
         {
-            yield return $"{siteBaseUri}/styles/DirectoryServices.css";
+            yield return $"{requestDirectoryPath}/styles/DirectoryServices.css";
         }
     }
 }

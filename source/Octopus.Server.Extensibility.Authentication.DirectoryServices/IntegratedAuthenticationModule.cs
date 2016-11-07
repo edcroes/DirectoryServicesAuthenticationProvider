@@ -3,6 +3,7 @@ using Nancy.Responses;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
+using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
@@ -21,7 +22,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 Response response;
                 if (Request.Query["redirectTo"].HasValue && IsLocalUrl(Request.Query["redirectTo"].Value))
                 {
-                    var redirectLocation = Request.Url.SiteBase + "/app#" + Request.Query["redirectTo"].Value;
+                    var redirectLocation = Request.DirectoryPath() + "/app#" + Request.Query["redirectTo"].Value;
                     response = new RedirectResponse(redirectLocation).WithCookie(tokenCookie);
                 }
                 else
