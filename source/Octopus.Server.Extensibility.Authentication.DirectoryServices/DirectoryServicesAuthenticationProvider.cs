@@ -37,8 +37,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 FormsUsernameIdentifier = @"\",
                 LinkHtml = LinkHtml(requestDirectoryPath)
             };
-            authenticationProviderElement.Links.Add(AuthenticationProviderElement.FormsAuthenticateLinkName, AuthenticateUri);
-            authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, ChallengeUri);
+            authenticationProviderElement.Links.Add(AuthenticationProviderElement.FormsAuthenticateLinkName, "~" + AuthenticateUri);
+            authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, "~" + ChallengeUri);
             return authenticationProviderElement;
         }
 
