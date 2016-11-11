@@ -24,15 +24,21 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
                 var tokenCookie = tokenIssuer.CreateAuthCookie(Context, principal.IdentificationToken, false);
 
+                var directoryPathResult = Request.DirectoryPath();
+                if (!directoryPathResult.IsValid)
+                {
+                    return responseCreator.BadRequest(directoryPathResult.InvalidReason);
+                }
+
                 Response response;
-                if (Request.Query["redirectTo"].HasValue && IsLocalUrl(Request.DirectoryPath(), Request.Query["redirectTo"].Value))
+                if (Request.Query["redirectTo"].HasValue && IsLocalUrl(directoryPathResult.Path, Request.Query["redirectTo"].Value))
                 {
                     var redirectLocation = Request.Query["redirectTo"].Value;
                     response = new RedirectResponse(redirectLocation).WithCookie(tokenCookie);
                 }
                 else
                 {
-                    response = new RedirectResponse(Request.Url.BasePath ?? "/").WithCookie(tokenCookie);
+                    response = new RedirectResponse(directoryPathResult.Path ?? "/").WithCookie(tokenCookie);
                 }
 
                 return response;
