@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Nancy;
 using Nancy.Responses;
 using Octopus.Diagnostics;
@@ -24,48 +25,30 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
                 var tokenCookie = tokenIssuer.CreateAuthCookie(Context, principal.IdentificationToken, false);
 
-                var directoryPathResult = Request.DirectoryPath();
+                var directoryPathResult = Request.AbsoluteVirtualDirectoryPath();
                 if (!directoryPathResult.IsValid)
                 {
                     return responseCreator.BadRequest(directoryPathResult.InvalidReason);
                 }
 
+                string[] whitelist = null;
+                if (Debugger.IsAttached)
+                    whitelist = new[] { "http://localhost", "https://localhost" };
+
                 Response response;
-                if (Request.Query["redirectTo"].HasValue && IsLocalUrl(directoryPathResult.Path, Request.Query["redirectTo"].Value))
+                if (Request.Query["redirectTo"].HasValue && Requests.IsLocalUrl(directoryPathResult.Path, Request.Query["redirectTo"].Value, whitelist))
                 {
                     var redirectLocation = Request.Query["redirectTo"].Value;
                     response = new RedirectResponse(redirectLocation).WithCookie(tokenCookie);
                 }
                 else
                 {
+                    log.WarnFormat("Prevented potential Open Redirection attack on an NTLM challenge from the local instance {0} to the non-local url {1}", directoryPathResult.Path, Request.Query["redirectTo"].Value);
                     response = new RedirectResponse(directoryPathResult.Path ?? "/").WithCookie(tokenCookie);
                 }
 
                 return response;
             };
-        }
-
-        public bool IsLocalUrl(string directoryPath, string url)
-        {
-            // Credit to Microsoft - Preventing Open Redirection Attacks (C#)
-            // http://www.asp.net/mvc/overview/security/preventing-open-redirection-attacks
-
-            var isLocalUrl = !string.IsNullOrEmpty(url) &&
-                            
-                             // Allows full paths that start with the DirectoryPath
-                             (url.StartsWith(directoryPath) ||
-
-                             // Allows "/" or "/foo" but not "//" or "/\".
-                             (url[0] == '/' && (url.Length == 1 || (url[1] != '/' && url[1] != '\\'))) ||
-
-                              // Allows "~/" or "~/foo".
-                              (url.Length > 1 && url[0] == '~' && url[1] == '/'));
-            if (!isLocalUrl)
-            {
-                log.WarnFormat("Prevented potential Open Redirection attack on an NTLM challenge from the local instance {0} to the non-local url {1}", directoryPath, url);
-            }
-
-            return isLocalUrl;
         }
     }
 }
