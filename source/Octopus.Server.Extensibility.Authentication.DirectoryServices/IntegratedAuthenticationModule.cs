@@ -11,12 +11,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
     public class IntegratedAuthenticationModule : NancyModule
     {
-        readonly ILog log;
-
-        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator)
+        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator, IWebPortalConfigurationStore webPortalConfigurationStore)
         {
-            this.log = log;
-
             Get[DirectoryServicesConstants.ChallengePath] = c =>
             {
                 if (Context.CurrentUser == null)
@@ -31,10 +27,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     return responseCreator.BadRequest(directoryPathResult.InvalidReason);
                 }
 
-                string[] whitelist = null;
-                if (Debugger.IsAttached)
-                    whitelist = new[] { "http://localhost", "https://localhost" };
-
+                var whitelist = webPortalConfigurationStore.GetTrustedRedirectUrls();
                 Response response;
                 if (Request.Query["redirectTo"].HasValue && Requests.IsLocalUrl(directoryPathResult.Path, Request.Query["redirectTo"].Value, whitelist))
                 {
