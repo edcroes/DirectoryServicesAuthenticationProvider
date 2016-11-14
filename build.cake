@@ -22,7 +22,7 @@ var assetDir = "./BuildAssets";
 var localPackagesDir = "../LocalPackages";
 var globalAssemblyFile = "./source/Solution Items/VersionInfo.cs";
 var extensionName = "Octopus.Server.Extensibility.Authentication.DirectoryServices";
-var solutionToBuild = "./source/" + extensionName + ".sln";
+var solutionToBuild = "./source/DirectoryServicesAuthenticationProvider.sln";
 var fileToPublish = "./source/" + extensionName + "/bin/Release/" + extensionName + ".dll";
 var cleanups = new List<IDisposable>(); 
 

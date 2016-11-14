@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using Nancy;
 using Nancy.Responses;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
@@ -9,7 +11,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
     public class IntegratedAuthenticationModule : NancyModule
     {
-        public IntegratedAuthenticationModule(IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator)
+        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator, IWebPortalConfigurationStore webPortalConfigurationStore)
         {
             Get[DirectoryServicesConstants.ChallengePath] = c =>
             {
@@ -19,33 +21,27 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
                 var tokenCookie = tokenIssuer.CreateAuthCookie(Context, principal.IdentificationToken, false);
 
-                Response response;
-                if (Request.Query["redirectTo"].HasValue && IsLocalUrl(Request.Query["redirectTo"].Value))
+                var directoryPathResult = Request.AbsoluteVirtualDirectoryPath();
+                if (!directoryPathResult.IsValid)
                 {
-                    var redirectLocation = Request.DirectoryPath() + "/app#" + Request.Query["redirectTo"].Value;
+                    return responseCreator.BadRequest(directoryPathResult.InvalidReason);
+                }
+
+                var whitelist = webPortalConfigurationStore.GetTrustedRedirectUrls();
+                Response response;
+                if (Request.Query["redirectTo"].HasValue && Requests.IsLocalUrl(directoryPathResult.Path, Request.Query["redirectTo"].Value, whitelist))
+                {
+                    var redirectLocation = Request.Query["redirectTo"].Value;
                     response = new RedirectResponse(redirectLocation).WithCookie(tokenCookie);
                 }
                 else
                 {
-                    response = new RedirectResponse(Request.Url.BasePath ?? "/").WithCookie(tokenCookie);
+                    log.WarnFormat("Prevented potential Open Redirection attack on an NTLM challenge from the local instance {0} to the non-local url {1}", directoryPathResult.Path, Request.Query["redirectTo"].Value);
+                    response = new RedirectResponse(directoryPathResult.Path ?? "/").WithCookie(tokenCookie);
                 }
 
                 return response;
             };
-        }
-
-        public bool IsLocalUrl(string url)
-        {
-            // Credit to Microsoft - Preventing Open Redirection Attacks (C#)
-            // http://www.asp.net/mvc/overview/security/preventing-open-redirection-attacks
-
-            return !string.IsNullOrEmpty(url) &&
-
-                // Allows "/" or "/foo" but not "//" or "/\".
-                ((url[0] == '/' && (url.Length == 1 || (url[1] != '/' && url[1] != '\\'))) ||
-
-                // Allows "~/" or "~/foo".
-                (url.Length > 1 && url[0] == '~' && url[1] == '/'));
         }
     }
 }
