@@ -54,5 +54,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 LookupUri = DirectoryServicesApi.ApiExternalGroupsLookup
             };
         }
+
+        public string[] GetAuthenticationUrls()
+        {
+            return new[] { AuthenticateUri, ChallengeUri };
+        }
     }
 }
