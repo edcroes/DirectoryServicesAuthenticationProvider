@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Nancy;
 using Nancy.Responses;
 using Octopus.Diagnostics;
@@ -11,7 +10,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
     public class IntegratedAuthenticationModule : NancyModule
     {
-        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator, IWebPortalConfigurationStore webPortalConfigurationStore)
+        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator)
         {
             Get[DirectoryServicesConstants.ChallengePath] = c =>
             {
@@ -21,23 +20,15 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
                 var tokenCookie = tokenIssuer.CreateAuthCookie(Context, principal.IdentificationToken, false);
 
-                var directoryPathResult = Request.AbsoluteVirtualDirectoryPath();
-                if (!directoryPathResult.IsValid)
-                {
-                    return responseCreator.BadRequest(directoryPathResult.InvalidReason);
-                }
-
-                var whitelist = webPortalConfigurationStore.GetTrustedRedirectUrls();
                 Response response;
-                if (Request.Query["redirectTo"].HasValue && Requests.IsLocalUrl(directoryPathResult.Path, Request.Query["redirectTo"].Value, whitelist))
+                if (Request.Query["redirectTo"].HasValue)
                 {
                     var redirectLocation = Request.Query["redirectTo"].Value;
                     response = new RedirectResponse(redirectLocation).WithCookie(tokenCookie);
                 }
                 else
                 {
-                    log.WarnFormat("Prevented potential Open Redirection attack on an NTLM challenge from the local instance {0} to the non-local url {1}", directoryPathResult.Path, Request.Query["redirectTo"].Value);
-                    response = new RedirectResponse(directoryPathResult.Path ?? "/").WithCookie(tokenCookie);
+                    response = new RedirectResponse(Request.Url.BasePath ?? "/").WithCookie(tokenCookie);
                 }
 
                 return response;

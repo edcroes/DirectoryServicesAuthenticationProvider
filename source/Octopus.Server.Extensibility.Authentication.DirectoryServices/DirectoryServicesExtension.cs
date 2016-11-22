@@ -48,6 +48,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
             builder.RegisterType<DirectoryServicesCSSContributor>().As<IContributesCSS>().InstancePerDependency();
             builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();
+            builder.RegisterType<DirectoryServicesJavascriptContributor>()
+                .As<IContributesJavascript>()
+                .As<IContributesAngularModules>()
+                .InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesAuthenticationProvider>()
                 .As<IAuthenticationProvider>()

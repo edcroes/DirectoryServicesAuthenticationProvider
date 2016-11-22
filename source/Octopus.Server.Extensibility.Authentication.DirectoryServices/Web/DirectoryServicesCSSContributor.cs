@@ -7,7 +7,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
     {
         public IEnumerable<string> GetCSSUris(string requestDirectoryPath)
         {
-            yield return $"{requestDirectoryPath}/styles/DirectoryServices.css";
+            yield return "styles/DirectoryServices.css";
         }
     }
 }

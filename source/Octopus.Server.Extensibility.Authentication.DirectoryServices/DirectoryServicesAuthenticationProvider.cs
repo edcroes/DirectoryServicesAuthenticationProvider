@@ -23,9 +23,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public string AuthenticateUri => DirectoryServicesApi.ApiUsersAuthenticate;
         string ChallengeUri => DirectoryServicesConstants.ChallengePath;
 
-        string LinkHtml(string requestDirectoryPath)
+        string LinkHtml()
         {
-            return $"<a href='{{{{authenticateLink}}}}'><div class=\"external-provider-button ds-button\"><img src=\"{requestDirectoryPath}/images/directory_services_signin_buttons/microsoft-logo.svg\"><div>Sign in with a domain account</div></div></a>";
+            return "<active-directory-auth-provider provider='provider' should-auto-login='shouldAutoLogin'></active-directory-auth-provider>";
         }
 
         public AuthenticationProviderElement GetAuthenticationProviderElement(string requestDirectoryPath)
@@ -35,7 +35,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 Name = IdentityProviderName,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
                 FormsUsernameIdentifiers = new [] { @"\", "@" },
-                LinkHtml = LinkHtml(requestDirectoryPath)
+                LinkHtml = LinkHtml()
             };
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.FormsAuthenticateLinkName, "~" + AuthenticateUri);
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, "~" + ChallengeUri);
