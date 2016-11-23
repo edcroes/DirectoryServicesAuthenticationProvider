@@ -47,7 +47,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             if (!configurationStore.GetIsEnabled())
                 return responseCreator.AsStatusCode(HttpStatusCode.BadRequest);
 
-            var model = modelBinder.Bind<LoginCommand>(context);
+            var model = modelBinder.BindAndValidate<LoginCommand>(context);
+            if (!context.ModelValidationResult.IsValid)
+                return responseCreator.BadRequest(context.ModelValidationResult);
 
             var attemptedUsername = model.Username;
             var requestUserHostAddress = context.Request.UserHostAddress;
