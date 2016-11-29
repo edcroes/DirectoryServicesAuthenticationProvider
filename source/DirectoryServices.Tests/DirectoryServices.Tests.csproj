@@ -71,13 +71,12 @@
       <HintPath>..\packages\Octopus.Diagnostics.1.0.11\lib\netstandard1.0\Octopus.Diagnostics.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octopus.Server.Extensibility, Version=1.1.46.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octopus.Server.Extensibility.1.1.46\lib\net45\Octopus.Server.Extensibility.dll</HintPath>
-      <HintPath>..\packages\Octopus.Server.Extensibility.1.1.46-relativeurl0002\lib\net45\Octopus.Server.Extensibility.dll</HintPath>
+    <Reference Include="Octopus.Server.Extensibility, Version=1.1.47.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octopus.Server.Extensibility.1.1.47-relativeurl0002\lib\net45\Octopus.Server.Extensibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Octopus.Server.Extensibility.Authentication, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.1.2.1-relativeurls0001\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
+      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.1.2.1-relativeurls0002\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Octopus.Time, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">

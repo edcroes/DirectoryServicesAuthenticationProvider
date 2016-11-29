@@ -1,20 +1,37 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {
     public class DirectoryServicesJavascriptContributor : IContributesJavascript, IContributesAngularModules
     {
+        readonly IDirectoryServicesConfigurationStore configurationStore;
+
+        public DirectoryServicesJavascriptContributor(IDirectoryServicesConfigurationStore configurationStore)
+        {
+            this.configurationStore = configurationStore;
+        }
+
         public IEnumerable<string> GetAngularModuleNames()
         {
-            yield return "octopusApp.users.directoryServices";
+            if (!configurationStore.GetIsEnabled())
+                return Enumerable.Empty<string>();
+            return new [] { "octopusApp.users.directoryServices" };
         }
 
         public IEnumerable<string> GetJavascriptUris(string requestDirectoryPath)
         {
-            yield return "areas/users/ad_users_module.js";
-            yield return "areas/users/controllers/ad_auth_provider_controller.js";
-            yield return "areas/users/directives/ad_auth_provider.js";
+            if (!configurationStore.GetIsEnabled())
+                return Enumerable.Empty<string>();
+
+            return new[]
+            {
+                "~/areas/users/ad_users_module.js",
+                "~/areas/users/controllers/ad_auth_provider_controller.js",
+                "~/areas/users/directives/ad_auth_provider.js"
+            };
         }
     }
 }

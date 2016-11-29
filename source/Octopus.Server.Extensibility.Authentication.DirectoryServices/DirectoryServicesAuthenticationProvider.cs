@@ -25,10 +25,15 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
         string LinkHtml()
         {
-            return "<active-directory-auth-provider provider='provider' should-auto-login='shouldAutoLogin'></active-directory-auth-provider>";
+            return "<active-directory-auth-provider provider='provider' should-auto-login='shouldAutoLogin' is-submitting='isSubmitting' handle-sign-in-error='handleSignInError'></active-directory-auth-provider>";
         }
 
         public AuthenticationProviderElement GetAuthenticationProviderElement(string requestDirectoryPath)
+        {
+            return GetAuthenticationProviderElement();
+        }
+
+        public AuthenticationProviderElement GetAuthenticationProviderElement()
         {
             var authenticationProviderElement = new AuthenticationProviderElement
             {
