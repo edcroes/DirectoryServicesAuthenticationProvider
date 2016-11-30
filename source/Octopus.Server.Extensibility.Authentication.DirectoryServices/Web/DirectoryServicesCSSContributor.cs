@@ -14,7 +14,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             this.configurationStore = configurationStore;
         }
 
-        public IEnumerable<string> GetCSSUris(string requestDirectoryPath)
+        public IEnumerable<string> GetCSSUris()
         {
             if (!configurationStore.GetIsEnabled())
                 return Enumerable.Empty<string>();

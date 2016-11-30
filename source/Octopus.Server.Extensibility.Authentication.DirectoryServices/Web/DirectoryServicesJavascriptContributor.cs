@@ -21,7 +21,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             return new [] { "octopusApp.users.directoryServices" };
         }
 
-        public IEnumerable<string> GetJavascriptUris(string requestDirectoryPath)
+        public IEnumerable<string> GetJavascriptUris()
         {
             if (!configurationStore.GetIsEnabled())
                 return Enumerable.Empty<string>();
