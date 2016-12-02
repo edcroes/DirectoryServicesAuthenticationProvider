@@ -51,7 +51,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 Name = IdentityProviderName,
                 IsRoleBased = false,
                 SupportsGroupLookup = true,
-                LookupUri = DirectoryServicesApi.ApiExternalGroupsLookup
+                LookupUri = "~" + DirectoryServicesApi.ApiExternalGroupsLookup
             };
         }
 
