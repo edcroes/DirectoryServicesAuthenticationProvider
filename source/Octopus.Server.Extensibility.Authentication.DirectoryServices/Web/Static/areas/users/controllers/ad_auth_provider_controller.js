@@ -18,8 +18,8 @@ module.controller('DirectoryServicesAuthController', function ($scope, $rootScop
         }
 
         var authUri = $scope.provider.Links["Authenticate"];
-        if ($rootScope.redirectAfterLoginTo) {
-            authUri += '?redirectTo=' + $location.absUrl().replace($location.path(), '') + $rootScope.redirectAfterLoginTo;
+        if ($rootScope.redirectAfterExternalLoginTo) {
+            authUri += '?redirectTo=' + $rootScope.redirectAfterExternalLoginTo;
         }
         else {
             authUri += '?redirectTo=' + octopusClient.resolve('~/');
