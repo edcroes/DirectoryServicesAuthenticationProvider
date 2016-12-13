@@ -34,12 +34,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             var results = new List<ExternalSecurityGroup>();
             string domain;
-            string username;
-            credentialNormalizer.NormalizeCredentials(name, out username, out domain);
+            string partialGroupName;
+            credentialNormalizer.NormalizeCredentials(name, out partialGroupName, out domain);
             using (var context = contextProvider.GetContext(domain))
             {
                 var searcher = new PrincipalSearcher();
-                searcher.QueryFilter = new GroupPrincipal(context) { Name = name + "*" };
+                searcher.QueryFilter = new GroupPrincipal(context) { Name = partialGroupName + "*" };
 
                 var iterGroup = searcher.FindAll().GetEnumerator();
                 using (iterGroup)
