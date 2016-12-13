@@ -117,11 +117,17 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         {
             var name = credentialNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
 
+            var externalId = principal.SamAccountName;
+            if (!string.IsNullOrWhiteSpace(fallbackDomain))
+            {
+                externalId = fallbackDomain + @"\" + externalId;
+            }
+
             return userStore.CreateOrUpdate(
                 name,
                 string.IsNullOrWhiteSpace(principal.DisplayName) ? principal.Name : principal.DisplayName,
                 principal.EmailAddress,
-                principal.SamAccountName,
+                externalId,
                 null,
                 true,
                 null,

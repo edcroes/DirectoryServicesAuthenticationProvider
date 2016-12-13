@@ -64,27 +64,27 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return results.OrderBy(o => o.DisplayName).ToList();
         }
 
-        public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string username)
+        public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string externalId)
         {
-            if (username == null) throw new ArgumentNullException("username");
+            if (externalId == null) throw new ArgumentNullException("externalId");
 
             if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());
 
-            log.Verbose($"Finding external security groups for '{username}'...");
+            log.Verbose($"Finding external security groups for '{externalId}'...");
 
             string domain;
-            credentialNormalizer.NormalizeCredentials(username, out username, out domain);
+            credentialNormalizer.NormalizeCredentials(externalId, out externalId, out domain);
 
             var groups = new List<string>();
 
             using (var context = contextProvider.GetContext(domain))
             {
-                var principal = UserPrincipal.FindByIdentity(context, username);
+                var principal = UserPrincipal.FindByIdentity(context, externalId);
                 if (principal == null)
                 {
                     var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
-                    log.Trace($"While loading security groups, a principal identifiable by '{username}' was not found in '{searchedContext}'");
+                    log.Trace($"While loading security groups, a principal identifiable by '{externalId}' was not found in '{searchedContext}'");
                     return new DirectoryServicesExternalSecurityGroupLocatorResult();
                 }
 

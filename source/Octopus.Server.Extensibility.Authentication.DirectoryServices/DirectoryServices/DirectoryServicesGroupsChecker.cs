@@ -44,7 +44,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             {
                 try
                 {
-                    var result = groupLocator.GetGroupIdsForUser(user.Username);
+                    var result = groupLocator.GetGroupIdsForUser(user.ExternalId);
                     if (!result.WasAbleToRetrieveGroups)
                         return new HashSet<string>();
 
