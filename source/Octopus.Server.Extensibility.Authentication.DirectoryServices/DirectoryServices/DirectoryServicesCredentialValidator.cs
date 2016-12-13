@@ -67,6 +67,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 {
                     var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
                     log.Info($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
+                    if (username.Contains("@"))
+                    {
+                        return new UserCreateOrUpdateResult($"Username not found.  UPN format may not be supported for your domain configuration.");
+                    }
                     return new UserCreateOrUpdateResult($"Username not found");
                 }
 
