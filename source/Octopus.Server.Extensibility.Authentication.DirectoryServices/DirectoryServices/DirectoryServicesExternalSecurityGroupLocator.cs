@@ -12,18 +12,18 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
     {
         readonly ILog log;
         readonly IDirectoryServicesContextProvider contextProvider;
-        readonly IDirectoryServicesCredentialNormalizer credentialNormalizer;
+        readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesExternalSecurityGroupLocator(
             ILog log,
             IDirectoryServicesContextProvider contextProvider,
-            IDirectoryServicesCredentialNormalizer credentialNormalizer,
+            IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesConfigurationStore configurationStore)
         {
             this.log = log;
             this.contextProvider = contextProvider;
-            this.credentialNormalizer = credentialNormalizer;
+            this.objectNameNormalizer = objectNameNormalizer;
             this.configurationStore = configurationStore;
         }
 
@@ -35,7 +35,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             var results = new List<ExternalSecurityGroup>();
             string domain;
             string partialGroupName;
-            credentialNormalizer.NormalizeCredentials(name, out partialGroupName, out domain);
+            objectNameNormalizer.NormalizeName(name, out partialGroupName, out domain);
             using (var context = contextProvider.GetContext(domain))
             {
                 var searcher = new PrincipalSearcher();
@@ -66,7 +66,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string externalId)
         {
-            if (externalId == null) throw new ArgumentNullException("externalId");
+            if (externalId == null) throw new ArgumentNullException(nameof(externalId));
 
             if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());
@@ -74,7 +74,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             log.Verbose($"Finding external security groups for '{externalId}'...");
 
             string domain;
-            credentialNormalizer.NormalizeCredentials(externalId, out externalId, out domain);
+            objectNameNormalizer.NormalizeName(externalId, out externalId, out domain);
 
             var groups = new List<string>();
 

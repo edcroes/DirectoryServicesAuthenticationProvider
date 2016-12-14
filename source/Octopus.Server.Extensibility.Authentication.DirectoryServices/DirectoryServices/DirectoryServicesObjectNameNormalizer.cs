@@ -4,26 +4,26 @@ using Octopus.Diagnostics;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesCredentialNormalizer : IDirectoryServicesCredentialNormalizer
+    public class DirectoryServicesObjectNameNormalizer : IDirectoryServicesObjectNameNormalizer
     {
         readonly ILog log;
         const string NTAccountUsernamePrefix = "nt:";
 
-        public DirectoryServicesCredentialNormalizer(ILog log)
+        public DirectoryServicesObjectNameNormalizer(ILog log)
         {
             this.log = log;
         }
 
-        public void NormalizeCredentials(string username, out string usernamePart, out string domainPart)
+        public void NormalizeName(string name, out string namePart, out string domainPart)
         {
-            if (username == null) throw new ArgumentNullException(nameof(username));
+            if (name == null) throw new ArgumentNullException(nameof(name));
 
-            if (username.StartsWith(NTAccountUsernamePrefix))
-                username = username.Remove(0, NTAccountUsernamePrefix.Length);
+            if (name.StartsWith(NTAccountUsernamePrefix))
+                name = name.Remove(0, NTAccountUsernamePrefix.Length);
 
-            if (!TryParseDownLevelLogonName(username, out usernamePart, out domainPart))
+            if (!TryParseDownLevelLogonName(name, out namePart, out domainPart))
             {
-                usernamePart = username;
+                namePart = name;
                 domainPart = null;
             }
         }
@@ -37,14 +37,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 if (string.IsNullOrWhiteSpace(fallbackDomain))
                     throw new InvalidOperationException("No fallback domain was provided");
                 if (string.IsNullOrWhiteSpace(fallbackUsername))
-                    throw new InvalidOperationException("No fallback username was provided");
+                    throw new InvalidOperationException("No fallback name was provided");
                 name = NTAccountUsernamePrefix + fallbackDomain.Trim() + "\\" + fallbackUsername.Trim();
             }
             return name;
         }
 
-        // If the return value is true, dlln was a valid down-level logon name, and username/domain
-        // contain precisely the component username and domain name values. Note, we don't split
+        // If the return value is true, dlln was a valid down-level logon name, and name/domain
+        // contain precisely the component name and domain name values. Note, we don't split
         // UPNs this way because the suffix part of a UPN is not necessarily a domain, and in
         // the default LogonUser case should be passed whole to the function with a null domain.
         static bool TryParseDownLevelLogonName(string dlln, out string username, out string domain)

@@ -16,8 +16,8 @@ namespace DirectoryServices.Tests
         {
             string usernamePart, domainPart;
             var log = Substitute.For<ILog>();
-            var credentialNormalizer = new DirectoryServicesCredentialNormalizer(log);
-            credentialNormalizer.NormalizeCredentials(rawUsername, out usernamePart, out domainPart);
+            var credentialNormalizer = new DirectoryServicesObjectNameNormalizer(log);
+            credentialNormalizer.NormalizeName(rawUsername, out usernamePart, out domainPart);
             Assert.AreEqual(usedUsername, usernamePart);
             Assert.AreEqual(usedDomain, domainPart);
         }

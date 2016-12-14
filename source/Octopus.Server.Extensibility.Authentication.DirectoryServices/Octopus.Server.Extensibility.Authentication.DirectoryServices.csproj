@@ -109,7 +109,7 @@
     <Compile Include="DirectoryServicesAuthenticationProvider.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesConstants.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesContextProvider.cs" />
-    <Compile Include="DirectoryServices\DirectoryServicesCredentialNormalizer.cs" />
+    <Compile Include="DirectoryServices\DirectoryServicesObjectNameNormalizer.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesCredentialValidator.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesExternalSecurityGroupLocator.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesExternalSecurityGroupLocatorResult.cs" />
@@ -127,7 +127,7 @@
     <Compile Include="Configuration\DirectoryServicesConfigureCommands.cs" />
     <Compile Include="Configuration\IDirectoryServicesConfigurationStore.cs" />
     <Compile Include="DirectoryServices\IDirectoryServicesContextProvider.cs" />
-    <Compile Include="DirectoryServices\IDirectoryServicesCredentialNormalizer.cs" />
+    <Compile Include="DirectoryServices\IDirectoryServicesObjectNameNormalizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\DirectoryServicesCSSContributor.cs" />
     <Compile Include="Web\DirectoryServicesStaticContentFolders.cs" />

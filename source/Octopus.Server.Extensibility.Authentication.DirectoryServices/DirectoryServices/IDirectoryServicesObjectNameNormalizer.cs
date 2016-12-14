@@ -2,9 +2,9 @@ using System.DirectoryServices.AccountManagement;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public interface IDirectoryServicesCredentialNormalizer
+    public interface IDirectoryServicesObjectNameNormalizer
     {
-        void NormalizeCredentials(string username, out string usernamePart, out string domainPart);
+        void NormalizeName(string name, out string namePart, out string domainPart);
 
         string ValidatedUserPrincipalName(UserPrincipal principal, string fallbackUsername, string fallbackDomain);
     }

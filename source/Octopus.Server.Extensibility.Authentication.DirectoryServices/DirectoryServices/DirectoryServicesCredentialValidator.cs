@@ -25,20 +25,20 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         const int LOGON32_PROVIDER_DEFAULT = 0;
 
         readonly ILog log;
-        readonly IDirectoryServicesCredentialNormalizer credentialNormalizer;
+        readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IUserStore userStore;
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesCredentialValidator(
             ILog log, 
-            IDirectoryServicesCredentialNormalizer credentialNormalizer,
+            IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesContextProvider contextProvider,
             IUserStore userStore,
             IDirectoryServicesConfigurationStore configurationStore)
         {
             this.log = log;
-            this.credentialNormalizer = credentialNormalizer;
+            this.objectNameNormalizer = objectNameNormalizer;
             this.contextProvider = contextProvider;
             this.userStore = userStore;
             this.configurationStore = configurationStore;
@@ -57,7 +57,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             log.Verbose($"Validating credentials provided for '{username}'...");
 
             string domain;
-            credentialNormalizer.NormalizeCredentials(username, out username, out domain);
+            objectNameNormalizer.NormalizeName(username, out username, out domain);
 
             using (var context = contextProvider.GetContext(domain))
             {
@@ -102,7 +102,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         public UserCreateOrUpdateResult GetOrCreateUser(string username)
         {
             string domain;
-            credentialNormalizer.NormalizeCredentials(username, out username, out domain);
+            objectNameNormalizer.NormalizeName(username, out username, out domain);
 
             using (var context = contextProvider.GetContext(domain))
             {
@@ -119,7 +119,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         UserCreateOrUpdateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain)
         {
-            var name = credentialNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
+            var name = objectNameNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
 
             var externalId = principal.SamAccountName;
             if (!string.IsNullOrWhiteSpace(fallbackDomain))
