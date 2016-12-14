@@ -12,18 +12,18 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
     {
         readonly ILog log;
         readonly IDirectoryServicesContextProvider contextProvider;
-        readonly IDirectoryServicesCredentialNormalizer credentialNormalizer;
+        readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesExternalSecurityGroupLocator(
             ILog log,
             IDirectoryServicesContextProvider contextProvider,
-            IDirectoryServicesCredentialNormalizer credentialNormalizer,
+            IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesConfigurationStore configurationStore)
         {
             this.log = log;
             this.contextProvider = contextProvider;
-            this.credentialNormalizer = credentialNormalizer;
+            this.objectNameNormalizer = objectNameNormalizer;
             this.configurationStore = configurationStore;
         }
 
@@ -34,12 +34,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             var results = new List<ExternalSecurityGroup>();
             string domain;
-            string username;
-            credentialNormalizer.NormalizeCredentials(name, out username, out domain);
+            string partialGroupName;
+            objectNameNormalizer.NormalizeName(name, out partialGroupName, out domain);
             using (var context = contextProvider.GetContext(domain))
             {
                 var searcher = new PrincipalSearcher();
-                searcher.QueryFilter = new GroupPrincipal(context) { Name = name + "*" };
+                searcher.QueryFilter = new GroupPrincipal(context) { Name = partialGroupName + "*" };
 
                 var iterGroup = searcher.FindAll().GetEnumerator();
                 using (iterGroup)
@@ -64,27 +64,27 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return results.OrderBy(o => o.DisplayName).ToList();
         }
 
-        public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string username)
+        public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string externalId)
         {
-            if (username == null) throw new ArgumentNullException("username");
+            if (externalId == null) throw new ArgumentNullException(nameof(externalId));
 
             if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());
 
-            log.Verbose($"Finding external security groups for '{username}'...");
+            log.Verbose($"Finding external security groups for '{externalId}'...");
 
             string domain;
-            credentialNormalizer.NormalizeCredentials(username, out username, out domain);
+            objectNameNormalizer.NormalizeName(externalId, out externalId, out domain);
 
             var groups = new List<string>();
 
             using (var context = contextProvider.GetContext(domain))
             {
-                var principal = UserPrincipal.FindByIdentity(context, username);
+                var principal = UserPrincipal.FindByIdentity(context, externalId);
                 if (principal == null)
                 {
                     var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
-                    log.Trace($"While loading security groups, a principal identifiable by '{username}' was not found in '{searchedContext}'");
+                    log.Trace($"While loading security groups, a principal identifiable by '{externalId}' was not found in '{searchedContext}'");
                     return new DirectoryServicesExternalSecurityGroupLocatorResult();
                 }
 
