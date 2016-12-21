@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
@@ -44,12 +45,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.configurationStore = configurationStore;
         }
 
-        public UserCreateOrUpdateResult ValidateCredentials(string username, string password)
+        public int Priority => 100;
+
+        public AuthenticationUserCreateOrUpdateResult ValidateCredentials(string username, string password)
         {
             if (!configurationStore.GetIsEnabled() || 
                 !configurationStore.GetAllowFormsAuthenticationForDomainUsers())
             {
-                return new UserCreateOrUpdateResult("Directory services forms authentication is not enabled");
+                return new AuthenticationUserCreateOrUpdateResult();
             }
 
             if (username == null) throw new ArgumentNullException(nameof(username));
@@ -69,9 +72,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     log.Info($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
                     if (username.Contains("@"))
                     {
-                        return new UserCreateOrUpdateResult("Username not found.  UPN format may not be supported for your domain configuration.");
+                        return new AuthenticationUserCreateOrUpdateResult("Username not found.  UPN format may not be supported for your domain configuration.");
                     }
-                    return new UserCreateOrUpdateResult("Username not found");
+                    return new AuthenticationUserCreateOrUpdateResult("Username not found");
                 }
 
                 var hToken = IntPtr.Zero;
@@ -85,7 +88,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         var error = new Win32Exception();
                         log.Warn(error, $"Principal '{logon}' (Domain: '{domain}') could not be logged on via WIN32: 0x{error.NativeErrorCode:X8}.");
 
-                        return new UserCreateOrUpdateResult("Active directory login error");
+                        return new AuthenticationUserCreateOrUpdateResult("Active directory login error");
                     }
                 }
                 finally
@@ -99,7 +102,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             }
         }
 
-        public UserCreateOrUpdateResult GetOrCreateUser(string username)
+        public AuthenticationUserCreateOrUpdateResult GetOrCreateUser(string username)
         {
             string domain;
             objectNameNormalizer.NormalizeName(username, out username, out domain);
@@ -117,7 +120,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             }
         }
 
-        UserCreateOrUpdateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain)
+        AuthenticationUserCreateOrUpdateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain)
         {
             var username = objectNameNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
 
@@ -135,7 +138,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 log.Error($"We couldn't find a valid external identity to use for the Active Directory user '{displayName}' with email address '{emailAddress}' for the Octopus User Account named '{username}'. Octopus uses the samAccountName (pre-Windows 2000 Logon Name) as the external identity for Active Directory users. Please make sure this user has a valid samAccountName and try again. Learn more about troubleshooting Active Directory authentication at http://g.octopushq.com/TroubleshootingAD");
             }
 
-            return userStore.CreateOrUpdate(
+            return new AuthenticationUserCreateOrUpdateResult (userStore.CreateOrUpdate(
                 username,
                 displayName,
                 emailAddress,
@@ -144,7 +147,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 true,
                 null,
                 false,
-                new string[0]);
+                new string[0]));
         }
 
 

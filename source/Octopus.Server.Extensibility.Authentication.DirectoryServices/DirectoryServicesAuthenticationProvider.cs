@@ -34,7 +34,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             {
                 Name = IdentityProviderName,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
-                FormsUsernameIdentifiers = new [] { @"\", "@" },
                 LinkHtml = LinkHtml()
             };
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.FormsAuthenticateLinkName, "~" + AuthenticateUri);
