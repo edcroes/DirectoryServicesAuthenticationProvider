@@ -69,9 +69,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     log.Info($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
                     if (username.Contains("@"))
                     {
-                        return new UserCreateOrUpdateResult($"Username not found.  UPN format may not be supported for your domain configuration.");
+                        return new UserCreateOrUpdateResult("Username not found.  UPN format may not be supported for your domain configuration.");
                     }
-                    return new UserCreateOrUpdateResult($"Username not found");
+                    return new UserCreateOrUpdateResult("Username not found");
                 }
 
                 var hToken = IntPtr.Zero;
@@ -119,7 +119,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         UserCreateOrUpdateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain)
         {
-            var name = objectNameNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
+            var username = objectNameNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
 
             var externalId = principal.SamAccountName;
             if (!string.IsNullOrWhiteSpace(fallbackDomain))
@@ -127,10 +127,18 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 externalId = fallbackDomain + @"\" + externalId;
             }
 
+            var displayName = string.IsNullOrWhiteSpace(principal.DisplayName) ? principal.Name : principal.DisplayName;
+            var emailAddress = principal.EmailAddress;
+
+            if (string.IsNullOrWhiteSpace(externalId))
+            {
+                log.Error($"We couldn't find a valid external identity to use for the Active Directory user '{displayName}' with email address '{emailAddress}' for the Octopus User Account named '{username}'. Octopus uses the samAccountName (pre-Windows 2000 Logon Name) as the external identity for Active Directory users. Please make sure this user has a valid samAccountName and try again. Learn more about troubleshooting Active Directory authentication at http://g.octopushq.com/TroubleshootingAD");
+            }
+
             return userStore.CreateOrUpdate(
-                name,
-                string.IsNullOrWhiteSpace(principal.DisplayName) ? principal.Name : principal.DisplayName,
-                principal.EmailAddress,
+                username,
+                displayName,
+                emailAddress,
                 externalId,
                 null,
                 true,

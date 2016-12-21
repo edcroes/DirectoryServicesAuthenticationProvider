@@ -66,7 +66,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string externalId)
         {
-            if (externalId == null) throw new ArgumentNullException(nameof(externalId));
+            if (externalId == null) throw new ArgumentNullException(nameof(externalId), "The external identity is null indicating we were not able to associate this Octopus User Account with an identifier from Active Directory.");
 
             if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());

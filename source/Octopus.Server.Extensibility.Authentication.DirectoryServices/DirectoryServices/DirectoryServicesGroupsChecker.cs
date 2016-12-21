@@ -54,7 +54,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 }
                 catch (Exception ex)
                 {
-                    log.Warn(ex, "An error occurred while loading the users external security groups.");
+                    LogWarning(user, ex, "foreground loading");
                 }
             }
             else if (expiryChecker.ShouldFetchExternalGroupsInBackground(user))
@@ -78,9 +78,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 }
                 catch (Exception ex)
                 {
-                    log.Warn(ex, "An error occurred while refreshing the users external security groups.");
+                    LogWarning(user, ex, "background refreshing");
                 }
             });
+        }
+
+        void LogWarning(IUser user, Exception ex, string operation)
+        {
+            log.Warn(ex, $"An error occurred while {operation} the external security groups for the Octopus User Account. This will prevent the Octopus User Account being associated with Octopus Teams. Learn more about external groups: http://g.octopushq.com/ExternalGroupsAndRoles (Username: '{user.Username}' Display Name: '{user.DisplayName}' Email Address: '{user.EmailAddress}' External Identity: '{user.ExternalId}').");
         }
     }
 }
