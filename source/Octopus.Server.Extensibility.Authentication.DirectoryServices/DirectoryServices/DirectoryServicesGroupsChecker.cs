@@ -33,7 +33,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public HashSet<string> EnsureExternalSecurityGroupsAreUpToDate(IUser user, bool forceRefresh = false)
         {
-            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
+            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled() || string.IsNullOrWhiteSpace(user.ExternalId))
                 return new HashSet<string>();
 
             // We will retrieve the user's external groups when they initially log in.  We can also refresh
