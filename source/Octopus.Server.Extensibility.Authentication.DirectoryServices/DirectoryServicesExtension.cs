@@ -47,7 +47,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();
 
             builder.RegisterType<ListSecurityGroupsAction>().AsSelf().InstancePerDependency();
-            builder.RegisterType<UserLoginAction>().AsSelf().InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesCSSContributor>().As<IContributesCSS>().InstancePerDependency();
             builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();
