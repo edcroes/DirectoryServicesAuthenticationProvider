@@ -1,11 +1,10 @@
-using Octopus.Data.Storage.User;
+using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public interface IDirectoryServicesCredentialValidator
+    public interface IDirectoryServicesCredentialValidator : IDoesBasicAuthentication
     {
-        UserCreateOrUpdateResult ValidateCredentials(string username, string password);
-
-        UserCreateOrUpdateResult GetOrCreateUser(string username);
+        AuthenticationUserCreateOrUpdateResult GetOrCreateUser(string username);
     }
 }

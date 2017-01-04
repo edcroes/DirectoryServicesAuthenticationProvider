@@ -33,7 +33,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             builder.RegisterType<DirectoryServicesObjectNameNormalizer>().As<IDirectoryServicesObjectNameNormalizer>().InstancePerDependency();
             builder.RegisterType<DirectoryServicesExternalSecurityGroupLocator>().As<IDirectoryServicesExternalSecurityGroupLocator>().InstancePerDependency();
 
-            builder.RegisterType<DirectoryServicesCredentialValidator>().As<IDirectoryServicesCredentialValidator>().InstancePerDependency();
+            builder.RegisterType<DirectoryServicesCredentialValidator>()
+                .As<IDirectoryServicesCredentialValidator>()
+                .As<IDoesBasicAuthentication>()
+                .InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesUserSecurityGroupExpiryChecker>().As<IDirectoryServicesUserSecurityGroupExpiryChecker>().InstancePerDependency();
 
@@ -44,7 +47,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();
 
             builder.RegisterType<ListSecurityGroupsAction>().AsSelf().InstancePerDependency();
-            builder.RegisterType<UserLoginAction>().AsSelf().InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesCSSContributor>().As<IContributesCSS>().InstancePerDependency();
             builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();

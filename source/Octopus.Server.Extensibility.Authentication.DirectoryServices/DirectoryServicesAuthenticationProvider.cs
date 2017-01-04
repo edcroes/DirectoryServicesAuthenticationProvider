@@ -20,7 +20,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
         public bool SupportsPasswordManagement => false;
 
-        public string AuthenticateUri => DirectoryServicesApi.ApiUsersAuthenticate;
         string ChallengeUri => DirectoryServicesConstants.ChallengePath;
 
         string LinkHtml()
@@ -34,10 +33,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             {
                 Name = IdentityProviderName,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
-                FormsUsernameIdentifiers = new [] { @"\", "@" },
                 LinkHtml = LinkHtml()
             };
-            authenticationProviderElement.Links.Add(AuthenticationProviderElement.FormsAuthenticateLinkName, "~" + AuthenticateUri);
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, "~" + ChallengeUri);
             return authenticationProviderElement;
         }
@@ -57,7 +54,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
         public string[] GetAuthenticationUrls()
         {
-            return new[] { AuthenticateUri, ChallengeUri };
+            return new string[0];
         }
     }
 }

@@ -17,7 +17,7 @@ module.controller('DirectoryServicesAuthController', function ($scope, $rootScop
             return;
         }
 
-        var authUri = $scope.provider.Links["Authenticate"];
+        var authUri = $scope.resolveLink($scope.provider.Links["Authenticate"]);
         if ($rootScope.redirectAfterExternalLoginTo) {
             authUri += '?redirectTo=' + $rootScope.redirectAfterExternalLoginTo;
         }
