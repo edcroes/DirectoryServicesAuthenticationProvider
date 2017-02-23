@@ -1,6 +1,7 @@
 ﻿
 .ds-button {
     background-color: #ffffff;
+    cursor: pointer;
 }
 
 .ds-button:hover {
