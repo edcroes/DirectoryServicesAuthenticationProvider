@@ -73,8 +73,8 @@
       <HintPath>..\packages\Octopus.Server.Extensibility.2.0.0\lib\net45\Octopus.Server.Extensibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octopus.Server.Extensibility.Authentication, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.2.1.1\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
+    <Reference Include="Octopus.Server.Extensibility.Authentication, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.3.0.0\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Octopus.Time, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
@@ -128,6 +128,7 @@
     <Compile Include="Configuration\IDirectoryServicesConfigurationStore.cs" />
     <Compile Include="DirectoryServices\IDirectoryServicesContextProvider.cs" />
     <Compile Include="DirectoryServices\IDirectoryServicesObjectNameNormalizer.cs" />
+    <Compile Include="NancyResponseExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\DirectoryServicesCSSContributor.cs" />
     <Compile Include="Web\DirectoryServicesStaticContentFolders.cs" />

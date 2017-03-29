@@ -18,14 +18,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     return responseCreator.Unauthorized(Request);
 
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
-                var tokenCookie = tokenIssuer.CreateAuthCookie(Context, principal.IdentificationToken, false);
+                var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyMinutes);
 
                 var whitelist = webPortalConfigurationStore.GetTrustedRedirectUrls();
                 Response response;
                 if (Request.Query["redirectTo"].HasValue && Requests.IsLocalUrl(Request.Query["redirectTo"].Value, whitelist))
                 {
                     var redirectLocation = Request.Query["redirectTo"].Value;
-                    response = new RedirectResponse(redirectLocation).WithCookie(tokenCookie);
+                    response = new RedirectResponse(redirectLocation).WithCookies(authCookies);
                 }
                 else
                 {
@@ -34,7 +34,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                         log.WarnFormat("Prevented potential Open Redirection attack on an NTLM challenge, to the non-local url {0}", Request.Query["redirectTo"].Value);
                     }
 
-                    response = new RedirectResponse(Request.Url.BasePath ?? "/").WithCookie(tokenCookie);
+                    response = new RedirectResponse(Request.Url.BasePath ?? "/").WithCookies(authCookies);
                 }
 
                 return response;
