@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using Octopus.Diagnostics;
+using Octopus.Node.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Server.Extensibility.Authentication.HostServices;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {

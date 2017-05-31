@@ -1,4 +1,4 @@
-using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices

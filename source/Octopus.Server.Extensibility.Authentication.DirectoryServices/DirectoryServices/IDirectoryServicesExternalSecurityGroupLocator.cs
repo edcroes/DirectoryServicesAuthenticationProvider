@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Octopus.Server.Extensibility.Authentication.HostServices;
+using Octopus.Node.Extensibility.Authentication.HostServices;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {

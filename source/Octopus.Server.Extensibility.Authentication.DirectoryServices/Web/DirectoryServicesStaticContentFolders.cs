@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
+using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {

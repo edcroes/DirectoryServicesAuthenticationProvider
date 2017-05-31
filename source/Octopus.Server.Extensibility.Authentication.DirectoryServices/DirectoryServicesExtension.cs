@@ -1,12 +1,13 @@
 ﻿using Autofac;
+using Octopus.Node.Extensibility.Authentication.Extensions;
+using Octopus.Node.Extensibility.Extensions;
+using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
+using Octopus.Node.Extensibility.HostServices.Web;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Web;
-using Octopus.Server.Extensibility.Authentication.Extensions;
-using Octopus.Server.Extensibility.Extensions;
-using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
-using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {

@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {

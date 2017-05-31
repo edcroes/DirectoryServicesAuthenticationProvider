@@ -1,7 +1,6 @@
 ﻿using System.Security.Principal;
-using Octopus.Data.Storage.User;
+using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Server.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
