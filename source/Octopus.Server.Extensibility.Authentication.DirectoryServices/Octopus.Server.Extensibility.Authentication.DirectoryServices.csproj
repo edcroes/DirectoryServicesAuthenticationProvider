@@ -129,9 +129,7 @@
     <Compile Include="DirectoryServices\IDirectoryServicesObjectNameNormalizer.cs" />
     <Compile Include="NancyResponseExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Web\DirectoryServicesCSSContributor.cs" />
     <Compile Include="Web\DirectoryServicesStaticContentFolders.cs" />
-    <Compile Include="Web\DirectoryServicesJavascriptContributor.cs" />
     <Compile Include="Web\ListSecurityGroupsAction.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -143,9 +141,7 @@
     <EmbeddedResource Include="Web\Static\styles\directoryServices.css" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Web\Static\areas\users\controllers\ad_auth_provider_controller.js" />
-    <EmbeddedResource Include="Web\Static\areas\users\directives\ad_auth_provider.js" />
-    <EmbeddedResource Include="Web\Static\areas\users\ad_users_module.js" />
+    <EmbeddedResource Include="Web\Static\areas\users\ad_auth_provider.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
