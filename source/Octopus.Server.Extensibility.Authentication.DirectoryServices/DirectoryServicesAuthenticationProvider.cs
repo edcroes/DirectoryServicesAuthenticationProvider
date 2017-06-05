@@ -1,11 +1,14 @@
-﻿using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Authentication.Resources;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport
+    public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport, IContributesJavascript, IContributesCSS
     {
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
@@ -55,6 +58,20 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public string[] GetAuthenticationUrls()
         {
             return new string[0];
+        }
+
+        public IEnumerable<string> GetJavascriptUris()
+        {
+            return !configurationStore.GetIsEnabled() 
+                ? Enumerable.Empty<string>() 
+                : new[] { "~/areas/users/controllers/ad_auth_provider.js" };
+        }
+
+        public IEnumerable<string> GetCSSUris()
+        {
+            return !configurationStore.GetIsEnabled() 
+                ? Enumerable.Empty<string>() 
+                : new[] { "~/styles/directoryServices.css" };
         }
     }
 }

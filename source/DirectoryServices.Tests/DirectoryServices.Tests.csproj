@@ -75,9 +75,8 @@
       <HintPath>..\packages\Octopus.Server.Extensibility.2.0.0\lib\net45\Octopus.Server.Extensibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octopus.Server.Extensibility.Authentication, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.3.0.0\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Octopus.Server.Extensibility.Authentication, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.4.0.0-enh-frontendrefa0002\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
     </Reference>
     <Reference Include="Octopus.Time, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octopus.Time.1.0.8\lib\netstandard1.0\Octopus.Time.dll</HintPath>
