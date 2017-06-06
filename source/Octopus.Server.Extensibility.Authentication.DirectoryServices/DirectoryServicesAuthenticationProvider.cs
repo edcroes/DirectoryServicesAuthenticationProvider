@@ -8,7 +8,10 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport
+    public class DirectoryServicesAuthenticationProvider : 
+        IAuthenticationProviderWithGroupSupport,
+        IContributesCSS,
+        IContributesJavascript
     {
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
@@ -58,6 +61,20 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public string[] GetAuthenticationUrls()
         {
             return new string[0];
+        }
+
+        public IEnumerable<string> GetCSSUris()
+        {
+            return !configurationStore.GetIsEnabled()
+                ? Enumerable.Empty<string>()
+                : new[] { "~/styles/directoryServices.css" };
+        }
+
+        public IEnumerable<string> GetJavascriptUris()
+        {
+            return !configurationStore.GetIsEnabled()
+                ? Enumerable.Empty<string>()
+                : new[] { "~/areas/users/ad_auth_provider.js" };
         }
     }
 }

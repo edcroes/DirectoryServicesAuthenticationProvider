@@ -129,8 +129,6 @@
     <Compile Include="DirectoryServices\IDirectoryServicesObjectNameNormalizer.cs" />
     <Compile Include="NancyResponseExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Web\DirectoryServicesCSSContributor.cs" />
-    <Compile Include="Web\DirectoryServicesJavascriptContributor.cs" />
     <Compile Include="Web\DirectoryServicesStaticContentFolders.cs" />
     <Compile Include="Web\ListSecurityGroupsAction.cs" />
   </ItemGroup>
