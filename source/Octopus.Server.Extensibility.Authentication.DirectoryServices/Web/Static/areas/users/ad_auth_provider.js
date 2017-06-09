@@ -1,4 +1,4 @@
-var providerName = "Directory Services";
+var providerName = "Active Directory";
 
 function directoryServicesAuthProvider(octopusClient, provider, redirectAfterLoginToLink, onError) {
     this.octopusClient = octopusClient;
