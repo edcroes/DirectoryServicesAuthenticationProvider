@@ -28,18 +28,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
         string ChallengeUri => DirectoryServicesConstants.ChallengePath;
 
-        string LinkHtml()
-        {
-            return "<active-directory-auth-provider provider='provider' should-auto-login='shouldAutoLogin' is-submitting='isSubmitting' handle-sign-in-error='handleSignInError'></active-directory-auth-provider>";
-        }
-
         public AuthenticationProviderElement GetAuthenticationProviderElement()
         {
             var authenticationProviderElement = new AuthenticationProviderElement
             {
                 Name = IdentityProviderName,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
-                LinkHtml = LinkHtml()
             };
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, "~" + ChallengeUri);
             return authenticationProviderElement;

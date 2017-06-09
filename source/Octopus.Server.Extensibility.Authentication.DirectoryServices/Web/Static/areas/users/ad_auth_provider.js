@@ -1,16 +1,17 @@
 var providerName = "Directory Services";
 
-function directoryServicesAuthProvider(octopusClient) {
+function directoryServicesAuthProvider(octopusClient, provider, redirectAfterLoginToLink, onError) {
     this.octopusClient = octopusClient;
+    this.provider = provider;
+    this.redirectAfterLoginToLink = redirectAfterLoginToLink;
 
-    this.name = providerName;
     this.linkHtml =
-        '<a><div class="external-provider-button ds-button"><img src="' + octopusClient.resolve("~/images/directory_services_signin_buttons/microsoft-logo.svg") + '"><div>Sign in with a domain account</div></div></a>';
+        '<a><div class="ds-button"><img src="' + octopusClient.resolve("~/images/directory_services_signin_buttons/microsoft-logo.svg") + '"><div>Sign in with a domain account</div></div></a>';
 
-    this.signIn = function (authLink, redirectAfterLoginToLink, success) {
-        console.log(this.name + " clicked");
+    this.signIn = function () {
+        console.log("Signing in using " + providerName + " provider");
 
-        var authUri = authLink;
+        var authUri = this.provider.Links.Authenticate;
         if (redirectAfterLoginToLink) {
             authUri += "?redirectTo=" + redirectAfterLoginToLink;
         } else {
@@ -21,7 +22,7 @@ function directoryServicesAuthProvider(octopusClient) {
     };
 
     return {
-        Name: this.name,
+        Name: providerName,
         LinkHtml: this.linkHtml,
         SignIn: this.signIn
     };
