@@ -1,9 +1,6 @@
 var providerName = "Active Directory";
 
 function directoryServicesAuthProvider(octopusClient, provider, redirectAfterLoginToLink, onError) {
-    this.octopusClient = octopusClient;
-    this.provider = provider;
-    this.redirectAfterLoginToLink = redirectAfterLoginToLink;
 
     this.linkHtml =
         '<a><div class="ds-button"><img src="' + octopusClient.resolve("~/images/directory_services_signin_buttons/microsoft-logo.svg") + '"><div>Sign in with a domain account</div></div></a>';
@@ -11,7 +8,7 @@ function directoryServicesAuthProvider(octopusClient, provider, redirectAfterLog
     this.signIn = function () {
         console.log("Signing in using " + providerName + " provider");
 
-        var authUri = this.provider.Links.Authenticate;
+        var authUri = provider.Links.Authenticate;
         if (redirectAfterLoginToLink) {
             authUri += "?redirectTo=" + redirectAfterLoginToLink;
         } else {
