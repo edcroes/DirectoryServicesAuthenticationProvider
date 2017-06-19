@@ -149,7 +149,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 // if we haven't converted the old externalId into the new identity then set it up now
                 if (!user.Identities.OfType<ActiveDirectoryIdentity>().Any())
                 {
-                    user = userStore.AddIdentity(user.Id, NewIdentity((user.Identities.Max(x => int.Parse(x.Id)) + 1).ToString(), emailAddress, userPrincipalName, samAccountName));
+                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, NewIdentity((user.Identities.Max(x => int.Parse(x.Id)) + 1).ToString(), emailAddress, userPrincipalName, samAccountName)));
                 }
                 
                 return new AuthenticationUserCreateResult(user);
