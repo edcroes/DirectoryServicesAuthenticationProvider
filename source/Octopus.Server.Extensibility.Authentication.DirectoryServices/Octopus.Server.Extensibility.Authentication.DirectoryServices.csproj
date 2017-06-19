@@ -12,7 +12,7 @@
     <PackageLicenseUrl>https://octopus.com/</PackageLicenseUrl>
     <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
@@ -31,12 +31,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Web\Static\images\directory_services_signin_buttons\microsoft-logo.svg" />
     <EmbeddedResource Include="Web\Static\styles\directoryServices.css" />
+    <EmbeddedResource Include="Web\Static\areas\users\ad_auth_provider.js" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Web\Static\areas\users\controllers\ad_auth_provider_controller.js" />
-    <EmbeddedResource Include="Web\Static\areas\users\directives\ad_auth_provider.js" />
-    <EmbeddedResource Include="Web\Static\areas\users\ad_users_module.js" />
-  </ItemGroup>
+
   <ItemGroup>
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />

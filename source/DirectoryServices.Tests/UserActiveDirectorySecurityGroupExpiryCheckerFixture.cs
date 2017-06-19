@@ -2,6 +2,7 @@
 using NSubstitute;
 using NUnit.Framework;
 using Octopus.Data.Model.User;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Time;
 
@@ -27,60 +28,54 @@ namespace DirectoryServices.Tests
         [Test]
         public void ShouldFetchExternalGroupsIfNotFetched()
         {
-            var user = Substitute.For<IUser>();
-            user.SecurityGroupsLastUpdated.Returns((DateTimeOffset?)null);
+            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
+            Assert.IsTrue(subject.ShouldFetchExternalGroups(identity));
         }
 
         [Test]
         public void ShouldFetchExternalGroupsIfFetchedGreaterThan7DaysAgo()
         {
-            var user = Substitute.For<IUser>();
-            user.SecurityGroupsLastUpdated.Returns(DateTimeOffset.UtcNow.AddDays(-8));
-            user.HasSecurityGroupIds.Returns(true);
+            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
+            identity.SetSecurityGroupIds(new [] { "abc"}, DateTimeOffset.UtcNow.AddDays(-8));
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
+            Assert.IsTrue(subject.ShouldFetchExternalGroups(identity));
         }
 
         [Test]
         public void ShouldFetchExternalGroupsIfGroupsIsEmpty()
         {
-            var user = Substitute.For<IUser>();
-            user.SecurityGroupsLastUpdated.Returns(DateTimeOffset.UtcNow.AddMinutes(-30));
-            user.HasSecurityGroupIds.Returns(false);
+            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
+            identity.SetSecurityGroupIds(new string[0], DateTimeOffset.UtcNow.AddMinutes(-30));
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
+            Assert.IsTrue(subject.ShouldFetchExternalGroups(identity));
         }
 
         [Test]
         public void ShouldNotFetchExternalGroupsIfRecentlyFetched()
         {
-            var user = Substitute.For<IUser>();
-            user.SecurityGroupsLastUpdated.Returns(DateTimeOffset.UtcNow.AddMinutes(-10));
-            user.HasSecurityGroupIds.Returns(true);
+            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
+            identity.SetSecurityGroupIds(new[] { "abc" }, DateTimeOffset.UtcNow.AddMinutes(-10));
 
-            Assert.IsFalse(subject.ShouldFetchExternalGroups(user));
+            Assert.IsFalse(subject.ShouldFetchExternalGroups(identity));
         }
 
         [Test]
         public void ShouldRefreshExternalGroupsIfLastFetchedOverAnHourAgo()
         {
-            var user = Substitute.For<IUser>();
-            user.SecurityGroupsLastUpdated.Returns(DateTimeOffset.UtcNow.AddHours(-2));
-            user.HasSecurityGroupIds.Returns(true);
+            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
+            identity.SetSecurityGroupIds(new[] { "abc" }, DateTimeOffset.UtcNow.AddHours(-2));
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroupsInBackground(user));
+            Assert.IsTrue(subject.ShouldFetchExternalGroupsInBackground(identity));
         }
 
         [Test]
         public void ShoulNotRefreshExternalGroupsIfLastFetchedLessThanAnHourAgo()
         {
-            var user = Substitute.For<IUser>();
-            user.SecurityGroupsLastUpdated.Returns(DateTimeOffset.UtcNow.AddMinutes(-30));
-            user.HasSecurityGroupIds.Returns(true);
+            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
+            identity.SetSecurityGroupIds(new[] { "abc" }, DateTimeOffset.UtcNow.AddMinutes(-30));
 
-            Assert.IsFalse(subject.ShouldFetchExternalGroupsInBackground(user));
+            Assert.IsFalse(subject.ShouldFetchExternalGroupsInBackground(identity));
         }
     }
 }

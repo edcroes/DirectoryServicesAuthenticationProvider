@@ -20,7 +20,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             // The users groups are empty
             return !identity.SecurityGroupsLastUpdated.HasValue ||
                    identity.SecurityGroupsLastUpdated.Value.AddDays(7) < clock.GetUtcTime() ||
-                !identity.SecurityGroups.Any();
+                !identity.SecurityGroupIds.Any();
         }
 
         // It's been an hour since we last refreshed the users groups

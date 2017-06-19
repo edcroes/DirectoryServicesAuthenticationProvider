@@ -58,8 +58,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         return new HashSet<string>();
 
                     var newGroups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-                    identity.SecurityGroups = newGroups;
-                    identity.SecurityGroupsLastUpdated = clock.GetUtcTime();
+                    identity.SetSecurityGroupIds(newGroups, clock.GetUtcTime());
                     
                     user = userStore.UpdateIdentity(user.Id, identity);
                     return newGroups;
@@ -69,7 +68,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     LogWarning(user, identity, ex, "foreground loading");
                 }
             }
-            else if (expiryChecker.ShouldFetchExternalGroupsInBackground(user))
+            else if (expiryChecker.ShouldFetchExternalGroupsInBackground(identity))
             {
                 RefreshMemberExternalSecurityGroups(user, identity);
             }
@@ -86,8 +85,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     if (!result.WasAbleToRetrieveGroups) return;
 
                     var groups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-                    identity.SecurityGroups = groups;
-                    identity.SecurityGroupsLastUpdated = clock.GetUtcTime();
+                    identity.SetSecurityGroupIds(groups, clock.GetUtcTime());
 
                     user = userStore.UpdateIdentity(user.Id, identity);
                 }

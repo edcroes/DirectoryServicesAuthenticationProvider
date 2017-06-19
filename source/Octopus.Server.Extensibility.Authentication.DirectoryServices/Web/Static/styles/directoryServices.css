@@ -1,15 +1,13 @@
-﻿
-.ds-button {
+﻿.ds-button {
     background-color: #ffffff;
+    color: #000000;
     cursor: pointer;
+    border-radius: 2px;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.24), 0 0 1px 0 rgba(0, 0, 0, 0.12);
 }
 
 .ds-button:hover {
     background-color: #eeeeee;
-}
-
-.ds-button a {
-    color: #000000;
 }
 
 .ds-button img {
@@ -21,10 +19,8 @@
 .ds-button div {
     font-weight: 600;
     display: inline-block;
-    color: #000000;
-    float: right;
     text-align: left;
-    width: 200px;
+    width: 160px;
     height: 40px;
     line-height: 40px;
     overflow: hidden;

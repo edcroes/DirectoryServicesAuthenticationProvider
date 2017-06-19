@@ -1,11 +1,17 @@
-﻿using Octopus.Node.Extensibility.Authentication.Extensions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Authentication.Resources;
+using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport
+    public class DirectoryServicesAuthenticationProvider : 
+        IAuthenticationProviderWithGroupSupport,
+        IContributesCSS,
+        IContributesJavascript
     {
         public const string ProviderName = "Active Directory";
         
@@ -24,18 +30,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
         string ChallengeUri => DirectoryServicesConstants.ChallengePath;
 
-        string LinkHtml()
-        {
-            return "<active-directory-auth-provider provider='provider' should-auto-login='shouldAutoLogin' is-submitting='isSubmitting' handle-sign-in-error='handleSignInError'></active-directory-auth-provider>";
-        }
-
         public AuthenticationProviderElement GetAuthenticationProviderElement()
         {
             var authenticationProviderElement = new AuthenticationProviderElement
             {
                 Name = IdentityProviderName,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
-                LinkHtml = LinkHtml()
             };
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, "~" + ChallengeUri);
             return authenticationProviderElement;
@@ -57,6 +57,20 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public string[] GetAuthenticationUrls()
         {
             return new string[0];
+        }
+
+        public IEnumerable<string> GetCSSUris()
+        {
+            return !configurationStore.GetIsEnabled()
+                ? Enumerable.Empty<string>()
+                : new[] { "~/styles/directoryServices.css" };
+        }
+
+        public IEnumerable<string> GetJavascriptUris()
+        {
+            return !configurationStore.GetIsEnabled()
+                ? Enumerable.Empty<string>()
+                : new[] { "~/areas/users/ad_auth_provider.js" };
         }
     }
 }
