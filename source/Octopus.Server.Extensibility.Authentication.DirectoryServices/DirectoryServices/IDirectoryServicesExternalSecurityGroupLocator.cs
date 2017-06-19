@@ -7,6 +7,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
     {
         IList<ExternalSecurityGroup> FindGroups(string name);
 
-        DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string externalId);
+        DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string samAccountName);
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using Octopus.Data.Model.User;
 using Octopus.Time;
 
@@ -12,21 +13,21 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.clock = clock;
         }
 
-        public bool ShouldFetchExternalGroups(IUser user)
+        public bool ShouldFetchExternalGroups(ActiveDirectoryIdentity identity)
         {
             // Users groups hasn't been retrieved yet, or
             // We haven't been able to update the users groups for a week, or
             // The users groups are empty
-            return !user.SecurityGroupsLastUpdated.HasValue ||
-                user.SecurityGroupsLastUpdated.Value.AddDays(7) < clock.GetUtcTime() ||
-                !user.HasSecurityGroupIds;
+            return !identity.SecurityGroupsLastUpdated.HasValue ||
+                   identity.SecurityGroupsLastUpdated.Value.AddDays(7) < clock.GetUtcTime() ||
+                !identity.SecurityGroups.Any();
         }
 
         // It's been an hour since we last refreshed the users groups
-        public bool ShouldFetchExternalGroupsInBackground(IUser user)
+        public bool ShouldFetchExternalGroupsInBackground(ActiveDirectoryIdentity identity)
         {
-            return user.SecurityGroupsLastUpdated.HasValue &&
-                user.SecurityGroupsLastUpdated.Value.AddHours(1) < clock.GetUtcTime();
+            return identity.SecurityGroupsLastUpdated.HasValue &&
+                   identity.SecurityGroupsLastUpdated.Value.AddHours(1) < clock.GetUtcTime();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Security.Principal;
 using Octopus.Node.Extensibility.Authentication.Extensions;
+using Octopus.Node.Extensibility.Authentication.Storage.User;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
@@ -18,10 +18,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.credentialValidator = credentialValidator;
         }
 
-        public AuthenticationUserCreateOrUpdateResult GetOrCreateUser(IPrincipal principal)
+        public AuthenticationUserCreateResult GetOrCreateUser(IPrincipal principal)
         {
             return !configurationStore.GetIsEnabled() ? 
-                new AuthenticationUserCreateOrUpdateResult() : 
+                new AuthenticationUserCreateResult() : 
                 credentialValidator.GetOrCreateUser(principal.Identity.Name);
         }
     }

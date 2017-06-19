@@ -64,27 +64,27 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return results.OrderBy(o => o.DisplayName).ToList();
         }
 
-        public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string externalId)
+        public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string samAccountName)
         {
-            if (externalId == null) throw new ArgumentNullException(nameof(externalId), "The external identity is null indicating we were not able to associate this Octopus User Account with an identifier from Active Directory.");
+            if (samAccountName == null) throw new ArgumentNullException(nameof(samAccountName), "The external identity is null indicating we were not able to associate this Octopus User Account with an identifier from Active Directory.");
 
             if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());
 
-            log.Verbose($"Finding external security groups for '{externalId}'...");
+            log.Verbose($"Finding external security groups for '{samAccountName}'...");
 
             string domain;
-            objectNameNormalizer.NormalizeName(externalId, out externalId, out domain);
+            objectNameNormalizer.NormalizeName(samAccountName, out samAccountName, out domain);
 
             var groups = new List<string>();
 
             using (var context = contextProvider.GetContext(domain))
             {
-                var principal = UserPrincipal.FindByIdentity(context, externalId);
+                var principal = UserPrincipal.FindByIdentity(context, samAccountName);
                 if (principal == null)
                 {
                     var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
-                    log.Trace($"While loading security groups, a principal identifiable by '{externalId}' was not found in '{searchedContext}'");
+                    log.Trace($"While loading security groups, a principal identifiable by '{samAccountName}' was not found in '{searchedContext}'");
                     return new DirectoryServicesExternalSecurityGroupLocatorResult();
                 }
 

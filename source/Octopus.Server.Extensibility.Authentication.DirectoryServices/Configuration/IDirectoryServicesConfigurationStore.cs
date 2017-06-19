@@ -16,5 +16,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
 
         bool GetAreSecurityGroupsEnabled();
         void SetAreSecurityGroupsEnabled(bool areSecurityGroupsEnabled);
+
+        bool GetAllowAutoUserCreation();
+        void SetAllowAutoUserCreation(bool allowAutoUserCreation);
     }
 }
