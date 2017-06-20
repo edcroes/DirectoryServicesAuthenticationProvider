@@ -28,54 +28,55 @@ namespace DirectoryServices.Tests
         [Test]
         public void ShouldFetchExternalGroupsIfNotFetched()
         {
-            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
+            var user = Substitute.For<IUser>();
+            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups());
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroups(identity));
+            Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
         }
 
         [Test]
         public void ShouldFetchExternalGroupsIfFetchedGreaterThan7DaysAgo()
         {
-            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
-            identity.SetSecurityGroupIds(new [] { "abc"}, DateTimeOffset.UtcNow.AddDays(-8));
+            var user = Substitute.For<IUser>();
+            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups{ GroupIds = new []{"abc"}, LastUpdated = DateTimeOffset.UtcNow.AddDays(-8) });
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroups(identity));
+            Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
         }
 
         [Test]
         public void ShouldFetchExternalGroupsIfGroupsIsEmpty()
         {
-            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
-            identity.SetSecurityGroupIds(new string[0], DateTimeOffset.UtcNow.AddMinutes(-30));
+            var user = Substitute.For<IUser>();
+            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new string[0], LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-30) });
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroups(identity));
+            Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
         }
 
         [Test]
         public void ShouldNotFetchExternalGroupsIfRecentlyFetched()
         {
-            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
-            identity.SetSecurityGroupIds(new[] { "abc" }, DateTimeOffset.UtcNow.AddMinutes(-10));
+            var user = Substitute.For<IUser>();
+            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-10) });
 
-            Assert.IsFalse(subject.ShouldFetchExternalGroups(identity));
+            Assert.IsFalse(subject.ShouldFetchExternalGroups(user));
         }
 
         [Test]
         public void ShouldRefreshExternalGroupsIfLastFetchedOverAnHourAgo()
         {
-            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
-            identity.SetSecurityGroupIds(new[] { "abc" }, DateTimeOffset.UtcNow.AddHours(-2));
+            var user = Substitute.For<IUser>();
+            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddHours(-2) });
 
-            Assert.IsTrue(subject.ShouldFetchExternalGroupsInBackground(identity));
+            Assert.IsTrue(subject.ShouldFetchExternalGroupsInBackground(user));
         }
 
         [Test]
         public void ShoulNotRefreshExternalGroupsIfLastFetchedLessThanAnHourAgo()
         {
-            var identity = new ActiveDirectoryIdentity("1", DirectoryServicesAuthenticationProvider.ProviderName, "test@octopus.com", "test@octopus.com", "test");
-            identity.SetSecurityGroupIds(new[] { "abc" }, DateTimeOffset.UtcNow.AddMinutes(-30));
+            var user = Substitute.For<IUser>();
+            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-30) });
 
-            Assert.IsFalse(subject.ShouldFetchExternalGroupsInBackground(identity));
+            Assert.IsFalse(subject.ShouldFetchExternalGroupsInBackground(user));
         }
     }
 }

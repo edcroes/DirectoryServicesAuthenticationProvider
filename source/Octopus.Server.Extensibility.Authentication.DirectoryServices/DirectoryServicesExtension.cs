@@ -44,6 +44,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 .As<IExternalGroupsChecker>()
                 .InstancePerDependency();
 
+            builder.RegisterType<UserLookup>().As<ICanLookupExternalUsers>().InstancePerDependency();
+            
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();

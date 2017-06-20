@@ -49,7 +49,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             // them in the background periodically.  This is to cater for environments where the group
             // membership is managed outside of Octopus Deploy, e.g. Active Directory, and we need to balance
             // performance vs keeping the group list up to date.
-            if (forceRefresh || expiryChecker.ShouldFetchExternalGroups(identity))
+            if (forceRefresh || expiryChecker.ShouldFetchExternalGroups(user))
             {
                 try
                 {
@@ -58,9 +58,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         return new HashSet<string>();
 
                     var newGroups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-                    identity.SetSecurityGroupIds(newGroups, clock.GetUtcTime());
-                    
-                    user = userStore.UpdateIdentity(user.Id, identity);
+                    userStore.SetSecurityGroupIds(DirectoryServicesAuthenticationProvider.ProviderName, user.Id, newGroups, clock.GetUtcTime());
                     return newGroups;
                 }
                 catch (Exception ex)
@@ -68,7 +66,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     LogWarning(user, identity, ex, "foreground loading");
                 }
             }
-            else if (expiryChecker.ShouldFetchExternalGroupsInBackground(identity))
+            else if (expiryChecker.ShouldFetchExternalGroupsInBackground(user))
             {
                 RefreshMemberExternalSecurityGroups(user, identity);
             }
@@ -85,9 +83,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     if (!result.WasAbleToRetrieveGroups) return;
 
                     var groups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-                    identity.SetSecurityGroupIds(groups, clock.GetUtcTime());
-
-                    user = userStore.UpdateIdentity(user.Id, identity);
+                    userStore.SetSecurityGroupIds(DirectoryServicesAuthenticationProvider.ProviderName, user.Id, groups, clock.GetUtcTime());
                 }
                 catch (Exception ex)
                 {

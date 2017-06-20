@@ -4,7 +4,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     public interface IDirectoryServicesUserSecurityGroupExpiryChecker
     {
-        bool ShouldFetchExternalGroups(ActiveDirectoryIdentity identity);
-        bool ShouldFetchExternalGroupsInBackground(ActiveDirectoryIdentity identity);
+        bool ShouldFetchExternalGroups(IUser user);
+        bool ShouldFetchExternalGroupsInBackground(IUser user);
     }
 }
