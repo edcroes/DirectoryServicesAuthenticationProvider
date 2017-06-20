@@ -50,7 +50,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
                 activeDirectoryConfiguration.SetAreSecurityGroupsEnabled(externalSecurityGroupsEnabled);
                 log.Info("Active Directory security groups enabled: " + externalSecurityGroupsEnabled);
             });
-
+            yield return new ConfigureCommandOption("activeDirectoryAllowAutoUserCreation=", "Whether unknown users will be automatically upon successful login.", v =>
+            {
+                var isAllowed = bool.Parse(v);
+                activeDirectoryConfiguration.SetAllowAutoUserCreation(isAllowed);
+                log.Info("Active Directory auto user creation allowed: " + isAllowed);
+            });
         }
 
         public void Handle(string webAuthenticationMode)
