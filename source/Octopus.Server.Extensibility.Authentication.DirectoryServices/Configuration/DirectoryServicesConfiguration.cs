@@ -41,6 +41,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
         /// <summary>
         /// Gets or sets whether user records will be automatically created when someone passes authentication but is unknown.
         /// </summary>
-        public bool AllowAutoUserCreation { get; set; }
+        public bool? AllowAutoUserCreation { get; set; }
     }
 }

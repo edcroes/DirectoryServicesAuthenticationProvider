@@ -130,11 +130,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
         {
             var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId);
             if (doc != null)
-                return doc.AllowAutoUserCreation;
+                return doc.AllowAutoUserCreation.GetValueOrDefault(true);
 
             doc = MoveSettingsToDatabase();
 
-            return doc.AllowAutoUserCreation;
+            return doc.AllowAutoUserCreation.GetValueOrDefault(true);
         }
 
         public void SetAllowAutoUserCreation(bool allowAutoUserCreation)
@@ -187,7 +187,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             yield return new ConfigurationValue("Octopus.WebPortal.AuthenticationScheme", GetAuthenticationScheme().ToString(), GetIsEnabled(), "Authentication Scheme");
             yield return new ConfigurationValue("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", GetAllowFormsAuthenticationForDomainUsers().ToString(), GetIsEnabled(), "Allow forms authentication");
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectorySecurityGroupsEnabled", GetAreSecurityGroupsEnabled().ToString(), GetIsEnabled(), "Security groups enabled");
-            yield return new ConfigurationValue("Octopus.WebPortal.AllowAutoUserCreation", GetIsEnabled().ToString(), GetIsEnabled(), "Allow auto user creation");
+            yield return new ConfigurationValue("Octopus.WebPortal.AllowAutoUserCreation", GetAllowAutoUserCreation().ToString(), GetIsEnabled(), "Allow auto user creation");
         }
     }
 }
