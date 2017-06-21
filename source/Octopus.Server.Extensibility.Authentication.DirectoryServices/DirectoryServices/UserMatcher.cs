@@ -33,9 +33,20 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             using (var context = contextProvider.GetContext(domain))
             {
+                var userPrincipal = new UserPrincipal(context);
+
+                if (normalisedName.Contains("@"))
+                {
+                    userPrincipal.UserPrincipalName = normalisedName;
+                }
+                else
+                {
+                    userPrincipal.SamAccountName = normalisedName;
+                }
+                
                 var searcher = new PrincipalSearcher
                 {
-                    QueryFilter = new UserPrincipal(context) { Name = normalisedName }
+                    QueryFilter = userPrincipal
                 };
 
                 var users = searcher.FindAll();
@@ -43,9 +54,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     return null;
                 
                 return users
-                    .Select(u => new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, "", u.UserPrincipalName, u.SamAccountName))
+                    .Select(u => new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, "", u.UserPrincipalName, ConvertSamAccountName(u, domain)))
                     .First();
             }
+        }
+
+        static string ConvertSamAccountName(Principal u, string domain)
+        {
+            return !string.IsNullOrWhiteSpace(domain) ? $"{domain}\\{u.SamAccountName}" : u.SamAccountName;
         }
     }
 }
