@@ -45,6 +45,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 .InstancePerDependency();
 
             builder.RegisterType<UserLookup>().As<ICanLookupExternalUsers>().InstancePerDependency();
+            builder.RegisterType<UserMatcher>().As<ICanMatchExternalUser>().InstancePerDependency();
             
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();
 
