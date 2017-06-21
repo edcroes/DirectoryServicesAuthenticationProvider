@@ -8,7 +8,7 @@ function directoryServicesAuthProvider(octopusClient, provider, redirectAfterLog
     this.signIn = function () {
         console.log("Signing in using " + providerName + " provider");
 
-        var authUri = provider.Links.Authenticate;
+        var authUri = octopusClient.resolve(provider.Links.Authenticate);
         if (redirectAfterLoginToLink) {
             authUri += "?redirectTo=" + redirectAfterLoginToLink;
         } else {
