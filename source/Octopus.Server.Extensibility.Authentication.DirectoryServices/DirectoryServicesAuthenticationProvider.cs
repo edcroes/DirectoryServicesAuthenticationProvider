@@ -35,6 +35,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             var authenticationProviderElement = new AuthenticationProviderElement
             {
                 Name = IdentityProviderName,
+                IdentityType = IdentityType.ActiveDirectory,
                 FormsLoginEnabled = configurationStore.GetAllowFormsAuthenticationForDomainUsers(),
             };
             authenticationProviderElement.Links.Add(AuthenticationProviderElement.AuthenticateLinkName, "~" + ChallengeUri);
