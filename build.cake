@@ -66,10 +66,14 @@ Task("__Clean")
 });
 
 Task("__Restore")
-    .Does(() => DotNetCoreRestore("source", new DotNetCoreRestoreSettings
-    {
-        ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
-    }));
+    .Does(() => {
+        DotNetCoreRestore("source", new DotNetCoreRestoreSettings
+        {
+            ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
+        });
+        
+        NuGetRestore("./source/DirectoryServicesAuthenticationProvider.sln");
+    });
 	
 Task("__Build")
     .Does(() =>
