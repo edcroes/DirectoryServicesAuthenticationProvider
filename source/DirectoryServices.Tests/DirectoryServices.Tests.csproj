@@ -10,6 +10,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Octopus.Server.Extensibility.Authentication.DirectoryServices\Octopus.Server.Extensibility.Authentication.DirectoryServices.csproj" />
+    <ProjectReference Include="..\Server\Server.csproj" />
   </ItemGroup>
 </Project>

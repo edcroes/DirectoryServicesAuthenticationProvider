@@ -36,7 +36,7 @@ Setup(context =>
     if(BuildSystem.IsRunningOnTeamCity)
         BuildSystem.TeamCity.SetBuildNumber(gitVersionInfo.NuGetVersion);
 
-    Information("Building Octopus.Server.Extensibility.Authentication.DirectoryServices v{0}", nugetVersion);
+    Information("Building Octopus Authentication DirectoryServices v{0}", nugetVersion);
 });
 
 Teardown(context =>

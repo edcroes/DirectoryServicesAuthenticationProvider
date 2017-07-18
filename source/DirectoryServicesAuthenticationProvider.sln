@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26606.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8BCB3C81-61D2-454F-A11C-992D8D3ED31E}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,9 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Solution Items\VersionInfo.cs = Solution Items\VersionInfo.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Octopus.Server.Extensibility.Authentication.DirectoryServices", "Octopus.Server.Extensibility.Authentication.DirectoryServices\Octopus.Server.Extensibility.Authentication.DirectoryServices.csproj", "{E56C6DA0-19E3-4DB2-A31B-13E45699D86B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{E56C6DA0-19E3-4DB2-A31B-13E45699D86B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryServices.Tests", "DirectoryServices.Tests\DirectoryServices.Tests.csproj", "{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirectoryServices.Tests", "DirectoryServices.Tests\DirectoryServices.Tests.csproj", "{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Node", "Node\Node.csproj", "{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

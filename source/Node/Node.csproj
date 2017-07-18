@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Octopus.Node.Extensibility.Authentication.DirectoryServices</RootNamespace>
+    <AssemblyName>Octopus.Node.Extensibility.Authentication.DirectoryServices</AssemblyName>
+    <Description>Implements the DirectoryServices authentication provider.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Authors>Octopus Deploy</Authors>
+    <PackageId>Octopus.Node.Extensibility.Authentication.DirectoryServices</PackageId>
+    <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
+    <PackageLicenseUrl>https://octopus.com/</PackageLicenseUrl>
+    <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.DirectoryServices" Version="4.5.0-preview2-25504-01" />
+  </ItemGroup>
+
+</Project>
