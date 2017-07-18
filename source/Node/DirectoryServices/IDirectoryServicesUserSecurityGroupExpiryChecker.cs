@@ -1,6 +1,6 @@
 using Octopus.Data.Model.User;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public interface IDirectoryServicesUserSecurityGroupExpiryChecker
     {

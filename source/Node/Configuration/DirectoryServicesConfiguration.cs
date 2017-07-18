@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
 {
     public class DirectoryServicesConfiguration : ExtensionConfigurationDocument
     {

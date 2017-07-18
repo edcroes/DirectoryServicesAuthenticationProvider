@@ -1,9 +1,9 @@
 ﻿using System.Security.Principal;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Authentication.Storage.User;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesUserCreationFromPrincipal : ISupportsAutoUserCreationFromPrincipal
     {

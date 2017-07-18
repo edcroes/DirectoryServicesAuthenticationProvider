@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Diagnostics;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Authentication.HostServices;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Time;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesGroupsChecker : IExternalGroupsChecker
     {
@@ -58,7 +58,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         return new HashSet<string>();
 
                     var newGroups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-                    userStore.SetSecurityGroupIds(DirectoryServicesAuthenticationProvider.ProviderName, user.Id, newGroups, clock.GetUtcTime());
+                    userStore.SetSecurityGroupIds(DirectoryServicesAuthentication.ProviderName, user.Id, newGroups, clock.GetUtcTime());
                     return newGroups;
                 }
                 catch (Exception ex)
@@ -83,7 +83,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     if (!result.WasAbleToRetrieveGroups) return;
 
                     var groups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-                    userStore.SetSecurityGroupIds(DirectoryServicesAuthenticationProvider.ProviderName, user.Id, groups, clock.GetUtcTime());
+                    userStore.SetSecurityGroupIds(DirectoryServicesAuthentication.ProviderName, user.Id, groups, clock.GetUtcTime());
                 }
                 catch (Exception ex)
                 {

@@ -1,10 +1,10 @@
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using Octopus.Data.Model.User;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Node.Extensibility.Authentication.Extensions;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class UserMatcher : ICanMatchExternalUser
     {
@@ -54,7 +54,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     return null;
                 
                 return users
-                    .Select(u => new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, "", u.UserPrincipalName, ConvertSamAccountName(u, domain)))
+                    .Select(u => new ActiveDirectoryIdentity(DirectoryServicesAuthentication.ProviderName, "", u.UserPrincipalName, ConvertSamAccountName(u, domain)))
                     .First();
             }
         }

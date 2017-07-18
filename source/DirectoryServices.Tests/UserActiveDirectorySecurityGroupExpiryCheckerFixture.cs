@@ -2,8 +2,8 @@
 using NSubstitute;
 using NUnit.Framework;
 using Octopus.Data.Model.User;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Time;
 
 namespace DirectoryServices.Tests
@@ -29,7 +29,7 @@ namespace DirectoryServices.Tests
         public void ShouldFetchExternalGroupsIfNotFetched()
         {
             var user = Substitute.For<IUser>();
-            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups());
+            user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName).Returns(new SecurityGroups());
 
             Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
         }
@@ -38,7 +38,7 @@ namespace DirectoryServices.Tests
         public void ShouldFetchExternalGroupsIfFetchedGreaterThan7DaysAgo()
         {
             var user = Substitute.For<IUser>();
-            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups{ GroupIds = new []{"abc"}, LastUpdated = DateTimeOffset.UtcNow.AddDays(-8) });
+            user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName).Returns(new SecurityGroups{ GroupIds = new []{"abc"}, LastUpdated = DateTimeOffset.UtcNow.AddDays(-8) });
 
             Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
         }
@@ -47,7 +47,7 @@ namespace DirectoryServices.Tests
         public void ShouldFetchExternalGroupsIfGroupsIsEmpty()
         {
             var user = Substitute.For<IUser>();
-            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new string[0], LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-30) });
+            user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName).Returns(new SecurityGroups { GroupIds = new string[0], LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-30) });
 
             Assert.IsTrue(subject.ShouldFetchExternalGroups(user));
         }
@@ -56,7 +56,7 @@ namespace DirectoryServices.Tests
         public void ShouldNotFetchExternalGroupsIfRecentlyFetched()
         {
             var user = Substitute.For<IUser>();
-            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-10) });
+            user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-10) });
 
             Assert.IsFalse(subject.ShouldFetchExternalGroups(user));
         }
@@ -65,7 +65,7 @@ namespace DirectoryServices.Tests
         public void ShouldRefreshExternalGroupsIfLastFetchedOverAnHourAgo()
         {
             var user = Substitute.For<IUser>();
-            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddHours(-2) });
+            user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddHours(-2) });
 
             Assert.IsTrue(subject.ShouldFetchExternalGroupsInBackground(user));
         }
@@ -74,7 +74,7 @@ namespace DirectoryServices.Tests
         public void ShoulNotRefreshExternalGroupsIfLastFetchedLessThanAnHourAgo()
         {
             var user = Substitute.For<IUser>();
-            user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-30) });
+            user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName).Returns(new SecurityGroups { GroupIds = new[] { "abc" }, LastUpdated = DateTimeOffset.UtcNow.AddMinutes(-30) });
 
             Assert.IsFalse(subject.ShouldFetchExternalGroupsInBackground(user));
         }

@@ -2,7 +2,7 @@ using System.Linq;
 using Octopus.Data.Model.User;
 using Octopus.Time;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesUserSecurityGroupExpiryChecker : IDirectoryServicesUserSecurityGroupExpiryChecker
     {
@@ -15,7 +15,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public bool ShouldFetchExternalGroups(IUser user)
         {
-            var groups = user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName);
+            var groups = user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName);
 
             if (groups == null)
                 return false;
@@ -31,7 +31,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         // It's been an hour since we last refreshed the users groups
         public bool ShouldFetchExternalGroupsInBackground(IUser user)
         {
-            var groups = user.GetSecurityGroups(DirectoryServicesAuthenticationProvider.ProviderName);
+            var groups = user.GetSecurityGroups(DirectoryServicesAuthentication.ProviderName);
 
             if (groups == null)
                 return false;

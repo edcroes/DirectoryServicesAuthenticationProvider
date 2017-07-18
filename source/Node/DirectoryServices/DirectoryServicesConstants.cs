@@ -1,4 +1,4 @@
-﻿namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
+﻿namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesConstants
     {

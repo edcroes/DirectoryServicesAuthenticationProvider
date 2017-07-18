@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Authentication.Resources;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
@@ -13,8 +14,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         IContributesCSS,
         IContributesJavascript
     {
-        public const string ProviderName = "Active Directory";
-        
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesAuthenticationProvider(IDirectoryServicesConfigurationStore configurationStore)
@@ -22,7 +21,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             this.configurationStore = configurationStore;
         }
 
-        public string IdentityProviderName => ProviderName;
+        public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
 
         public bool IsEnabled => configurationStore.GetIsEnabled();
 

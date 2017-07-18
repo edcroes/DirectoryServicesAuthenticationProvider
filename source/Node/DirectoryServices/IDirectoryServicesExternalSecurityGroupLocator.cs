@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Octopus.Node.Extensibility.Authentication.HostServices;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public interface IDirectoryServicesExternalSecurityGroupLocator
     {

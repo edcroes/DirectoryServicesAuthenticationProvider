@@ -93,7 +93,8 @@ Task("__Pack")
         CreateDirectory(odNugetPackDir);
         CopyFileToDirectory(Path.Combine(assetDir, nuspecFile), odNugetPackDir);
 
-        CopyFileToDirectory(solutionDir + "Octopus.Server.Extensibility.Authentication.DirectoryServices" + bin451 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
+        CopyFileToDirectory(solutionDir + "Server" + bin451 + "Octopus.Node.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
+        CopyFileToDirectory(solutionDir + "Server" + bin451 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
 
         NuGetPack(Path.Combine(odNugetPackDir, nuspecFile), new NuGetPackSettings {
             Version = nugetVersion,

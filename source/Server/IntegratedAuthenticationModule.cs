@@ -1,9 +1,9 @@
 using Nancy;
 using Nancy.Responses;
 using Octopus.Diagnostics;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.HostServices;
 using Octopus.Node.Extensibility.HostServices.Web;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 

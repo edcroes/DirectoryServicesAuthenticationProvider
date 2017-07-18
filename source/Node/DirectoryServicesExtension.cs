@@ -1,19 +1,17 @@
 ﻿using Autofac;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Extensions;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
-using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
 using Octopus.Node.Extensibility.HostServices.Web;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.Web;
 
-namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
+namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
 {
     [OctopusPlugin("Directory Services", "Octopus Deploy")]
     public class DirectoryServicesExtension : IOctopusExtension
     {
-        public void Load(ContainerBuilder builder)
+        public virtual void Load(ContainerBuilder builder)
         {
             builder.RegisterType<DirectoryServicesConfigurationMapping>().As<IConfigurationDocumentMapper>().InstancePerDependency();
 
@@ -21,10 +19,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 .As<IDirectoryServicesConfigurationStore>()
                 .As<IAuthenticationSchemeProvider>()
                 .As<IHasConfigurationSettings>()
-                .InstancePerDependency();
-            builder.RegisterType<DirectoryServicesConfigureCommands>()
-                .As<IContributeToConfigureCommand>()
-                .As<IHandleLegacyWebAuthenticationModeConfigurationCommand>()
                 .InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesUserCreationFromPrincipal>().As<ISupportsAutoUserCreationFromPrincipal>().InstancePerDependency();
@@ -46,20 +40,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
             builder.RegisterType<UserLookup>().As<ICanLookupExternalUsers>().InstancePerDependency();
             builder.RegisterType<UserMatcher>().As<ICanMatchExternalUser>().InstancePerDependency();
-            
+
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();
-
-            builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();
-
-            builder.RegisterType<ListSecurityGroupsAction>().AsSelf().InstancePerDependency();
-
-            builder.RegisterType<DirectoryServicesAuthenticationProvider>()
-                .As<IAuthenticationProvider>()
-                .As<IAuthenticationProviderWithGroupSupport>()
-                .As<IContributesCSS>()
-                .As<IContributesJavascript>()
-                .AsSelf()
-                .InstancePerDependency();
         }
     }
 }
