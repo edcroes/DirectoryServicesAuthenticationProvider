@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices</RootNamespace>
+    <AssemblyName>Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices</AssemblyName>
+    <Description>Implements the DirectoryServices authentication provider.</Description>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Authors>Octopus Deploy</Authors>
+    <PackageId>Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices</PackageId>
+    <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
+    <PackageLicenseUrl>https://octopus.com/</PackageLicenseUrl>
+    <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Web\Static\**\*.js" />
+    <EmbeddedResource Include="Web\Static\**\*.svg" />
+    <EmbeddedResource Include="Web\Static\**\*.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Node\Node.csproj" />
+  </ItemGroup>
+
+</Project>

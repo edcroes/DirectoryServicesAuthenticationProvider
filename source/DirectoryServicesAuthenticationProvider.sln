@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirectoryServices.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Node", "Node\Node.csproj", "{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataCenterManager", "DataCenterManager\DataCenterManager.csproj", "{49EEE633-4CCE-438E-B206-DD4B5FAD8346}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49EEE633-4CCE-438E-B206-DD4B5FAD8346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49EEE633-4CCE-438E-B206-DD4B5FAD8346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49EEE633-4CCE-438E-B206-DD4B5FAD8346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49EEE633-4CCE-438E-B206-DD4B5FAD8346}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

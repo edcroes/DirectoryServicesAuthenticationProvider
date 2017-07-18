@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.Extensions;
-using Octopus.Node.Extensibility.Extensions;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
@@ -9,7 +8,6 @@ using Octopus.Server.Extensibility.Authentication.DirectoryServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    [OctopusPlugin("Directory Services", "Octopus Deploy")]
     public class ServerDirectoryServicesExtension : DirectoryServicesExtension
     {
         public override void Load(ContainerBuilder builder)
