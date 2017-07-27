@@ -24,4 +24,13 @@
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0-preview2-25517-02" />
   </ItemGroup>
 
+  <Target Name="AfterBuildNetStd" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <Message Text="after build step for $(TargetFramework)" Importance="High" />
+    <Exec Command="xcopy $(OutputPath)*DirectoryServices.* C:\Octopus\DataCenterManager\CustomExtensions /S /Y /I /D" />
+  </Target>
+  <Target Name="AfterBuildNet451" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net451'">
+    <Message Text="after build step for $(TargetFramework)" Importance="High" />
+    <Exec Command="xcopy $(OutputPath)*DirectoryServices.* C:\ProgramData\Octopus\CustomExtensions /S /Y /I /D" />
+  </Target>
+
 </Project>

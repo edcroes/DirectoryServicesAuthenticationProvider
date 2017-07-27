@@ -11,6 +11,9 @@
     <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
     <PackageLicenseUrl>https://octopus.com/</PackageLicenseUrl>
     <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
+    <PostBuildEvent>
+      xcopy "$(TargetDir)Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices.*" "C:\Octopus\DataCenterManager\CustomExtensions" /S /Y /I /D
+    </PostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>

@@ -21,6 +21,7 @@ var localPackagesDir = "../LocalPackages";
 var artifactsDir = "./artifacts";
 var assetDir = "./BuildAssets";
 var bin451 = "/bin/Release/net451/";
+var std20 = "/bin/Release/netstandard2.0/";
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
     OutputType = GitVersionOutput.Json
@@ -93,25 +94,32 @@ Task("__Pack")
         CreateDirectory(odNugetPackDir);
         CopyFileToDirectory(Path.Combine(assetDir, nuspecFile), odNugetPackDir);
 
-        CopyFileToDirectory(solutionDir + "Server" + bin451 + "Octopus.Node.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
-        CopyFileToDirectory(solutionDir + "Server" + bin451 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
-
+        var files = new [] {
+            solutionDir + "Server" + bin451 + "Octopus.Node.Extensibility.Authentication.DirectoryServices.dll",
+            solutionDir + "Server" + bin451 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll"
+        };
+        Zip("./", Path.Combine(odNugetPackDir, "DirectoryServices.zip"), files);
+        
         NuGetPack(Path.Combine(odNugetPackDir, nuspecFile), new NuGetPackSettings {
             Version = nugetVersion,
             OutputDirectory = artifactsDir
         });
         
         var dcmNugetPackDir = Path.Combine(publishDir, "dcm");
-		DotNetCorePack("source", new DotNetCorePackSettings
-        {
-            Configuration = configuration,
-            OutputDirectory = dcmNugetPackDir,
-            NoBuild = true,
-            ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
-        });
+        var dcmNuspecFile = "Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices.nuspec";
+        CreateDirectory(dcmNugetPackDir);
+        CopyFileToDirectory(Path.Combine(assetDir, dcmNuspecFile), dcmNugetPackDir);
 
-        CopyFileToDirectory(Path.Combine(dcmNugetPackDir, $"Octopus.Node.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg"), artifactsDir);
-        CopyFileToDirectory(Path.Combine(dcmNugetPackDir, $"Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg"), artifactsDir);
+        files = new [] {
+            solutionDir + "DataCenterManager" + std20 + "Octopus.Node.Extensibility.Authentication.DirectoryServices.dll",
+            solutionDir + "DataCenterManager" + std20 + "Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices.dll"
+        };
+        Zip("./", Path.Combine(dcmNugetPackDir, "DirectoryServices.zip"), files);
+        
+        NuGetPack(Path.Combine(dcmNugetPackDir, dcmNuspecFile), new NuGetPackSettings {
+            Version = nugetVersion,
+            OutputDirectory = artifactsDir
+        });
 });
 
 Task("__Publish")
@@ -119,10 +127,6 @@ Task("__Publish")
     .Does(() =>
 {
     NuGetPush($"{artifactsDir}/Octopus.Server.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg", new NuGetPushSettings {
-        Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
-        ApiKey = EnvironmentVariable("MyGetApiKey")
-    });
-    NuGetPush($"{artifactsDir}/Octopus.Node.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg", new NuGetPushSettings {
         Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
         ApiKey = EnvironmentVariable("MyGetApiKey")
     });
@@ -134,10 +138,6 @@ Task("__Publish")
     if (gitVersionInfo.PreReleaseLabel == "")
     {
         NuGetPush($"{artifactsDir}/Octopus.Server.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg", new NuGetPushSettings {
-            Source = "https://www.nuget.org/api/v2/package",
-            ApiKey = EnvironmentVariable("NuGetApiKey")
-        });
-        NuGetPush($"{artifactsDir}/Octopus.Node.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg", new NuGetPushSettings {
             Source = "https://www.nuget.org/api/v2/package",
             ApiKey = EnvironmentVariable("NuGetApiKey")
         });
@@ -157,7 +157,6 @@ Task("__CopyToLocalPackages")
     CreateDirectory(localPackagesDir);
     CopyFileToDirectory(Path.Combine(artifactsDir, $"Octopus.Server.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg"), localPackagesDir);
 
-    CopyFileToDirectory(Path.Combine(artifactsDir, $"Octopus.Node.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg"), localPackagesDir);
     CopyFileToDirectory(Path.Combine(artifactsDir, $"Octopus.DataCenterManager.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg"), localPackagesDir);
 });
 
