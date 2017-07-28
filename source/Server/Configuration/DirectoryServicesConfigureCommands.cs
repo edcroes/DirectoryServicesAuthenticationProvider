@@ -54,7 +54,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             yield return new ConfigureCommandOption("activeDirectoryAllowAutoUserCreation=", "Whether unknown users will be automatically upon successful login.", v =>
             {
                 var isAllowed = bool.Parse(v);
-                activeDirectoryConfiguration.SetAllowAutoUserCreation(isAllowed);
+                activeDirectoryConfiguration.Value.SetAllowAutoUserCreation(isAllowed);
                 log.Info("Active Directory auto user creation allowed: " + isAllowed);
             });
         }
