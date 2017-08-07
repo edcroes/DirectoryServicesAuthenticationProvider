@@ -38,10 +38,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 .As<IDoesBasicAuthentication>()
                 .InstancePerDependency();
 
-            builder.RegisterType<DirectoryServicesUserSecurityGroupExpiryChecker>().As<IDirectoryServicesUserSecurityGroupExpiryChecker>().InstancePerDependency();
-
-            builder.RegisterType<DirectoryServicesGroupsChecker>()
-                .As<IExternalGroupsChecker>()
+            builder.RegisterType<GroupRetriever>()
+                .As<IExternalGroupRetriever>()
                 .InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();

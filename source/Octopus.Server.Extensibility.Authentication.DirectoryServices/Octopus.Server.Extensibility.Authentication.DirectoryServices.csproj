@@ -73,9 +73,8 @@
       <HintPath>..\packages\Octopus.Server.Extensibility.2.0.0\lib\net45\Octopus.Server.Extensibility.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octopus.Server.Extensibility.Authentication, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.3.0.0\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Octopus.Server.Extensibility.Authentication, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.3.0.1-enh-extsecgrpsch0001\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
     </Reference>
     <Reference Include="Octopus.Time, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octopus.Time.1.0.8\lib\netstandard1.0\Octopus.Time.dll</HintPath>
@@ -113,13 +112,11 @@
     <Compile Include="DirectoryServices\DirectoryServicesCredentialValidator.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesExternalSecurityGroupLocator.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesExternalSecurityGroupLocatorResult.cs" />
-    <Compile Include="DirectoryServices\DirectoryServicesGroupsChecker.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesHomeLinksContributor.cs" />
     <Compile Include="DirectoryServices\DirectoryServicesUserCreationFromPrincipal.cs" />
-    <Compile Include="DirectoryServices\DirectoryServicesUserSecurityGroupExpiryChecker.cs" />
+    <Compile Include="DirectoryServices\GroupRetriever.cs" />
     <Compile Include="DirectoryServices\IDirectoryServicesCredentialValidator.cs" />
     <Compile Include="DirectoryServices\IDirectoryServicesExternalSecurityGroupLocator.cs" />
-    <Compile Include="DirectoryServices\IDirectoryServicesUserSecurityGroupExpiryChecker.cs" />
     <Compile Include="IntegratedAuthenticationModule.cs" />
     <Compile Include="DirectoryServicesExtension.cs" />
     <Compile Include="Configuration\DirectoryServicesConfigurationMapping.cs" />

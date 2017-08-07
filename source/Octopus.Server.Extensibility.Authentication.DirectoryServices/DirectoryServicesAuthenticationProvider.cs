@@ -7,6 +7,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
     public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport
     {
+        public const string ProviderName = "Active Directory";
+
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesAuthenticationProvider(IDirectoryServicesConfigurationStore configurationStore)
@@ -14,7 +16,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             this.configurationStore = configurationStore;
         }
 
-        public string IdentityProviderName => "Active Directory";
+        public string IdentityProviderName => ProviderName;
 
         public bool IsEnabled => configurationStore.GetIsEnabled();
 
