@@ -146,8 +146,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 null,
                 true,
                 null,
-                false,
-                new string[0]));
+                false));
         }
 
 
