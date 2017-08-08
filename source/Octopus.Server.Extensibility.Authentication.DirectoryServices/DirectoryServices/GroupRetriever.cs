@@ -18,17 +18,17 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.groupLocator = groupLocator;
         }
 
-        public IEnumerable<ExternalGroupResult> Read(IUser user)
+        public ExternalGroupResult Read(IUser user)
         {
             if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled() || string.IsNullOrWhiteSpace(user.ExternalId))
-                return new ExternalGroupResult[] {};
-
+                return null;
+            
             var result = groupLocator.GetGroupIdsForUser(user.ExternalId);
             if (!result.WasAbleToRetrieveGroups)
-                return new ExternalGroupResult[] {};
+                return null;
 
             var newGroups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-            return newGroups.Select(g => new ExternalGroupResult { ProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupId = g }).ToArray();
+            return new ExternalGroupResult { ProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = newGroups.Select(g => g).ToArray() };
         }
     }
 }

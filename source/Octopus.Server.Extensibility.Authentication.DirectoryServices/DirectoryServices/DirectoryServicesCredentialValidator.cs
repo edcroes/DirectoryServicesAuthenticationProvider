@@ -144,8 +144,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 emailAddress,
                 externalId,
                 null,
-                true,
-                null,
                 false));
         }
 
