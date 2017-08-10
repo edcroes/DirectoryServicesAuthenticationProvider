@@ -1,3 +1,4 @@
+using System.Threading;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Authentication.Storage.User;
 
@@ -5,6 +6,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     public interface IDirectoryServicesCredentialValidator : IDoesBasicAuthentication
     {
-        AuthenticationUserCreateOrUpdateResult GetOrCreateUser(string username);
+        AuthenticationUserCreateOrUpdateResult GetOrCreateUser(string username, CancellationToken cancellationToken);
     }
 }

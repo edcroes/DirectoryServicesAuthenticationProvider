@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.Extensions;
@@ -18,12 +19,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.groupLocator = groupLocator;
         }
 
-        public ExternalGroupResult Read(IUser user)
+        public ExternalGroupResult Read(IUser user, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled() || string.IsNullOrWhiteSpace(user.ExternalId))
                 return null;
             
-            var result = groupLocator.GetGroupIdsForUser(user.ExternalId);
+            var result = groupLocator.GetGroupIdsForUser(user.ExternalId, cancellationToken);
             if (!result.WasAbleToRetrieveGroups)
                 return null;
 

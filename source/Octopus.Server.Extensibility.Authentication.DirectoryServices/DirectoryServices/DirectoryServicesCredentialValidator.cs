@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Runtime.InteropServices;
+using System.Threading;
+using Octopus.Data.Model.User;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
@@ -47,7 +49,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public int Priority => 100;
 
-        public AuthenticationUserCreateOrUpdateResult ValidateCredentials(string username, string password)
+        public AuthenticationUserCreateOrUpdateResult ValidateCredentials(string username, string password, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() || 
                 !configurationStore.GetAllowFormsAuthenticationForDomainUsers())
@@ -98,11 +100,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
                 log.Verbose($"Credentials for '{username}' validated, mapped to principal '{principal.UserPrincipalName ?? ("(NTAccount)" + principal.Name)}'");
 
-                return GetOrCreateUser(principal, username, domain);
+                return GetOrCreateUser(principal, username, domain, cancellationToken);
             }
         }
 
-        public AuthenticationUserCreateOrUpdateResult GetOrCreateUser(string username)
+        public AuthenticationUserCreateOrUpdateResult GetOrCreateUser(string username, CancellationToken cancellationToken)
         {
             string domain;
             objectNameNormalizer.NormalizeName(username, out username, out domain);
@@ -116,11 +118,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     throw new ArgumentException($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
                 }
 
-                return GetOrCreateUser(principal, username, domain ?? Environment.UserDomainName);
+                return GetOrCreateUser(principal, username, domain ?? Environment.UserDomainName, cancellationToken);
             }
         }
 
-        AuthenticationUserCreateOrUpdateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain)
+        AuthenticationUserCreateOrUpdateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain, CancellationToken cancellationToken)
         {
             var username = objectNameNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
 
@@ -142,9 +144,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 username,
                 displayName,
                 emailAddress,
-                externalId,
                 null,
-                false));
+                false,
+                new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, emailAddress, principal.UserPrincipalName, principal.SamAccountName), 
+                cancellationToken));
         }
 
 
