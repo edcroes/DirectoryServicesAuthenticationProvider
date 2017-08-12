@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Octopus.Data.Model.User;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 
@@ -10,21 +11,33 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     public class GroupRetriever : IExternalGroupRetriever
     {
+        readonly ILog log;
         readonly IDirectoryServicesConfigurationStore configurationStore;
         readonly IDirectoryServicesExternalSecurityGroupLocator groupLocator;
 
-        public GroupRetriever(IDirectoryServicesConfigurationStore configurationStore, IDirectoryServicesExternalSecurityGroupLocator groupLocator)
+        public GroupRetriever(
+            ILog log,
+            IDirectoryServicesConfigurationStore configurationStore, 
+            IDirectoryServicesExternalSecurityGroupLocator groupLocator)
         {
+            this.log = log;
             this.configurationStore = configurationStore;
             this.groupLocator = groupLocator;
         }
 
         public ExternalGroupResult Read(IUser user, CancellationToken cancellationToken)
         {
-            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled() || string.IsNullOrWhiteSpace(user.ExternalId))
+            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled() || user.Username == User.GuestLogin || !user.Identities.OfType<ActiveDirectoryIdentity>().Any())
                 return null;
+
+            if (user.Identities.OfType<ActiveDirectoryIdentity>().Count() > 1)
+            {
+                log.WarnFormat("User with username {0} has multiple AD identities, only the first will be used for retrieving groups", user.Username);
+            }
+
+            var ad = user.Identities.OfType<ActiveDirectoryIdentity>().First();
             
-            var result = groupLocator.GetGroupIdsForUser(user.ExternalId, cancellationToken);
+            var result = groupLocator.GetGroupIdsForUser(ad.SamAccountName, cancellationToken);
             if (!result.WasAbleToRetrieveGroups)
                 return null;
 

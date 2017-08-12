@@ -61,7 +61,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Octopus.Data, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octopus.Data.2.0.0-enh-extsecgrpsch0017\lib\netstandard1.0\Octopus.Data.dll</HintPath>
+      <HintPath>..\packages\Octopus.Data.2.0.0-enh-extsecgrpsch0019\lib\netstandard1.0\Octopus.Data.dll</HintPath>
     </Reference>
     <Reference Include="Octopus.Diagnostics, Version=1.0.11.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octopus.Diagnostics.1.0.11\lib\netstandard1.0\Octopus.Diagnostics.dll</HintPath>
@@ -72,7 +72,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Octopus.Server.Extensibility.Authentication, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.4.0.0-enh-extsecgrpsch0010\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
+      <HintPath>..\packages\Octopus.Server.Extensibility.Authentication.4.0.0-enh-extsecgrpsch0012\lib\net45\Octopus.Server.Extensibility.Authentication.dll</HintPath>
     </Reference>
     <Reference Include="Octopus.Time, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octopus.Time.1.0.8\lib\netstandard1.0\Octopus.Time.dll</HintPath>
