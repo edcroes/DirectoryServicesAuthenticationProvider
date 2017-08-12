@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Octopus.Data.Model.User;
-using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.HostServices;
@@ -142,7 +141,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 log.Error($"We couldn't find a valid external identity to use for the Active Directory user '{displayName}' with email address '{emailAddress}' for the Octopus User Account named '{userPrincipalName}'. Octopus uses the samAccountName (pre-Windows 2000 Logon Name) as the external identity for Active Directory users. Please make sure this user has a valid samAccountName and try again. Learn more about troubleshooting Active Directory authentication at http://g.octopushq.com/TroubleshootingAD");
             }
 
-            var user = userStore.GetByIdentity(new ActiveDirectoryIdentityToMatch(DirectoryServicesAuthenticationProvider.ProviderName, emailAddress, userPrincipalName, samAccountName));
+            var user = userStore.GetByIdentity(new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, emailAddress, userPrincipalName, samAccountName));
 
             if (user != null)
             {
