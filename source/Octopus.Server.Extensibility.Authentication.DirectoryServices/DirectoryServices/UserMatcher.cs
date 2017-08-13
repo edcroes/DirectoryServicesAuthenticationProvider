@@ -50,7 +50,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 };
 
                 var users = searcher.FindAll();
-                if (users.Count() > 1)
+                if (!users.Any() || users.Count() > 1)
                     return null;
 
                 return users
