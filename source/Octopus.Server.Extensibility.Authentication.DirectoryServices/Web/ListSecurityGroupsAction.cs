@@ -27,9 +27,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             if (string.IsNullOrWhiteSpace(name))
                 return responseCreator.BadRequest("Please provide the name of a group to search by, or a team");
 
-            using (var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
+            using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
             {
-                return responseCreator.AsOctopusJson(response, SearchByName(name, cancellationToken.Token));
+                return responseCreator.AsOctopusJson(response, SearchByName(name, cts.Token));
             }
         }
 
