@@ -2,6 +2,7 @@ using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using Octopus.Data.Model.User;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -11,15 +12,18 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesConfigurationStore configurationStore;
+        readonly IIdentityCreator identityCreator;
 
         public UserMatcher(
             IDirectoryServicesContextProvider contextProvider,
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
-            IDirectoryServicesConfigurationStore configurationStore)
+            IDirectoryServicesConfigurationStore configurationStore,
+            IIdentityCreator identityCreator)
         {
             this.contextProvider = contextProvider;
             this.objectNameNormalizer = objectNameNormalizer;
             this.configurationStore = configurationStore;
+            this.identityCreator = identityCreator;
         }
 
         public Identity Match(string name)
@@ -54,7 +58,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     return null;
 
                 return users
-                    .Select(u => new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, "", u.UserPrincipalName, ConvertSamAccountName(u, domain)))
+                    .Select(u => identityCreator.Create("", u.UserPrincipalName, ConvertSamAccountName(u, domain), u.DisplayName))
                     .First();
             }
         }

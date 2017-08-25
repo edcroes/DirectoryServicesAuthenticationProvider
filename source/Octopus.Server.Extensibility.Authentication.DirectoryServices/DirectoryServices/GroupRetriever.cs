@@ -5,6 +5,7 @@ using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -27,17 +28,20 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public ExternalGroupResult Read(IUser user, CancellationToken cancellationToken)
         {
-            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled() || user.Username == User.GuestLogin || !user.Identities.OfType<ActiveDirectoryIdentity>().Any())
+            if (!configurationStore.GetIsEnabled() ||
+                !configurationStore.GetAreSecurityGroupsEnabled() || 
+                user.Username == User.GuestLogin ||
+                user.Identities.All(p => p.Provider != DirectoryServicesAuthenticationProvider.ProviderName))
                 return null;
 
-            if (user.Identities.OfType<ActiveDirectoryIdentity>().Count() > 1)
+            if (user.Identities.Count(p => p.Provider == DirectoryServicesAuthenticationProvider.ProviderName) > 1)
             {
                 log.WarnFormat("User with username {0} has multiple AD identities, only the first will be used for retrieving groups", user.Username);
             }
 
-            var ad = user.Identities.OfType<ActiveDirectoryIdentity>().First();
+            var ad = user.Identities.First(p => p.Provider == DirectoryServicesAuthenticationProvider.ProviderName);
             
-            var result = groupLocator.GetGroupIdsForUser(ad.SamAccountName, cancellationToken);
+            var result = groupLocator.GetGroupIdsForUser(ad.Claims[IdentityCreator.SamAccountNameClaimType].Value, cancellationToken);
             if (!result.WasAbleToRetrieveGroups)
                 return null;
 

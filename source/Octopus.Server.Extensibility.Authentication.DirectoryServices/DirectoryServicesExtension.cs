@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Web;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Extensions;
@@ -16,6 +17,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public void Load(ContainerBuilder builder)
         {
             builder.RegisterType<DirectoryServicesConfigurationMapping>().As<IConfigurationDocumentMapper>().InstancePerDependency();
+
+            builder.RegisterType<IdentityCreator>().As<IIdentityCreator>().SingleInstance();
 
             builder.RegisterType<DirectoryServicesConfigurationStore>()
                 .As<IDirectoryServicesConfigurationStore>()

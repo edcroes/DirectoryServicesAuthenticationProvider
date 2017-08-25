@@ -2,6 +2,7 @@
 using System.Linq;
 using Octopus.Data.Model.User;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -11,15 +12,18 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesConfigurationStore configurationStore;
+        readonly IIdentityCreator identityCreator;
 
         public UserLookup(
             IDirectoryServicesContextProvider contextProvider,
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
-            IDirectoryServicesConfigurationStore configurationStore)
+            IDirectoryServicesConfigurationStore configurationStore,
+            IIdentityCreator identityCreator)
         {
             this.contextProvider = contextProvider;
             this.objectNameNormalizer = objectNameNormalizer;
             this.configurationStore = configurationStore;
+            this.identityCreator = identityCreator;
         }
 
         public Identity[] Search(string provider, string searchTerm)
@@ -39,7 +43,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 };
 
                 return searcher.FindAll()
-                    .Select(u => new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, "", u.UserPrincipalName, u.SamAccountName))
+                    .Select(u => identityCreator.Create("", u.UserPrincipalName, u.SamAccountName, u.DisplayName))
                     .ToArray();
             }
         }

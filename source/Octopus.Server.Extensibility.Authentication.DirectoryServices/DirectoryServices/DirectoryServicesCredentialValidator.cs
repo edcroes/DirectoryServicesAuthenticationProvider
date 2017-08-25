@@ -7,6 +7,7 @@ using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Storage.User;
 
@@ -33,19 +34,22 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IUpdateableUserStore userStore;
         readonly IDirectoryServicesConfigurationStore configurationStore;
+        readonly IIdentityCreator identityCreator;
 
         public DirectoryServicesCredentialValidator(
             ILog log, 
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesContextProvider contextProvider,
             IUpdateableUserStore userStore,
-            IDirectoryServicesConfigurationStore configurationStore)
+            IDirectoryServicesConfigurationStore configurationStore,
+            IIdentityCreator identityCreator)
         {
             this.log = log;
             this.objectNameNormalizer = objectNameNormalizer;
             this.contextProvider = contextProvider;
             this.userStore = userStore;
             this.configurationStore = configurationStore;
+            this.identityCreator = identityCreator;
         }
 
         public int Priority => 100;
@@ -141,20 +145,22 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 log.Error($"We couldn't find a valid external identity to use for the Active Directory user '{displayName}' with email address '{emailAddress}' for the Octopus User Account named '{userPrincipalName}'. Octopus uses the samAccountName (pre-Windows 2000 Logon Name) as the external identity for Active Directory users. Please make sure this user has a valid samAccountName and try again. Learn more about troubleshooting Active Directory authentication at http://g.octopushq.com/TroubleshootingAD");
             }
 
-            var user = userStore.GetByIdentity(new ActiveDirectoryIdentity(DirectoryServicesAuthenticationProvider.ProviderName, emailAddress, userPrincipalName, samAccountName));
+            var authenticatingIdentity = NewIdentity(emailAddress, userPrincipalName, samAccountName, displayName);
+
+            var user = userStore.GetByIdentity(authenticatingIdentity);
 
             if (user != null)
             {
                 // if we haven't converted the old externalId into the new identity then set it up now
-                var identity = user.Identities.OfType<ActiveDirectoryIdentity>().FirstOrDefault(p => p.Provider == DirectoryServicesAuthenticationProvider.ProviderName);
+                var identity = user.Identities.FirstOrDefault(p => p.Provider == DirectoryServicesAuthenticationProvider.ProviderName);
                 if (identity == null)
                 {
-                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, NewIdentity(emailAddress, userPrincipalName, samAccountName)));
+                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity));
                 }
 
-                identity.EmailAddress = emailAddress;
-                identity.Upn = userPrincipalName;
-                identity.SamAccountName = samAccountName;
+                identity.Claims[IdentityCreator.EmailClaimType].Value = emailAddress;
+                identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
+                identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
 
                 return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity));
             }
@@ -167,20 +173,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 displayName,
                 emailAddress,
                 cancellationToken,
-                identities: new[] { NewIdentity(emailAddress,
-                    userPrincipalName,
-                    samAccountName) });
+                identities: new[] { authenticatingIdentity });
 
             return new AuthenticationUserCreateResult(userCreateResult);
         }
 
-        Identity NewIdentity(string emailAddress, string userPrincipalName, string samAccountName)
+        Identity NewIdentity(string emailAddress, string userPrincipalName, string samAccountName, string displayName)
         {
-            return new ActiveDirectoryIdentity(
-                DirectoryServicesAuthenticationProvider.ProviderName,
-                emailAddress,
-                userPrincipalName,
-                samAccountName);
+            return identityCreator.Create(emailAddress, userPrincipalName, samAccountName, displayName);
         }
 
         [DllImport("advapi32.dll", SetLastError = true)]
