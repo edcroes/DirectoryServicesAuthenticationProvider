@@ -9,11 +9,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
     public class DirectoryServicesApi : NancyModule
     {
         public const string ApiExternalGroupsLookup = "/api/externalgroups/directoryServices{?name}";
+        public const string ApiExternalUsersLookup = "/api/externalusers/directoryServices{?name}";
 
         public DirectoryServicesApi(
-            Func<SecuredActionInvoker<ListSecurityGroupsAction, IDirectoryServicesConfigurationStore>> listSecurityGroupsActionInvokerFactory)
+            Func<SecuredActionInvoker<ListSecurityGroupsAction, IDirectoryServicesConfigurationStore>> listSecurityGroupsActionInvokerFactory,
+            Func<SecuredActionInvoker<UserLookupAction, IDirectoryServicesConfigurationStore>> userLookupActionInvokerFactory)
         {
             Get[ApiExternalGroupsLookup] = o => listSecurityGroupsActionInvokerFactory().Execute(Context, Response);
+            Get[ApiExternalUsersLookup] = o => userLookupActionInvokerFactory().Execute(Context, Response);
         }
     }
 }

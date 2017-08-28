@@ -4,6 +4,7 @@ using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectorySer
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Web;
 using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.Extensions.Identities;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
@@ -45,7 +46,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 .As<IExternalGroupRetriever>()
                 .InstancePerDependency();
 
-            builder.RegisterType<UserLookup>().As<ICanLookupExternalUsers>().InstancePerDependency();
+            builder.RegisterType<UserLookup>().As<ICanLookupExternalUsers>().As<ICanLookupActiveDirectoryUsers>().InstancePerDependency();
             builder.RegisterType<UserMatcher>().As<ICanMatchExternalUser>().InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();
@@ -62,6 +63,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             builder.RegisterType<DirectoryServicesAuthenticationProvider>()
                 .As<IAuthenticationProvider>()
                 .As<IAuthenticationProviderWithGroupSupport>()
+                .As<IUseAuthenticationIdentities>()
                 .AsSelf()
                 .InstancePerDependency();
         }

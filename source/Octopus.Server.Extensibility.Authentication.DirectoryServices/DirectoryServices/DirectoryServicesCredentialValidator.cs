@@ -9,6 +9,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.HostServices;
+using Octopus.Server.Extensibility.Authentication.Resources.Identities;
 using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -158,7 +159,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity));
                 }
 
-                identity.Claims[IdentityCreator.EmailClaimType].Value = emailAddress;
+                identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
                 identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
                 identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
 

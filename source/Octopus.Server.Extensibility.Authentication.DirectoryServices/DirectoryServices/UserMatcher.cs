@@ -1,5 +1,6 @@
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
@@ -26,7 +27,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.identityCreator = identityCreator;
         }
 
-        public Identity Match(string name)
+        public Identity Match(string name, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled())
                 return null;
@@ -37,6 +38,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             using (var context = contextProvider.GetContext(domain))
             {
+                if (cancellationToken.IsCancellationRequested) return null;
+
                 var userPrincipal = new UserPrincipal(context);
 
                 if (normalisedName.Contains("@"))

@@ -1,5 +1,6 @@
 ﻿using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
@@ -7,7 +8,7 @@ using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class UserLookup : ICanLookupExternalUsers
+    public class UserLookup : ICanLookupActiveDirectoryUsers
     {
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
@@ -26,10 +27,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.identityCreator = identityCreator;
         }
 
-        public Identity[] Search(string provider, string searchTerm)
+        public ExternalUserLookupResult Search(string searchTerm, CancellationToken cancellationToken)
         {
-            if (!configurationStore.GetIsEnabled() || provider != DirectoryServicesAuthenticationProvider.ProviderName)
-                return Enumerable.Empty<Identity>().ToArray();
+            if (!configurationStore.GetIsEnabled())
+                return new ExternalUserLookupResult (DirectoryServicesAuthenticationProvider.ProviderName, Enumerable.Empty<Identity>().ToArray());
 
             string domain;
             string partialName;
@@ -37,15 +38,21 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             using (var context = contextProvider.GetContext(domain))
             {
+                if (cancellationToken.IsCancellationRequested) return null;
+
                 var searcher = new PrincipalSearcher
                 {
                     QueryFilter = new UserPrincipal(context) { Name = partialName + "*" }
                 };
 
-                return searcher.FindAll()
+                var identities = searcher.FindAll()
                     .Select(u => identityCreator.Create("", u.UserPrincipalName, u.SamAccountName, u.DisplayName))
                     .ToArray();
+                return new ExternalUserLookupResult(DirectoryServicesAuthenticationProvider.ProviderName, identities);
             }
         }
     }
+
+    public interface ICanLookupActiveDirectoryUsers : ICanLookupExternalUsers
+    { }
 }
