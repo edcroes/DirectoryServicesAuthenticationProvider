@@ -1,7 +1,7 @@
 ﻿using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Threading;
-using Octopus.Data.Model.User;
+using Octopus.Data.Resources.Users;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
@@ -30,7 +30,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         public ExternalUserLookupResult Search(string searchTerm, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled())
-                return new ExternalUserLookupResult (DirectoryServicesAuthenticationProvider.ProviderName, Enumerable.Empty<Identity>().ToArray());
+                return new ExternalUserLookupResult (DirectoryServicesAuthenticationProvider.ProviderName, Enumerable.Empty<IdentityResource>().ToArray());
 
             string domain;
             string partialName;
@@ -46,10 +46,15 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 };
 
                 var identities = searcher.FindAll()
-                    .Select(u => identityCreator.Create("", u.UserPrincipalName, u.SamAccountName, u.DisplayName))
+                    .Select(u => identityCreator.Create("", u.UserPrincipalName, ConvertSamAccountName(u, domain), u.DisplayName).ToResource())
                     .ToArray();
                 return new ExternalUserLookupResult(DirectoryServicesAuthenticationProvider.ProviderName, identities);
             }
+        }
+
+        static string ConvertSamAccountName(Principal u, string domain)
+        {
+            return !string.IsNullOrWhiteSpace(domain) ? $"{domain}\\{u.SamAccountName}" : u.SamAccountName;
         }
     }
 

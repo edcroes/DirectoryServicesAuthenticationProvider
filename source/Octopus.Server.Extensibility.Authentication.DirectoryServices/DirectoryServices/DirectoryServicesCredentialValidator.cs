@@ -162,6 +162,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
                 identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
                 identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
+                identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
 
                 return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity));
             }
