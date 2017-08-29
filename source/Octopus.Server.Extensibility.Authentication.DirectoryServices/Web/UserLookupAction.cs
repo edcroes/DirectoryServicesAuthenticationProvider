@@ -21,7 +21,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 
         public Response Execute(NancyContext context, IResponseFormatter response)
         {
-            var name = context.Request.Query["name"];
+            var name = context.Request.Query["partialName"];
 
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
             {
