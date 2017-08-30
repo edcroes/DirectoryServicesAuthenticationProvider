@@ -67,7 +67,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         {
             return new IdentityMetadataResource
             {
-                ProviderName = ProviderName,
+                IdentityProviderName = ProviderName,
                 ClaimDescriptors = new []
                 {
                     new ClaimDescriptor { Type = ClaimDescriptor.DisplayNameClaimType, Label = "Display name", IsIdentifyingClaim = false}, 

@@ -153,7 +153,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             if (user != null)
             {
                 // if we haven't converted the old externalId into the new identity then set it up now
-                var identity = user.Identities.FirstOrDefault(p => p.Provider == DirectoryServicesAuthenticationProvider.ProviderName);
+                var identity = user.Identities.FirstOrDefault(p => p.IdentityProviderName == DirectoryServicesAuthenticationProvider.ProviderName);
                 if (identity == null)
                 {
                     return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity));

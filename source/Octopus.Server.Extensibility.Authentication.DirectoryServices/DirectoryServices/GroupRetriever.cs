@@ -31,22 +31,22 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             if (!configurationStore.GetIsEnabled() ||
                 !configurationStore.GetAreSecurityGroupsEnabled() || 
                 user.Username == User.GuestLogin ||
-                user.Identities.All(p => p.Provider != DirectoryServicesAuthenticationProvider.ProviderName))
+                user.Identities.All(p => p.IdentityProviderName != DirectoryServicesAuthenticationProvider.ProviderName))
                 return null;
 
-            if (user.Identities.Count(p => p.Provider == DirectoryServicesAuthenticationProvider.ProviderName) > 1)
+            if (user.Identities.Count(p => p.IdentityProviderName == DirectoryServicesAuthenticationProvider.ProviderName) > 1)
             {
                 log.WarnFormat("User with username {0} has multiple AD identities, only the first will be used for retrieving groups", user.Username);
             }
 
-            var ad = user.Identities.First(p => p.Provider == DirectoryServicesAuthenticationProvider.ProviderName);
+            var ad = user.Identities.First(p => p.IdentityProviderName == DirectoryServicesAuthenticationProvider.ProviderName);
             
             var result = groupLocator.GetGroupIdsForUser(ad.Claims[IdentityCreator.SamAccountNameClaimType].Value, cancellationToken);
             if (!result.WasAbleToRetrieveGroups)
                 return null;
 
             var newGroups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
-            return new ExternalGroupResult { ProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = newGroups.Select(g => g).ToArray() };
+            return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = newGroups.Select(g => g).ToArray() };
         }
     }
 }
