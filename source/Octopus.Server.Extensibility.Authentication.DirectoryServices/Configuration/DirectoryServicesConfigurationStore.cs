@@ -125,6 +125,24 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             doc.AreSecurityGroupsEnabled = areSecurityGroupsEnabled;
             configurationStore.Update(doc);
         }
+        
+        public bool GetAllowAutoUserCreation()
+        {
+            var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId);
+            if (doc != null)
+                return doc.AllowAutoUserCreation.GetValueOrDefault(true);
+
+            doc = MoveSettingsToDatabase();
+
+            return doc.AllowAutoUserCreation.GetValueOrDefault(true);
+        }
+
+        public void SetAllowAutoUserCreation(bool allowAutoUserCreation)
+        {
+            var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId) ?? MoveSettingsToDatabase();
+            doc.AllowAutoUserCreation = allowAutoUserCreation;
+            configurationStore.Update(doc);
+        }
 
         readonly string[] legacyModes = {"Domain", "1"};
 
@@ -136,6 +154,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             var authenticationScheme = settings.Get("Octopus.WebPortal.AuthenticationScheme", AuthenticationSchemes.Ntlm);
             var allowFormsAuth = settings.Get("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", true);
             var areSecurityGroupsDisabled = settings.Get("Octopus.WebPortal.ExternalSecurityGroupsDisabled", false);
+            var allowAutoUserCreation = settings.Get("Octopus.WebPortal.ActiveDirectoryAllowAutoUserCreation", true);
 
             var authenticationMode = authenticationConfigurationStore.GetAuthenticationMode();
             var doc = new DirectoryServicesConfiguration("DirectoryServices", "Octopus Deploy")
@@ -144,7 +163,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
                 ActiveDirectoryContainer = activeDirectoryContainer,
                 AuthenticationScheme = authenticationScheme,
                 AllowFormsAuthenticationForDomainUsers = allowFormsAuth,
-                AreSecurityGroupsEnabled = !areSecurityGroupsDisabled
+                AreSecurityGroupsEnabled = !areSecurityGroupsDisabled,
+                AllowAutoUserCreation = allowAutoUserCreation
             };
 
             configurationStore.Create(doc);
@@ -153,6 +173,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             settings.Remove("Octopus.WebPortal.AuthenticationScheme");
             settings.Remove("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers");
             settings.Remove("Octopus.WebPortal.ExternalSecurityGroupsDisabled");
+            settings.Remove("Octopus.WebPortal.ActiveDirectoryAllowAutoUserCreation");
             settings.Save();
 
             return doc;
@@ -165,7 +186,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryContainer", GetActiveDirectoryContainer(), GetIsEnabled() && !string.IsNullOrWhiteSpace(GetActiveDirectoryContainer()), "Active Directory Container");
             yield return new ConfigurationValue("Octopus.WebPortal.AuthenticationScheme", GetAuthenticationScheme().ToString(), GetIsEnabled(), "Authentication Scheme");
             yield return new ConfigurationValue("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", GetAllowFormsAuthenticationForDomainUsers().ToString(), GetIsEnabled(), "Allow forms authentication");
-            yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectorySecurityGroupsEnabled", GetAreSecurityGroupsEnabled().ToString(), GetIsEnabled(), "Security groups enabled");
+            yield return new ConfigurationValue("Octopus.WebPortal.ExternalSecurityGroupsDisabled", GetAreSecurityGroupsEnabled().ToString(), GetIsEnabled(), "Security groups enabled");
+            yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryAllowAutoUserCreation", GetAllowAutoUserCreation().ToString(), GetIsEnabled(), "Allow auto user creation");
         }
     }
 }

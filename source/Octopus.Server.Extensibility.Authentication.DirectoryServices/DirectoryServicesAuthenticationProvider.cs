@@ -1,12 +1,18 @@
-﻿using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+﻿using Octopus.Data.Model;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.Extensions.Identities;
 using Octopus.Server.Extensibility.Authentication.Resources;
+using Octopus.Server.Extensibility.Authentication.Resources.Identities;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport
+    public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport, IUseAuthenticationIdentities
     {
+        public const string ProviderName = "Active Directory";
+
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesAuthenticationProvider(IDirectoryServicesConfigurationStore configurationStore)
@@ -14,7 +20,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             this.configurationStore = configurationStore;
         }
 
-        public string IdentityProviderName => "Active Directory";
+        public string IdentityProviderName => ProviderName;
 
         public bool IsEnabled => configurationStore.GetIsEnabled();
 
@@ -55,6 +61,22 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public string[] GetAuthenticationUrls()
         {
             return new string[0];
+        }
+
+        public IdentityMetadataResource GetMetadata()
+        {
+            return new IdentityMetadataResource
+            {
+                IdentityProviderName = ProviderName,
+                ClaimDescriptors = new []
+                {
+                    new ClaimDescriptor { Type = ClaimDescriptor.DisplayNameClaimType, Label = "Display name", IsIdentifyingClaim = false}, 
+                    new ClaimDescriptor { Type = IdentityCreator.UpnClaimType, Label = "User principal name", IsIdentifyingClaim = true}, 
+                    new ClaimDescriptor { Type = IdentityCreator.SamAccountNameClaimType, Label = "Sam Account Name", IsIdentifyingClaim = true},
+                    new ClaimDescriptor { Type = ClaimDescriptor.EmailClaimType, Label = "Email address", IsIdentifyingClaim = true}
+                },
+                Links = new LinkCollection().Add("UserLookup", "~" + DirectoryServicesApi.ApiExternalUsersLookup)
+            };
         }
     }
 }

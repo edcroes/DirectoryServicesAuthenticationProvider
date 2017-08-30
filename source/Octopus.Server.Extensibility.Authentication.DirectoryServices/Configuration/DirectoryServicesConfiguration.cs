@@ -37,5 +37,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
         /// Gets or sets whether to allow the use of security groups from AD.
         /// </summary>
         public bool AreSecurityGroupsEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether user records will be automatically created when someone passes authentication but is unknown.
+        /// </summary>
+        public bool? AllowAutoUserCreation { get; set; }
     }
 }
