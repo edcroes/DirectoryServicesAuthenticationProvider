@@ -23,7 +23,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 
         public Response Execute(NancyContext context, IResponseFormatter response)
         {
-            var name = context.Request.Query["name"];
+            var name = context.Request.Query["partialName"];
             if (string.IsNullOrWhiteSpace(name))
                 return responseCreator.BadRequest("Please provide the name of a group to search by, or a team");
 
