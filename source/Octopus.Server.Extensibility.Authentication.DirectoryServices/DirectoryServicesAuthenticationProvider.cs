@@ -70,10 +70,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 IdentityProviderName = ProviderName,
                 ClaimDescriptors = new []
                 {
-                    new ClaimDescriptor { Type = ClaimDescriptor.DisplayNameClaimType, Label = "Display name", IsIdentifyingClaim = false}, 
-                    new ClaimDescriptor { Type = IdentityCreator.UpnClaimType, Label = "User principal name", IsIdentifyingClaim = true}, 
-                    new ClaimDescriptor { Type = IdentityCreator.SamAccountNameClaimType, Label = "Sam Account Name", IsIdentifyingClaim = true},
-                    new ClaimDescriptor { Type = ClaimDescriptor.EmailClaimType, Label = "Email address", IsIdentifyingClaim = true}
+                    new ClaimDescriptor { Type = IdentityCreator.UpnClaimType, Label = "User principal name", IsIdentifyingClaim = true, Description = "UPN identifier."}, 
+                    new ClaimDescriptor { Type = IdentityCreator.SamAccountNameClaimType, Label = "Sam Account Name", IsIdentifyingClaim = true, Description = "SAM identifier."},
+                    new ClaimDescriptor { Type = ClaimDescriptor.EmailClaimType, Label = "Email address", IsIdentifyingClaim = true, Description = "Email identifier."},
+                    new ClaimDescriptor { Type = ClaimDescriptor.DisplayNameClaimType, Label = "Display name", IsIdentifyingClaim = false, Description = "User's display name."}
                 },
                 Links = new LinkCollection().Add("UserLookup", "~" + DirectoryServicesApi.ApiExternalUsersLookup)
             };
