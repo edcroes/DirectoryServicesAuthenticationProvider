@@ -119,6 +119,7 @@
     <Compile Include="DirectoryServices\GroupRetriever.cs" />
     <Compile Include="DirectoryServices\IDirectoryServicesCredentialValidator.cs" />
     <Compile Include="DirectoryServices\IDirectoryServicesExternalSecurityGroupLocator.cs" />
+    <Compile Include="DirectoryServices\PrincipalComparer.cs" />
     <Compile Include="DirectoryServices\UserLookup.cs" />
     <Compile Include="DirectoryServices\UserMatcher.cs" />
     <Compile Include="Identities\IdentityCreator.cs" />
