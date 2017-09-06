@@ -156,7 +156,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 var identity = user.Identities.FirstOrDefault(p => p.IdentityProviderName == DirectoryServicesAuthenticationProvider.ProviderName);
                 if (identity == null)
                 {
-                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity));
+                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity, cancellationToken));
                 }
 
                 identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
@@ -164,7 +164,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
                 identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
 
-                return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity));
+                return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
             }
 
             if (!configurationStore.GetAllowAutoUserCreation())
