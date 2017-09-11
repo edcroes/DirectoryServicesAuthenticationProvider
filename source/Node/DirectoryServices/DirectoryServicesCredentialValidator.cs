@@ -3,10 +3,13 @@ using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Diagnostics;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Node.Extensibility.Authentication.HostServices;
+using Octopus.Node.Extensibility.Authentication.Resources.Identities;
 using Octopus.Node.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -32,24 +35,27 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IUpdateableUserStore userStore;
         readonly IDirectoryServicesConfigurationStore configurationStore;
+        readonly IIdentityCreator identityCreator;
 
         public DirectoryServicesCredentialValidator(
             ILog log, 
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesContextProvider contextProvider,
             IUpdateableUserStore userStore,
-            IDirectoryServicesConfigurationStore configurationStore)
+            IDirectoryServicesConfigurationStore configurationStore,
+            IIdentityCreator identityCreator)
         {
             this.log = log;
             this.objectNameNormalizer = objectNameNormalizer;
             this.contextProvider = contextProvider;
             this.userStore = userStore;
             this.configurationStore = configurationStore;
+            this.identityCreator = identityCreator;
         }
 
         public int Priority => 100;
 
-        public AuthenticationUserCreateResult ValidateCredentials(string username, string password)
+        public AuthenticationUserCreateResult ValidateCredentials(string username, string password, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() || 
                 !configurationStore.GetAllowFormsAuthenticationForDomainUsers())
@@ -100,11 +106,11 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
 
                 log.Verbose($"Credentials for '{username}' validated, mapped to principal '{principal.UserPrincipalName ?? ("(NTAccount)" + principal.Name)}'");
 
-                return GetOrCreateUser(principal, username, domain);
+                return GetOrCreateUser(principal, username, domain, cancellationToken);
             }
         }
 
-        public AuthenticationUserCreateResult GetOrCreateUser(string username)
+        public AuthenticationUserCreateResult GetOrCreateUser(string username, CancellationToken cancellationToken)
         {
             string domain;
             objectNameNormalizer.NormalizeName(username, out username, out domain);
@@ -118,11 +124,11 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
                     throw new ArgumentException($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
                 }
 
-                return GetOrCreateUser(principal, username, domain ?? Environment.UserDomainName);
+                return GetOrCreateUser(principal, username, domain ?? Environment.UserDomainName, cancellationToken);
             }
         }
 
-        AuthenticationUserCreateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain)
+        AuthenticationUserCreateResult GetOrCreateUser(UserPrincipal principal, string fallbackUsername, string fallbackDomain, CancellationToken cancellationToken)
         {
             var userPrincipalName = objectNameNormalizer.ValidatedUserPrincipalName(principal, fallbackUsername, fallbackDomain);
 
@@ -140,48 +146,43 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
                 log.Error($"We couldn't find a valid external identity to use for the Active Directory user '{displayName}' with email address '{emailAddress}' for the Octopus User Account named '{userPrincipalName}'. Octopus uses the samAccountName (pre-Windows 2000 Logon Name) as the external identity for Active Directory users. Please make sure this user has a valid samAccountName and try again. Learn more about troubleshooting Active Directory authentication at http://g.octopushq.com/TroubleshootingAD");
             }
 
-            var user = userStore.GetByIdentity(new ActiveDirectoryIdentity(DirectoryServicesAuthentication.ProviderName, emailAddress, userPrincipalName, samAccountName));
+            var authenticatingIdentity = NewIdentity(emailAddress, userPrincipalName, samAccountName, displayName);
+
+            var user = userStore.GetByIdentity(authenticatingIdentity);
 
             if (user != null)
             {
                 // if we haven't converted the old externalId into the new identity then set it up now
-                var identity = user.Identities.OfType<ActiveDirectoryIdentity>().FirstOrDefault(p => p.Provider == DirectoryServicesAuthentication.ProviderName);
+                var identity = user.Identities.FirstOrDefault(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName);
                 if (identity == null)
                 {
-                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, NewIdentity(emailAddress, userPrincipalName, samAccountName)));
+                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity, cancellationToken));
                 }
 
-                identity.EmailAddress = emailAddress;
-                identity.Upn = userPrincipalName;
-                identity.SamAccountName = samAccountName;
-                
-                return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity));
+                identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
+                identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
+                identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
+                identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
+
+                return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
             }
 
             if (!configurationStore.GetAllowAutoUserCreation())
                 return new AuthenticationUserCreateResult("User could not be located and auto user creation is not enabled.");
-            
             var userCreateResult = userStore.Create(
                 userPrincipalName,
                 displayName,
                 emailAddress,
-                identities: new [] { NewIdentity(emailAddress,
-                    userPrincipalName,
-                    samAccountName) },
-                isService: false);
+                cancellationToken,
+                identities: new[] { authenticatingIdentity });
 
-            return new AuthenticationUserCreateResult (userCreateResult);
+            return new AuthenticationUserCreateResult(userCreateResult);
         }
 
-        Identity NewIdentity(string emailAddress, string userPrincipalName, string samAccountName)
+        Identity NewIdentity(string emailAddress, string userPrincipalName, string samAccountName, string displayName)
         {
-            return new ActiveDirectoryIdentity(
-                DirectoryServicesAuthentication.ProviderName,
-                emailAddress,
-                userPrincipalName,
-                samAccountName);
+            return identityCreator.Create(emailAddress, userPrincipalName, samAccountName, displayName);
         }
-
 
         [DllImport("advapi32.dll", SetLastError = true)]
         public static extern bool LogonUser(

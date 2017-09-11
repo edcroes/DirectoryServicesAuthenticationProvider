@@ -22,6 +22,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();
 
             builder.RegisterType<ListSecurityGroupsAction>().AsSelf().InstancePerDependency();
+            builder.RegisterType<UserLookupAction>().AsSelf().InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesAuthenticationProvider>()
                 .As<IAuthenticationProvider>()

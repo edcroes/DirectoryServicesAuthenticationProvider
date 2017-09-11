@@ -18,23 +18,6 @@
     <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
     <PostBuildEvent>xcopy "$(TargetDir)Octopus.Server.Extensibility.Authentication.DirectoryServices.*" "C:\ProgramData\Octopus\CustomExtensions" /S /Y /I /D</PostBuildEvent>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.0" />
@@ -42,8 +25,9 @@
     <PackageReference Include="Nancy" Version="1.2.0" />
     <PackageReference Include="Nancy.Serialization.JsonNet" Version="1.2.0" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="3.0.0-enh-odcm0024" />
-    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="5.0.0-enh-odcm0046" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="3.0.0-enh-odcm0026" />
+    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="4.1.1-enh-odcm0053" />
+    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="4.1.1-enh-odcm0053" />
   </ItemGroup>
 
   <ItemGroup>

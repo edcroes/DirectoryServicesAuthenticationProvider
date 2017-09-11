@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using Nancy;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.HostServices;
@@ -21,16 +23,19 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 
         public Response Execute(NancyContext context, IResponseFormatter response)
         {
-            var name = context.Request.Query["name"];
+            var name = context.Request.Query["partialName"];
             if (string.IsNullOrWhiteSpace(name))
                 return responseCreator.BadRequest("Please provide the name of a group to search by, or a team");
 
-            return responseCreator.AsOctopusJson(response, SearchByName(name));
+            using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
+            {
+                return responseCreator.AsOctopusJson(response, SearchByName(name, cts.Token));
+            }
         }
 
-        IList<ExternalSecurityGroup> SearchByName(string name)
+        IList<ExternalSecurityGroup> SearchByName(string name, CancellationToken cancellationToken)
         {
-            return externalSecurityGroupLocator.FindGroups(name);
+            return externalSecurityGroupLocator.FindGroups(name, cancellationToken);
         }
     }
 }

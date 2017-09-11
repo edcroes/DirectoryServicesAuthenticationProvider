@@ -57,6 +57,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
                 activeDirectoryConfiguration.Value.SetAllowAutoUserCreation(isAllowed);
                 log.Info("Active Directory auto user creation allowed: " + isAllowed);
             });
+
         }
 
         public void Handle(string webAuthenticationMode)
