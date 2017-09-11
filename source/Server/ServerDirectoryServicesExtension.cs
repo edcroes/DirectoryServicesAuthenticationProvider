@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.Extensions;
+using Octopus.Node.Extensibility.Authentication.Extensions.Identities;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
@@ -29,6 +30,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 .As<IAuthenticationProviderWithGroupSupport>()
                 .As<IContributesCSS>()
                 .As<IContributesJavascript>()
+                .As<IUseAuthenticationIdentities>()
                 .AsSelf()
                 .InstancePerDependency();
         }
