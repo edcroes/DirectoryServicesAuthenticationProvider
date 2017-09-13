@@ -10,7 +10,7 @@ using Octopus.Node.Extensibility.HostServices.Web;
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
 {
     [OctopusPlugin("Directory Services", "Octopus Deploy")]
-    public class DirectoryServicesExtension : IOctopusExtension
+    public abstract class DirectoryServicesExtension : IOctopusExtension
     {
         public virtual void Load(ContainerBuilder builder)
         {
