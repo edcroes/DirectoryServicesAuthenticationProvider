@@ -34,18 +34,33 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
                 user.Identities.All(p => p.IdentityProviderName != DirectoryServicesAuthentication.ProviderName))
                 return null;
 
-            if (user.Identities.Count(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName) > 1)
+            // if the user has multiple, unique identities assigned then the group list should be the distinct union of the groups from
+            // all of the identities
+            var wasAbleToRetrieveSomeGroups = false;
+            var newGroups = new HashSet<string>();
+            var adIdentities = user.Identities.Where(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName);
+            foreach (var adIdentity in adIdentities)
             {
-                log.WarnFormat("User with username {0} has multiple AD identities, only the first will be used for retrieving groups", user.Username);
-            }
+                var samAccountName = adIdentity.Claims[IdentityCreator.SamAccountNameClaimType].Value;
 
-            var ad = user.Identities.First(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName);
+                var result = groupLocator.GetGroupIdsForUser(samAccountName, cancellationToken);
+                if (result.WasAbleToRetrieveGroups)
+                {
+                    foreach (var groupId in result.GroupsIds.Where(g => !newGroups.Contains(g)))
+                    {
+                        newGroups.Add(groupId);
+                    }
+                    wasAbleToRetrieveSomeGroups = true;
+                }
+                else
+                {
+                    log.WarnFormat("Couldn't retrieve groups for samAccountName {0}", samAccountName);
+                }
+            }
             
-            var result = groupLocator.GetGroupIdsForUser(ad.Claims[IdentityCreator.SamAccountNameClaimType].Value, cancellationToken);
-            if (!result.WasAbleToRetrieveGroups)
+            if (!wasAbleToRetrieveSomeGroups)
                 return null;
 
-            var newGroups = new HashSet<string>(result.GroupsIds, StringComparer.OrdinalIgnoreCase);
             return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthentication.ProviderName, GroupIds = newGroups.Select(g => g).ToArray() };
         }
     }
