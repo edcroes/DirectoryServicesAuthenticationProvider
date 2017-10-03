@@ -3,7 +3,6 @@ using Nancy.Responses;
 using Octopus.Diagnostics;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.HostServices;
-using Octopus.Node.Extensibility.HostServices.Web;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
@@ -11,7 +10,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
     public class IntegratedAuthenticationModule : NancyModule
     {
-        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator, IWebPortalConfigurationStore webPortalConfigurationStore)
+        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator, IAuthenticationConfigurationStore authenticationConfigurationStore)
         {
             Get[DirectoryServicesConstants.ChallengePath] = c =>
             {
@@ -21,7 +20,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
                 var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyMinutes);
 
-                var whitelist = webPortalConfigurationStore.GetTrustedRedirectUrls();
+                var whitelist = authenticationConfigurationStore.GetTrustedRedirectUrls();
                 Response response;
                 if (Request.Query["redirectTo"].HasValue && Requests.IsLocalUrl(Request.Query["redirectTo"].Value, whitelist))
                 {
