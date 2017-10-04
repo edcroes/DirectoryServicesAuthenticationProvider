@@ -7,7 +7,7 @@ using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DirectoryServicesConfigureCommands : IContributeToConfigureCommand, IHandleLegacyWebAuthenticationModeConfigurationCommand
+    public class DirectoryServicesConfigureCommands : IContributeToConfigureCommand
     {
         readonly ILog log;
         readonly Lazy<IDirectoryServicesConfigurationStore> activeDirectoryConfiguration;
@@ -58,13 +58,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
                 log.Info("Active Directory auto user creation allowed: " + isAllowed);
             });
 
-        }
-
-        public void Handle(string webAuthenticationMode)
-        {
-            var isEnabled = "Domain".Equals(webAuthenticationMode, StringComparison.InvariantCultureIgnoreCase);
-            activeDirectoryConfiguration.Value.SetIsEnabled(isEnabled);
-            log.Info($"Active directory IsEnabled set, based on webAuthenticationMode={webAuthenticationMode}, to: {isEnabled}");
         }
     }
 }

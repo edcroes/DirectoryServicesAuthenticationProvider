@@ -17,7 +17,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
             builder.RegisterType<DirectoryServicesConfigureCommands>()
                 .As<IContributeToConfigureCommand>()
-                .As<IHandleLegacyWebAuthenticationModeConfigurationCommand>()
                 .InstancePerDependency();
             
             builder.RegisterType<DirectoryServicesStaticContentFolders>().As<IContributesStaticContentFolders>().InstancePerDependency();

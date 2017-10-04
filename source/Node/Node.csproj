@@ -17,7 +17,7 @@
     <PackageReference Include="Octopus.Configuration" Version="1.0.11" />
     <PackageReference Include="Octopus.Data" Version="2.1.0-alpha0040" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
-    <PackageReference Include="Octopus.Node.Extensibility" Version="3.0.0-enh-odcm0032" />
+    <PackageReference Include="Octopus.Node.Extensibility" Version="3.0.0-enh-odcm0034" />
     <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="4.1.1-enh-odcm0055" />
     <PackageReference Include="Octopus.Time" Version="1.0.9" />
     <PackageReference Include="System.DirectoryServices" Version="4.5.0-preview2-25517-02" />
