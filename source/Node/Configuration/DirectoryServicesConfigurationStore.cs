@@ -179,7 +179,14 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
             return doc;
         }
 
+        public string Id => SingletonId;
+
         public string ConfigurationSetName => "Active Directory";
+
+        public string Description => "Active Directory authentication settings";
+
+        public Type MetadataResourceType => typeof(DirectoryServicesConfiguration);
+
         public IEnumerable<ConfigurationValue> GetConfigurationValues()
         {
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryIsEnabled", GetIsEnabled().ToString(), GetIsEnabled(), "Is Enabled");
