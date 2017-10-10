@@ -4,6 +4,7 @@ using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServi
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Extensions;
+using Octopus.Node.Extensibility.Extensions.Infrastructure;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Node.Extensibility.HostServices.Web;
 
@@ -15,6 +16,8 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
         public virtual void Load(ContainerBuilder builder)
         {
             builder.RegisterType<DirectoryServicesConfigurationMapping>().As<IConfigurationDocumentMapper>().InstancePerDependency();
+
+            builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>().InstancePerDependency();
 
             builder.RegisterType<IdentityCreator>().As<IIdentityCreator>().SingleInstance();
 
