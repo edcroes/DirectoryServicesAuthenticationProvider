@@ -12,8 +12,6 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
             AreSecurityGroupsEnabled = true;
         }
 
-        public bool IsEnabled { get; set; }
-
         /// <summary>
         /// Gets or sets the active directory container, if not specified default container is used
         /// </summary>
