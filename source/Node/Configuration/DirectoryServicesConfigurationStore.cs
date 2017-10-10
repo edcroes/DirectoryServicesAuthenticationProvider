@@ -36,6 +36,16 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
         public string ChallengePath => DirectoryServicesConstants.ChallengePath;
         public AuthenticationSchemes AuthenticationScheme => GetIsEnabled() ? GetAuthenticationScheme() : AuthenticationSchemes.Anonymous;
 
+        public object GetConfiguration()
+        {
+            return configurationStore.Get<DirectoryServicesConfiguration>(SingletonId);
+        }
+
+        public void SetConfiguration(object config)
+        {
+            configurationStore.Update(config as DirectoryServicesConfiguration);
+        }
+
         public bool GetIsEnabled()
         {
             var doc = configurationStore.Get<DirectoryServicesConfiguration>(SingletonId);

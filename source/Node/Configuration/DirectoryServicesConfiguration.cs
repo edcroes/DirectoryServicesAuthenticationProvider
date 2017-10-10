@@ -11,7 +11,6 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
 
         public DirectoryServicesConfiguration(string name, string extensionAuthor) : base(name, extensionAuthor)
         {
-            Id = DirectoryServicesConfigurationStore.SingletonId;
             AllowFormsAuthenticationForDomainUsers = true;
             AreSecurityGroupsEnabled = true;
         }
