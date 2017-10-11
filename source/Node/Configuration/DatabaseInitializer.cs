@@ -29,7 +29,15 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
         {
             var doc = configurationStore.Get<DirectoryServicesConfiguration>(DirectoryServicesConfigurationStore.SingletonId);
             if (doc != null)
+            {
+                // TODO: to cover a dev team edge case during 4.0 Alpha. Can be removed before final release
+                if (doc.ConfigurationSchemaVersion != "1.0")
+                {
+                    doc.ConfigurationSchemaVersion = "1.0";
+                    configurationStore.Update(doc);
+                }
                 return;
+            }
 
             log.Info("Moving Octopus.WebPortal.ActiveDirectoryContainer/AuthenticationScheme/AllowFormsAuthenticationForDomainUsers from config file to DB");
 
