@@ -32,7 +32,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
                 !configurationStore.GetAreSecurityGroupsEnabled() || 
                 user.Username == User.GuestLogin ||
                 user.Identities.All(p => p.IdentityProviderName != DirectoryServicesAuthentication.ProviderName))
-                return null;
+                return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = Enumerable.Empty<string>() };
 
             // if the user has multiple, unique identities assigned then the group list should be the distinct union of the groups from
             // all of the identities
@@ -57,9 +57,12 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
                     log.WarnFormat("Couldn't retrieve groups for samAccountName {0}", samAccountName);
                 }
             }
-            
+
             if (!wasAbleToRetrieveSomeGroups)
-                return null;
+            {
+                log.ErrorFormat("Couldn't retrieve groups for user {0}", user.Username);
+                return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = Enumerable.Empty<string>() };
+            }
 
             return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthentication.ProviderName, GroupIds = newGroups.Select(g => g).ToArray() };
         }
