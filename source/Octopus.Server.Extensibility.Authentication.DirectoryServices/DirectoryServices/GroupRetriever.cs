@@ -29,10 +29,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         public ExternalGroupResult Read(IUser user, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() ||
-                !configurationStore.GetAreSecurityGroupsEnabled() || 
-                user.Username == User.GuestLogin ||
-                user.Identities.All(p => p.IdentityProviderName != DirectoryServicesAuthenticationProvider.ProviderName))
-                return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = Enumerable.Empty<string>() };
+                !configurationStore.GetAreSecurityGroupsEnabled())
+                return new ExternalGroupResult(DirectoryServicesAuthenticationProvider.ProviderName, "Not enabled");
+            if (user.Username == User.GuestLogin)
+                return new ExternalGroupResult(DirectoryServicesAuthenticationProvider.ProviderName, "Not valid for Guest user");
+            if (user.Identities.All(p => p.IdentityProviderName != DirectoryServicesAuthenticationProvider.ProviderName))
+                return new ExternalGroupResult(DirectoryServicesAuthenticationProvider.ProviderName, "No identities matching this provider");
 
             // if the user has multiple, unique identities assigned then the group list should be the distinct union of the groups from
             // all of the identities
@@ -61,10 +63,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             if (!wasAbleToRetrieveSomeGroups)
             {
                 log.ErrorFormat("Couldn't retrieve groups for user {0}", user.Username);
-                return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = Enumerable.Empty<string>() };
+                return new ExternalGroupResult(DirectoryServicesAuthenticationProvider.ProviderName, $"Couldn't retrieve groups for user {user.Username}");
             }
 
-            return new ExternalGroupResult { IdentityProviderName = DirectoryServicesAuthenticationProvider.ProviderName, GroupIds = newGroups.Select(g => g).ToArray() };
+            return new ExternalGroupResult(DirectoryServicesAuthenticationProvider.ProviderName, newGroups.Select(g => g).ToArray());
         }
     }
 }
