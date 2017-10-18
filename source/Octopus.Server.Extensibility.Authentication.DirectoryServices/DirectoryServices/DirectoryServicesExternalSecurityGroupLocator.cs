@@ -74,50 +74,59 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return new DirectoryServicesExternalSecurityGroupLocatorResult(new List<string>());
 
-            log.Verbose($"Finding external security groups for '{externalId}'...");
-
-            string domain;
-            objectNameNormalizer.NormalizeName(externalId, out externalId, out domain);
-
             var groups = new List<string>();
 
-            using (var context = contextProvider.GetContext(domain))
+            try
             {
-                var principal = UserPrincipal.FindByIdentity(context, externalId);
-                if (principal == null)
-                {
-                    var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
-                    log.Trace($"While loading security groups, a principal identifiable by '{externalId}' was not found in '{searchedContext}'");
-                    return new DirectoryServicesExternalSecurityGroupLocatorResult();
-                }
+                log.Verbose($"Finding external security groups for '{externalId}'...");
 
-                try
+                string domain;
+                objectNameNormalizer.NormalizeName(externalId, out externalId, out domain);
+
+                using (var context = contextProvider.GetContext(domain))
                 {
-                    // Reads inherited groups - this fails in some situations
-                    ReadAuthorizationGroups(principal, groups, cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    // Don't log it as an Error, it's expected to fail in some situations
-                    log.Verbose(ex);
+                    var principal = UserPrincipal.FindByIdentity(context, externalId);
+                    if (principal == null)
+                    {
+                        var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
+                        log.Trace(
+                            $"While loading security groups, a principal identifiable by '{externalId}' was not found in '{searchedContext}'");
+                        return new DirectoryServicesExternalSecurityGroupLocatorResult();
+                    }
 
                     try
                     {
-                        // Reads just the groups they are a member of - more reliable but not ideal
-                        ReadUserGroups(principal, groups, cancellationToken);
+                        // Reads inherited groups - this fails in some situations
+                        ReadAuthorizationGroups(principal, groups, cancellationToken);
                     }
-                    catch (Exception ex2)
+                    catch (Exception ex)
                     {
-                        // Only log an error if both methods fail to read the groups
-                        log.Error(ex2);
+                        // Don't log it as an Error, it's expected to fail in some situations
+                        log.Verbose(ex);
 
-                        return new DirectoryServicesExternalSecurityGroupLocatorResult();
+                        try
+                        {
+                            // Reads just the groups they are a member of - more reliable but not ideal
+                            ReadUserGroups(principal, groups, cancellationToken);
+                        }
+                        catch (Exception ex2)
+                        {
+                            // Only log an error if both methods fail to read the groups
+                            log.Error(ex2);
+
+                            return new DirectoryServicesExternalSecurityGroupLocatorResult();
+                        }
                     }
                 }
-            }
 
-            if (cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
+                    return new DirectoryServicesExternalSecurityGroupLocatorResult();
+            }
+            catch (Exception ex)
+            {
+                log.ErrorFormat(ex, "Active Directory search for {0} failed.", externalId);
                 return new DirectoryServicesExternalSecurityGroupLocatorResult();
+            }
 
             return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
         }
