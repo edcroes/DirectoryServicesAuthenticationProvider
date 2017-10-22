@@ -25,9 +25,9 @@
     <PackageReference Include="Nancy" Version="1.2.0" />
     <PackageReference Include="Nancy.Serialization.JsonNet" Version="1.2.0" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="3.0.0-enh-odcm0048" />
-    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="4.1.1-enh-odcm0056" />
-    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="4.1.1-enh-odcm0056" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="3.0.0-enh-odcm0052" />
+    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="4.2.1-enh-odcm0057" />
+    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="4.2.1-enh-odcm0057" />
   </ItemGroup>
 
   <ItemGroup>
