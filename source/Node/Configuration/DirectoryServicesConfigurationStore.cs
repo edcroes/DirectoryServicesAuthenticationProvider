@@ -5,6 +5,7 @@ using Octopus.Data.Storage.Configuration;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Node.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
 {
@@ -12,7 +13,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
     {
         public static string SingletonId = "authentication-directoryservices";
 
-        public DirectoryServicesConfigurationStore(IConfigurationStore configurationStore) : base(configurationStore)
+        public DirectoryServicesConfigurationStore(IConfigurationStore configurationStore, IResourceMappingFactory resourceMappingfactory) : base(configurationStore, resourceMappingfactory)
         {
         }
 
@@ -93,6 +94,11 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
             yield return new ConfigurationValue("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", GetAllowFormsAuthenticationForDomainUsers().ToString(), GetIsEnabled(), "Allow forms authentication");
             yield return new ConfigurationValue("Octopus.WebPortal.ExternalSecurityGroupsDisabled", GetAreSecurityGroupsEnabled().ToString(), GetIsEnabled(), "Security groups enabled");
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryAllowAutoUserCreation", GetAllowAutoUserCreation().ToString(), GetIsEnabled(), "Allow auto user creation");
+        }
+
+        public override IResourceMapping GetMapping()
+        {
+            return ResourceMappingFactory.Create<DirectoryServicesConfigurationResource, DirectoryServicesConfiguration>();
         }
     }
 }

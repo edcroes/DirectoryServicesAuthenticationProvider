@@ -6,6 +6,7 @@ using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Extensions;
 using Octopus.Node.Extensibility.Extensions.Infrastructure;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Node.Extensibility.Extensions.Mappings;
 using Octopus.Node.Extensibility.HostServices.Web;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
@@ -25,6 +26,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
                 .As<IDirectoryServicesConfigurationStore>()
                 .As<IAuthenticationSchemeProvider>()
                 .As<IHasConfigurationSettings>()
+                .As<IContributeMappings>()
                 .InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesUserCreationFromPrincipal>().As<ISupportsAutoUserCreationFromPrincipal>().InstancePerDependency();
