@@ -4,6 +4,10 @@
     cursor: pointer;
     border-radius: 2px;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.24), 0 0 1px 0 rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    padding-top: 0.8125rem;
+    padding-bottom: 0.8125rem;
 }
 
 .ds-button:hover {
@@ -11,17 +15,13 @@
 }
 
 .ds-button img {
-    margin-left: 10px;
-    margin-top: 9px; /* ([container-40h]-[image-22h]) / 2 = 9px */
-    float: left;
+    margin-left: 0.8125rem;
 }
 
 .ds-button div {
     font-weight: 600;
     display: inline-block;
     text-align: left;
-    width: 160px;
-    height: 40px;
-    line-height: 40px;
-    overflow: hidden;
+    margin-left: 0.8125rem;
+    overflow: hidden; 
 }
