@@ -28,30 +28,30 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
                 activeDirectoryConfiguration.Value.SetIsEnabled(isEnabled);
                 log.Info($"Active directory IsEnabled set to: {isEnabled}");
             });
-            yield return new ConfigureCommandOption("activeDirectoryContainer=", "Set the active directory container used for authentication.", v =>
+            yield return new ConfigureCommandOption("activeDirectoryContainer=", DirectoryServicesConfigurationResource.ActiveDirectoryContainerDescription, v =>
             {
                 activeDirectoryConfiguration.Value.SetActiveDirectoryContainer(v);
                 log.Info($"Active directory container set to: {v}");
             });
-            yield return new ConfigureCommandOption("webAuthenticationScheme=", "When Domain authentication is used, specifies the scheme (Basic, Digest, IntegratedWindowsAuthentication, Negotiate, Ntlm)", v =>
+            yield return new ConfigureCommandOption("webAuthenticationScheme=", DirectoryServicesConfigurationResource.AuthenticationSchemeDescription, v =>
             {
                 var scheme = (AuthenticationSchemes) Enum.Parse(typeof(AuthenticationSchemes), v);
                 activeDirectoryConfiguration.Value.SetAuthenticationScheme(scheme);
                 log.Info("Web authentication scheme: " + scheme);
             });
-            yield return new ConfigureCommandOption("allowFormsAuthenticationForDomainUsers=", "When Domain authentication is used, specifies whether the HTML-based username/password form can be used to sign in.", v =>
+            yield return new ConfigureCommandOption("allowFormsAuthenticationForDomainUsers=", DirectoryServicesConfigurationResource.AllowFormsAuthenticationForDomainUsersDescription, v =>
             {
                 var allowFormsAuthenticationForDomainUsers = bool.Parse(v);
                 activeDirectoryConfiguration.Value.SetAllowFormsAuthenticationForDomainUsers(allowFormsAuthenticationForDomainUsers);
                 log.Info("Allow forms authentication for domain users: " + allowFormsAuthenticationForDomainUsers);
             });
-            yield return new ConfigureCommandOption("activeDirectorySecurityGroupsEnabled=", "When Domain authentication is used, specifies whether to support security groups from AD.", v =>
+            yield return new ConfigureCommandOption("activeDirectorySecurityGroupsEnabled=", DirectoryServicesConfigurationResource.AreSecurityGroupsEnabledDescription, v =>
             {
                 var externalSecurityGroupsEnabled = bool.Parse(v);
                 activeDirectoryConfiguration.Value.SetAreSecurityGroupsEnabled(externalSecurityGroupsEnabled);
                 log.Info("Active Directory security groups enabled: " + externalSecurityGroupsEnabled);
             });
-            yield return new ConfigureCommandOption("activeDirectoryAllowAutoUserCreation=", "Whether unknown users will be automatically upon successful login.", v =>
+            yield return new ConfigureCommandOption("activeDirectoryAllowAutoUserCreation=", DirectoryServicesConfigurationResource.AllowAutoUserCreationDescription, v =>
             {
                 var isAllowed = bool.Parse(v);
                 activeDirectoryConfiguration.Value.SetAllowAutoUserCreation(isAllowed);

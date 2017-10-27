@@ -9,7 +9,7 @@ using Octopus.Node.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DirectoryServicesConfigurationStore : ExtensionConfigurationStore<DirectoryServicesConfiguration, DirectoryServicesConfiguration>, IDirectoryServicesConfigurationStore, IAuthenticationSchemeProvider
+    public class DirectoryServicesConfigurationStore : ExtensionConfigurationStore<DirectoryServicesConfiguration, DirectoryServicesConfigurationResource>, IDirectoryServicesConfigurationStore, IAuthenticationSchemeProvider
     {
         public static string SingletonId = "authentication-directoryservices";
 
@@ -19,16 +19,6 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
 
         public string ChallengePath => DirectoryServicesConstants.ChallengePath;
         public AuthenticationSchemes AuthenticationScheme => GetIsEnabled() ? GetAuthenticationScheme() : AuthenticationSchemes.Anonymous;
-
-        protected override DirectoryServicesConfiguration MapToResource(DirectoryServicesConfiguration doc)
-        {
-            return doc;
-        }
-
-        protected override DirectoryServicesConfiguration MapFromResource(DirectoryServicesConfiguration resource)
-        {
-            return resource;
-        }
 
         public string GetActiveDirectoryContainer()
         {

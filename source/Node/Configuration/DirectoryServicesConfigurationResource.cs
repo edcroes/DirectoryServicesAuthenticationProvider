@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Octopus.Data.Resources.Attributes;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
@@ -9,15 +8,15 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
     public class DirectoryServicesConfigurationResource : ExtensionConfigurationResource
     {
 
-        public const string ActiveDirectoryContainerDescription = "Comma-separated whitelist of domains that are allowed to retrieve data (empty turns CORS off, * allows all).";
+        public const string ActiveDirectoryContainerDescription = "Set the active directory container used for authentication.";
 
-        public const string AuthenticationSchemeDescription = "Comma-separated whitelist of domains that are allowed to retrieve data (empty turns CORS off, * allows all).";
+        public const string AuthenticationSchemeDescription = "When Domain authentication is used, specifies the scheme (Basic, Digest, IntegratedWindowsAuthentication, Negotiate, Ntlm).";
 
-        public const string AllowFormsAuthenticationForDomainUsersDescription = "Comma-separated whitelist of domains that are allowed to retrieve data (empty turns CORS off, * allows all).";
+        public const string AllowFormsAuthenticationForDomainUsersDescription = "When Domain authentication is used, specifies whether the HTML-based username/password form can be used to sign in.";
 
-        public const string AreSecurityGroupsEnabledDescription = "Comma-separated whitelist of domains that are allowed to retrieve data (empty turns CORS off, * allows all).";
+        public const string AreSecurityGroupsEnabledDescription = "When Domain authentication is used, specifies whether to support security groups from AD.";
 
-        public const string AllowAutoUserCreationDescription = "Comma-separated whitelist of domains that are allowed to retrieve data (empty turns CORS off, * allows all).";
+        public const string AllowAutoUserCreationDescription = "Whether unknown users will be automatically upon successful login.";
 
         [DisplayName("Active Directory Container")]
         [Description(ActiveDirectoryContainerDescription)]

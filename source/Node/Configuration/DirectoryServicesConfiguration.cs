@@ -17,7 +17,6 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
         /// <summary>
         /// Gets or sets the active directory container, if not specified default container is used
         /// </summary>
-        [Display(Name = "")]
         public string ActiveDirectoryContainer { get; set; }
 
         /// <summary>
