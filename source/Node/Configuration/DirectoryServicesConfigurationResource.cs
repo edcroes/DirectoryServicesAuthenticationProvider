@@ -26,6 +26,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
         [DisplayName("Authentication Scheme")]
         [Description(AuthenticationSchemeDescription)]
         [Writeable]
+        [HasOptions(SelectMode.Single)]
         public AuthenticationSchemes AuthenticationScheme { get; set; }
 
         [DisplayName("Allow Forms Authentication For Domain Users")]
