@@ -86,9 +86,9 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryAllowAutoUserCreation", GetAllowAutoUserCreation().ToString(), GetIsEnabled(), "Allow auto user creation");
         }
 
-        public override IResourceMapping GetMapping()
+        public override IEnumerable<IResourceMapping> GetMappings()
         {
-            return ResourceMappingFactory.Create<DirectoryServicesConfigurationResource, DirectoryServicesConfiguration>();
+            return new [] { ResourceMappingFactory.Create<DirectoryServicesConfigurationResource, DirectoryServicesConfiguration>() };
         }
     }
 }
