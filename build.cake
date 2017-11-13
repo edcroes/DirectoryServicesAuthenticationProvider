@@ -12,19 +12,17 @@ using Cake.Common.Tools;
 //////////////////////////////////////////////////////////////////////
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+var testFilter = Argument("where", "");
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 ///////////////////////////////////////////////////////////////////////////////
 var publishDir = "./publish";
+var localPackagesDir = "../LocalPackages";
 var artifactsDir = "./artifacts";
 var assetDir = "./BuildAssets";
-var localPackagesDir = "../LocalPackages";
-var globalAssemblyFile = "./source/Solution Items/VersionInfo.cs";
-var extensionName = "Octopus.Server.Extensibility.Authentication.DirectoryServices";
-var solutionToBuild = "./source/DirectoryServicesAuthenticationProvider.sln";
-var fileToPublish = "./source/" + extensionName + "/bin/Release/" + extensionName + ".dll";
-var cleanups = new List<IDisposable>(); 
+var bin451 = "/bin/Release/net451/";
+var std20 = "/bin/Release/netstandard2.0/";
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
     OutputType = GitVersionOutput.Json
@@ -39,18 +37,12 @@ Setup(context =>
 {
     if(BuildSystem.IsRunningOnTeamCity)
         BuildSystem.TeamCity.SetBuildNumber(gitVersionInfo.NuGetVersion);
-    if(BuildSystem.IsRunningOnAppVeyor)
-        AppVeyor.UpdateBuildVersion(gitVersionInfo.NuGetVersion);
 
-    Information("Building " + extensionName + " v{0}", nugetVersion);
+    Information("Building Octopus Authentication DirectoryServices v{0}", nugetVersion);
 });
 
 Teardown(context =>
 {
-    Information("Cleaning up");
-    foreach(var item in cleanups)
-        item.Dispose();
-
     Information("Finished running tasks.");
 });
 
@@ -61,8 +53,8 @@ Teardown(context =>
 Task("__Default")
     .IsDependentOn("__Clean")
     .IsDependentOn("__Restore")
-    .IsDependentOn("__UpdateAssemblyVersionInformation")
     .IsDependentOn("__Build")
+	.IsDependentOn("__Test")
     .IsDependentOn("__Pack")
 	.IsDependentOn("__Publish")
 	.IsDependentOn("__CopyToLocalPackages");
@@ -77,63 +69,77 @@ Task("__Clean")
 });
 
 Task("__Restore")
-    .Does(() => NuGetRestore(solutionToBuild));
-	
-Task("__UpdateAssemblyVersionInformation")
-    .Does(() =>
-{
-	cleanups.Add(new AutoRestoreFile(globalAssemblyFile));
-	
-	GitVersion(new GitVersionSettings {
-        UpdateAssemblyInfo = true,
-        UpdateAssemblyInfoFilePath = globalAssemblyFile
+    .Does(() => {
+        DotNetCoreRestore("source", new DotNetCoreRestoreSettings
+        {
+            ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
+        });
+        
+        NuGetRestore("./source/DirectoryServicesAuthenticationProvider.sln");
     });
-
-    Information("AssemblyVersion -> {0}", gitVersionInfo.AssemblySemVer);
-    Information("AssemblyFileVersion -> {0}", $"{gitVersionInfo.MajorMinorPatch}.0");
-    Information("AssemblyInformationalVersion -> {0}", gitVersionInfo.InformationalVersion);
-});
-
+	
 Task("__Build")
-    .IsDependentOn("__UpdateAssemblyVersionInformation")
     .Does(() =>
 {
-    DotNetBuild(solutionToBuild, settings => settings.SetConfiguration(configuration));
+    DotNetCoreBuild("./source", new DotNetCoreBuildSettings
+    {
+        Configuration = configuration,
+        ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
+    });
 });
+
+Task("__Test")
+    .IsDependentOn("__Build")
+    .Does(() => {
+		var projects = GetFiles("./source/**/*Tests.csproj");
+		foreach(var project in projects)
+			DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
+			{
+				Configuration = configuration,
+				NoBuild = true,
+				ArgumentCustomization = args => {
+					if(!string.IsNullOrEmpty(testFilter)) {
+						args = args.Append("--where").AppendQuoted(testFilter);
+					}
+					return args.Append("--logger:trx")
+                        .Append($"--verbosity normal");
+				}
+			});
+	});
 
 Task("__Pack")
     .Does(() => {
-        var nugetPackDir = Path.Combine(publishDir, "nuget");
-        var nuspecFile = extensionName + ".nuspec";
-        
-		CreateDirectory(nugetPackDir);
-        CopyFileToDirectory(Path.Combine(assetDir, nuspecFile), nugetPackDir);
-		CopyFileToDirectory(fileToPublish, nugetPackDir);
+        var solutionDir = "./source/";
+        var odNugetPackDir = Path.Combine(publishDir, "od");
+        var nuspecFile = "Octopus.Server.Extensibility.Authentication.DirectoryServices.nuspec";
+		var files = new string[0];
+		
+        CreateDirectory(odNugetPackDir);
+        CopyFileToDirectory(Path.Combine(assetDir, nuspecFile), odNugetPackDir);
 
-        NuGetPack(Path.Combine(nugetPackDir, nuspecFile), new NuGetPackSettings {
+		CopyFileToDirectory(solutionDir + "Server" + bin451 + "Octopus.Node.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
+		CopyFileToDirectory(solutionDir + "Server" + bin451 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
+        // files = new [] {
+            // solutionDir + "Server" + bin451 + "Octopus.Node.Extensibility.Authentication.DirectoryServices.dll",
+            // solutionDir + "Server" + bin451 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll"
+        // };
+        // Zip("./", Path.Combine(odNugetPackDir, "DirectoryServices.zip"), files);
+        
+        NuGetPack(Path.Combine(odNugetPackDir, nuspecFile), new NuGetPackSettings {
             Version = nugetVersion,
             OutputDirectory = artifactsDir
         });
-    });
+});
 
 Task("__Publish")
     .WithCriteria(BuildSystem.IsRunningOnTeamCity)
     .Does(() =>
 {
-    NuGetPush($"{artifactsDir}/{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
-		Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
-		ApiKey = EnvironmentVariable("MyGetApiKey")
-	});
-	
-    if (gitVersionInfo.PreReleaseLabel == "")
-    {
-        NuGetPush($"{artifactsDir}/{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
-            Source = "https://www.nuget.org/api/v2/package",
-            ApiKey = EnvironmentVariable("NuGetApiKey")
-        });
-    }
+    NuGetPush($"{artifactsDir}/Octopus.Server.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg", new NuGetPushSettings {
+        Source = "https://octopus.myget.org/F/octopus-dependencies/api/v3/index.json",
+        ApiKey = EnvironmentVariable("MyGetApiKey")
+    });
 });
-
 
 Task("__CopyToLocalPackages")
     .WithCriteria(BuildSystem.IsLocalBuild)
@@ -141,21 +147,8 @@ Task("__CopyToLocalPackages")
     .Does(() =>
 {
     CreateDirectory(localPackagesDir);
-    CopyFileToDirectory(Path.Combine(artifactsDir, $"{extensionName}.{nugetVersion}.nupkg"), localPackagesDir);
+    CopyFileToDirectory(Path.Combine(artifactsDir, $"Octopus.Server.Extensibility.Authentication.DirectoryServices.{nugetVersion}.nupkg"), localPackagesDir);
 });
-
-private class AutoRestoreFile : IDisposable
-{
-	private byte[] _contents;
-	private string _filename;
-	public AutoRestoreFile(string filename)
-	{
-		_filename = filename;
-		_contents = IO.File.ReadAllBytes(filename);
-	}
-
-	public void Dispose() => IO.File.WriteAllBytes(_filename, _contents);
-}
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
