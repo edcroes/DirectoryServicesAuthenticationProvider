@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Octopus.Client.Extensibility" Version="3.0.1-enh-clientconfig0008" />
+    <PackageReference Include="Octopus.Client.Extensibility" Version="3.0.1-enh-clientconfig0010" />
   </ItemGroup>
 
 </Project>
