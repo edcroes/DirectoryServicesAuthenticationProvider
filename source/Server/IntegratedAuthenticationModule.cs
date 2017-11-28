@@ -18,7 +18,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     return responseCreator.Unauthorized(Request);
 
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
-                var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyMinutes);
+                var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays);
 
                 var whitelist = authenticationConfigurationStore.GetTrustedRedirectUrls();
                 Response response;
