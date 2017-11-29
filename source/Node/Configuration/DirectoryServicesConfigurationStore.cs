@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using Octopus.Data.Storage.Configuration;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
@@ -9,13 +8,15 @@ using Octopus.Node.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DirectoryServicesConfigurationStore : ExtensionConfigurationStore<DirectoryServicesConfiguration, DirectoryServicesConfigurationResource>, IDirectoryServicesConfigurationStore, IAuthenticationSchemeProvider
+    public class DirectoryServicesConfigurationStore : ExtensionConfigurationStore<DirectoryServicesConfiguration>, IDirectoryServicesConfigurationStore, IAuthenticationSchemeProvider
     {
         public static string SingletonId = "authentication-directoryservices";
 
         public DirectoryServicesConfigurationStore(IConfigurationStore configurationStore, IResourceMappingFactory resourceMappingfactory) : base(configurationStore, resourceMappingfactory)
         {
         }
+
+        public override string Id => SingletonId;
 
         public string ChallengePath => DirectoryServicesConstants.ChallengePath;
         public AuthenticationSchemes AuthenticationScheme => GetIsEnabled() ? GetAuthenticationScheme() : AuthenticationSchemes.Anonymous;
@@ -68,27 +69,6 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
         public void SetAllowAutoUserCreation(bool allowAutoUserCreation)
         {
             SetProperty(doc => doc.AllowAutoUserCreation = allowAutoUserCreation);
-        }
-
-        public override string Id => SingletonId;
-
-        public override string ConfigurationSetName => "Active Directory";
-
-        public override string Description => "Active Directory authentication settings";
-
-        public override IEnumerable<ConfigurationValue> GetConfigurationValues()
-        {
-            yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryIsEnabled", GetIsEnabled().ToString(), GetIsEnabled(), "Is Enabled");
-            yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryContainer", GetActiveDirectoryContainer(), GetIsEnabled() && !string.IsNullOrWhiteSpace(GetActiveDirectoryContainer()), "Active Directory Container");
-            yield return new ConfigurationValue("Octopus.WebPortal.AuthenticationScheme", GetAuthenticationScheme().ToString(), GetIsEnabled(), "Authentication Scheme");
-            yield return new ConfigurationValue("Octopus.WebPortal.AllowFormsAuthenticationForDomainUsers", GetAllowFormsAuthenticationForDomainUsers().ToString(), GetIsEnabled(), "Allow forms authentication");
-            yield return new ConfigurationValue("Octopus.WebPortal.ExternalSecurityGroupsDisabled", GetAreSecurityGroupsEnabled().ToString(), GetIsEnabled(), "Security groups enabled");
-            yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryAllowAutoUserCreation", GetAllowAutoUserCreation().ToString(), GetIsEnabled(), "Allow auto user creation");
-        }
-
-        public override IEnumerable<IResourceMapping> GetMappings()
-        {
-            return new [] { ResourceMappingFactory.Create<DirectoryServicesConfigurationResource, DirectoryServicesConfiguration>() };
         }
     }
 }

@@ -3,7 +3,7 @@ using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public interface IDirectoryServicesConfigurationStore : IExtensionConfigurationStore
+    public interface IDirectoryServicesConfigurationStore : IExtensionConfigurationStore<DirectoryServicesConfiguration>
     {
         string GetActiveDirectoryContainer();
         void SetActiveDirectoryContainer(string activeDirectoryContainer);
