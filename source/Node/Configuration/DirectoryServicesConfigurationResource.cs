@@ -16,7 +16,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
 
         public const string AreSecurityGroupsEnabledDescription = "When Domain authentication is used, specifies whether to support security groups from AD.";
 
-        public const string AllowAutoUserCreationDescription = "Whether unknown users will be automatically upon successful login.";
+        public const string AllowAutoUserCreationDescription = "Whether unknown users will be automatically created upon successful login.";
 
         [DisplayName("Active Directory Container")]
         [Description(ActiveDirectoryContainerDescription)]
