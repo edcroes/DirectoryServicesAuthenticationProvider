@@ -5,11 +5,13 @@ using System.Linq;
 using System.Threading;
 using Octopus.Diagnostics;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Authentication.HostServices;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesExternalSecurityGroupLocator : IDirectoryServicesExternalSecurityGroupLocator
+    public class DirectoryServicesExternalSecurityGroupLocator : IDirectoryServicesExternalSecurityGroupLocator,
+        ICanMatchExternalGroup
     {
         readonly ILog log;
         readonly IDirectoryServicesContextProvider contextProvider;
@@ -128,6 +130,22 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
             }
 
             return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
+        }
+
+        public ExternalSecurityGroupResult Match(string name, CancellationToken cancellationToken)
+        {
+            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
+                return null;
+
+            var result = new ExternalSecurityGroupResult();
+
+            var groups = FindGroups(name, cancellationToken);
+            if (groups.Count == 1)
+            {
+                result.Group = groups.Single();
+            }
+
+            return result;
         }
 
         static void ReadAuthorizationGroups(UserPrincipal principal, ICollection<string> groups, CancellationToken cancellationToken)

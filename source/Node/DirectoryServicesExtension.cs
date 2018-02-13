@@ -38,7 +38,10 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
 
             builder.RegisterType<DirectoryServicesContextProvider>().As<IDirectoryServicesContextProvider>().InstancePerDependency();
             builder.RegisterType<DirectoryServicesObjectNameNormalizer>().As<IDirectoryServicesObjectNameNormalizer>().InstancePerDependency();
-            builder.RegisterType<DirectoryServicesExternalSecurityGroupLocator>().As<IDirectoryServicesExternalSecurityGroupLocator>().InstancePerDependency();
+            builder.RegisterType<DirectoryServicesExternalSecurityGroupLocator>()
+                .As<IDirectoryServicesExternalSecurityGroupLocator>()
+                .As<ICanMatchExternalGroup>()
+                .InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesCredentialValidator>()
                 .As<IDirectoryServicesCredentialValidator>()
