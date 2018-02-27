@@ -10,8 +10,7 @@ using Octopus.Node.Extensibility.Authentication.HostServices;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesExternalSecurityGroupLocator : IDirectoryServicesExternalSecurityGroupLocator,
-        ICanMatchExternalGroup
+    public class DirectoryServicesExternalSecurityGroupLocator : IDirectoryServicesExternalSecurityGroupLocator
     {
         readonly ILog log;
         readonly IDirectoryServicesContextProvider contextProvider;
@@ -30,10 +29,21 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
             this.configurationStore = configurationStore;
         }
 
-        public IList<ExternalSecurityGroup> FindGroups(string name, CancellationToken cancellationToken)
+        public ExternalSecurityGroupResult Search(string name, CancellationToken cancellationToken)
+        {
+            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
+                return null;
+
+            var groups = FindGroups(name, cancellationToken);
+            var result = new ExternalSecurityGroupResult(DirectoryServicesAuthentication.ProviderName, groups);
+
+            return result;
+        }
+
+        public ExternalSecurityGroup[] FindGroups(string name, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetAreSecurityGroupsEnabled())
-                return new List<ExternalSecurityGroup>();
+                return new ExternalSecurityGroup[0];
 
             var results = new List<ExternalSecurityGroup>();
             string domain;
@@ -66,7 +76,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
                 }
             }
 
-            return results.OrderBy(o => o.DisplayName).ToList();
+            return results.OrderBy(o => o.DisplayName).ToArray();
         }
 
         public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string samAccountName, CancellationToken cancellationToken)
@@ -130,22 +140,6 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
             }
 
             return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
-        }
-
-        public ExternalSecurityGroupResult Match(string name, CancellationToken cancellationToken)
-        {
-            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
-                return null;
-
-            var result = new ExternalSecurityGroupResult();
-
-            var groups = FindGroups(name, cancellationToken);
-            if (groups.Count == 1)
-            {
-                result.Group = groups.Single();
-            }
-
-            return result;
         }
 
         static void ReadAuthorizationGroups(UserPrincipal principal, ICollection<string> groups, CancellationToken cancellationToken)

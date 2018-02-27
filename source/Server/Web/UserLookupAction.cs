@@ -9,14 +9,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
     public class UserLookupAction : IApiAction
     {
         readonly IApiActionResponseCreator responseCreator;
-        readonly ICanLookupActiveDirectoryUsers userLookup;
+        readonly ICanSearchActiveDirectoryUsers userSearch;
 
         public UserLookupAction(
             IApiActionResponseCreator responseCreator,
-            ICanLookupActiveDirectoryUsers userLookup)
+            ICanSearchActiveDirectoryUsers userSearch)
         {
             this.responseCreator = responseCreator;
-            this.userLookup = userLookup;
+            this.userSearch = userSearch;
         }
 
         public Response Execute(NancyContext context, IResponseFormatter response)
@@ -27,7 +27,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
             {
-                return responseCreator.AsOctopusJson(response, userLookup.Search((string)name, cts.Token));
+                return responseCreator.AsOctopusJson(response, userSearch.Search((string)name, cts.Token));
             }
         }
     }
