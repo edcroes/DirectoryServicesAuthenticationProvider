@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using Nancy;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
@@ -33,9 +32,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             }
         }
 
-        IList<ExternalSecurityGroup> SearchByName(string name, CancellationToken cancellationToken)
+        ExternalSecurityGroup[] SearchByName(string name, CancellationToken cancellationToken)
         {
-            return externalSecurityGroupLocator.FindGroups(name, cancellationToken);
+            return externalSecurityGroupLocator.Search(name, cancellationToken).Groups;
         }
     }
 }

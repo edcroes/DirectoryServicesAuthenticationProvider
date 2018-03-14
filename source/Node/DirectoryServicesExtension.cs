@@ -38,7 +38,10 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
 
             builder.RegisterType<DirectoryServicesContextProvider>().As<IDirectoryServicesContextProvider>().InstancePerDependency();
             builder.RegisterType<DirectoryServicesObjectNameNormalizer>().As<IDirectoryServicesObjectNameNormalizer>().InstancePerDependency();
-            builder.RegisterType<DirectoryServicesExternalSecurityGroupLocator>().As<IDirectoryServicesExternalSecurityGroupLocator>().InstancePerDependency();
+            builder.RegisterType<DirectoryServicesExternalSecurityGroupLocator>()
+                .As<IDirectoryServicesExternalSecurityGroupLocator>()
+                .As<ICanSearchExternalGroups>()
+                .InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesCredentialValidator>()
                 .As<IDirectoryServicesCredentialValidator>()
@@ -49,7 +52,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
                 .As<IExternalGroupRetriever>()
                 .InstancePerDependency();
 
-            builder.RegisterType<UserLookup>().As<ICanLookupExternalUsers>().As<ICanLookupActiveDirectoryUsers>().InstancePerDependency();
+            builder.RegisterType<UserSearch>().As<ICanSearchExternalUsers>().As<ICanSearchActiveDirectoryUsers>().InstancePerDependency();
             builder.RegisterType<UserMatcher>().As<ICanMatchExternalUser>().InstancePerDependency();
 
             builder.RegisterType<DirectoryServicesHomeLinksContributor>().As<IHomeLinksContributor>().InstancePerDependency();

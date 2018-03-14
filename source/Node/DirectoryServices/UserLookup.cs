@@ -9,14 +9,14 @@ using Octopus.Node.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class UserLookup : ICanLookupActiveDirectoryUsers
+    public class UserSearch : ICanSearchActiveDirectoryUsers
     {
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesConfigurationStore configurationStore;
         readonly IIdentityCreator identityCreator;
 
-        public UserLookup(
+        public UserSearch(
             IDirectoryServicesContextProvider contextProvider,
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesConfigurationStore configurationStore,
@@ -70,6 +70,6 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
         }
     }
 
-    public interface ICanLookupActiveDirectoryUsers : ICanLookupExternalUsers
+    public interface ICanSearchActiveDirectoryUsers : ICanSearchExternalUsers
     { }
 }

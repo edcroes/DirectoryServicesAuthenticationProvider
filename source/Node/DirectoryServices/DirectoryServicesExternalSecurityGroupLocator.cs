@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Octopus.Diagnostics;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Authentication.HostServices;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -28,10 +29,21 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
             this.configurationStore = configurationStore;
         }
 
-        public IList<ExternalSecurityGroup> FindGroups(string name, CancellationToken cancellationToken)
+        public ExternalSecurityGroupResult Search(string name, CancellationToken cancellationToken)
+        {
+            if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
+                return null;
+
+            var groups = FindGroups(name, cancellationToken);
+            var result = new ExternalSecurityGroupResult(DirectoryServicesAuthentication.ProviderName, groups);
+
+            return result;
+        }
+
+        public ExternalSecurityGroup[] FindGroups(string name, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetAreSecurityGroupsEnabled())
-                return new List<ExternalSecurityGroup>();
+                return new ExternalSecurityGroup[0];
 
             var results = new List<ExternalSecurityGroup>();
             string domain;
@@ -64,7 +76,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
                 }
             }
 
-            return results.OrderBy(o => o.DisplayName).ToList();
+            return results.OrderBy(o => o.DisplayName).ToArray();
         }
 
         public DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string samAccountName, CancellationToken cancellationToken)

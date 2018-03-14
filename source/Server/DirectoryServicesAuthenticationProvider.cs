@@ -56,7 +56,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 Name = IdentityProviderName,
                 IsRoleBased = false,
                 SupportsGroupLookup = true,
-                LookupUri = "~" + DirectoryServicesApi.ApiExternalGroupsLookup
+                LookupUri = "~" + DirectoryServicesApi.ApiExternalGroupsSearch
             };
         }
 
@@ -91,7 +91,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     new ClaimDescriptor { Type = ClaimDescriptor.EmailClaimType, Label = "Email address", IsIdentifyingClaim = true, Description = "Email identifier."},
                     new ClaimDescriptor { Type = ClaimDescriptor.DisplayNameClaimType, Label = "Display name", IsIdentifyingClaim = false, Description = "User's display name."}
                 },
-                Links = new LinkCollection().Add("UserLookup", "~" + DirectoryServicesApi.ApiExternalUsersLookup)
+                Links = new LinkCollection().Add("UserSearch", "~" + DirectoryServicesApi.ApiExternalUsersSearch)
             };
         }
     }
