@@ -1,8 +1,11 @@
+using System;
+using System.Linq;
 using Nancy;
 using Nancy.Responses;
 using Octopus.Diagnostics;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.HostServices;
+using Octopus.Node.Extensibility.Authentication.Resources;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
@@ -18,7 +21,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     return responseCreator.Unauthorized(Request);
 
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
-                var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays);
+
+                var oau = Context.Request.Headers[ApiConstants.OctopusRequestAbsoluteUrlHeaderName]?.FirstOrDefault();
+                var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays, oau);
 
                 var whitelist = authenticationConfigurationStore.GetTrustedRedirectUrls();
                 Response response;
