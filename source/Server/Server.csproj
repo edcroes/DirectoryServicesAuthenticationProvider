@@ -18,28 +18,24 @@
     <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
     <PostBuildEvent>xcopy "$(TargetDir)Octopus.Server.Extensibility.Authentication.DirectoryServices.*" "C:\ProgramData\Octopus\CustomExtensions" /S /Y /I /D</PostBuildEvent>
   </PropertyGroup>
-  
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
     <PackageReference Include="Nancy" Version="1.2.0" />
     <PackageReference Include="Nancy.Serialization.JsonNet" Version="1.2.0" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
+    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="7.0.0" />
     <PackageReference Include="Octopus.Server.Extensibility" Version="4.0.0" />
-    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="6.0.1-enh-cookiesecure0004" />
-    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="6.0.1-enh-cookiesecure0004" />
+    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="7.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Web\Static\images\directory_services_signin_buttons\microsoft-logo.svg" />
     <EmbeddedResource Include="Web\Static\styles\directoryServices.css" />
     <EmbeddedResource Include="Web\Static\areas\users\ad_auth_provider.js" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Node\Node.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
