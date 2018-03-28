@@ -25,10 +25,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
                 if (Request.Query["state"].HasValue)
                 {
-                    var stateData = HttpUtility.UrlDecode(Request.Query["state"].Value);
+                    var stateData = HttpUtility.UrlDecode((string)Request.Query["state"].Value);
                     var state = JsonConvert.DeserializeObject<LoginState>(stateData);
 
-                    var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays, (bool)state.UsingSecureConnection);
+                    var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays, state.UsingSecureConnection);
 
                     var whitelist = authenticationConfigurationStore.GetTrustedRedirectUrls();
 
@@ -42,14 +42,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                         {
                             log.WarnFormat(
                                 "Prevented potential Open Redirection attack on an NTLM challenge, to the non-local url {0}",
-                                Request.Query["redirectTo"].Value);
+                                state.RedirectAfterLoginTo);
                         }
 
                         return new RedirectResponse(Request.Url.BasePath ?? "/").WithCookies(authCookies);
                     }
                 }
 
-                return responseCreator.BadRequest("Invalid state passed to server");
+                return responseCreator.BadRequest("Invalid state passed to the server when setting up the NTLM challenge.");
             };
         }
     }
