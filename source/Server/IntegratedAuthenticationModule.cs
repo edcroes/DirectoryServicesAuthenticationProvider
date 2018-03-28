@@ -1,8 +1,12 @@
+using System;
 using Nancy;
+using Nancy.Helpers;
 using Nancy.Responses;
+using Newtonsoft.Json;
 using Octopus.Diagnostics;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.HostServices;
+using Octopus.Node.Extensibility.Authentication.Resources;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
@@ -18,26 +22,34 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     return responseCreator.Unauthorized(Request);
 
                 var principal = (IOctopusPrincipal)Context.CurrentUser;
-                var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays);
 
-                var whitelist = authenticationConfigurationStore.GetTrustedRedirectUrls();
-                Response response;
-                if (Request.Query["redirectTo"].HasValue && Requests.IsLocalUrl(Request.Query["redirectTo"].Value, whitelist))
+                if (Request.Query["state"].HasValue)
                 {
-                    var redirectLocation = Request.Query["redirectTo"].Value;
-                    response = new RedirectResponse(redirectLocation).WithCookies(authCookies);
-                }
-                else
-                {
-                    if (Request.Query["redirectTo"].HasValue)
+                    var stateData = HttpUtility.UrlDecode((string)Request.Query["state"].Value);
+                    var state = JsonConvert.DeserializeObject<LoginState>(stateData);
+
+                    var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays, state.UsingSecureConnection);
+
+                    var whitelist = authenticationConfigurationStore.GetTrustedRedirectUrls();
+
+                    if (Requests.IsLocalUrl(state.RedirectAfterLoginTo, whitelist))
                     {
-                        log.WarnFormat("Prevented potential Open Redirection attack on an NTLM challenge, to the non-local url {0}", Request.Query["redirectTo"].Value);
+                        return new RedirectResponse(state.RedirectAfterLoginTo).WithCookies(authCookies);
                     }
+                    else
+                    {
+                        if (!string.IsNullOrWhiteSpace(state.RedirectAfterLoginTo))
+                        {
+                            log.WarnFormat(
+                                "Prevented potential Open Redirection attack on an NTLM challenge, to the non-local url {0}",
+                                state.RedirectAfterLoginTo);
+                        }
 
-                    response = new RedirectResponse(Request.Url.BasePath ?? "/").WithCookies(authCookies);
+                        return new RedirectResponse(Request.Url.BasePath ?? "/").WithCookies(authCookies);
+                    }
                 }
 
-                return response;
+                return responseCreator.BadRequest("Invalid state passed to the server when setting up the NTLM challenge.");
             };
         }
     }

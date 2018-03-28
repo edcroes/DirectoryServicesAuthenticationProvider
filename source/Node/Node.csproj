@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
     <RootNamespace>Octopus.Node.Extensibility.Authentication.DirectoryServices</RootNamespace>
@@ -12,17 +11,15 @@
     <PackageLicenseUrl>https://octopus.com/</PackageLicenseUrl>
     <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Octopus.Configuration" Version="1.0.11" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
     <PackageReference Include="Octopus.Node.Extensibility" Version="4.0.0" />
-    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="6.0.0" />
+    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="7.0.0" />
     <PackageReference Include="Octopus.Time" Version="1.1.2" />
     <PackageReference Include="System.DirectoryServices" Version="4.5.0-preview2-25517-02" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0-preview2-25517-02" />
   </ItemGroup>
-
   <Target Name="AfterBuildNetStd" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <Message Text="after build step for $(TargetFramework)" Importance="High" />
     <Exec Command="xcopy $(OutputPath)*DirectoryServices.* C:\Octopus\DataCenterManager\CustomExtensions /S /Y /I /D" />
@@ -31,5 +28,4 @@
     <Message Text="after build step for $(TargetFramework)" Importance="High" />
     <Exec Command="xcopy $(OutputPath)*DirectoryServices.* C:\ProgramData\Octopus\CustomExtensions /S /Y /I /D" />
   </Target>
-
 </Project>
