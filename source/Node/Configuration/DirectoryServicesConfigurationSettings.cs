@@ -9,8 +9,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
             IDirectoryServicesConfigurationStore>, IDirectoryServicesConfigurationSettings
     {
         public DirectoryServicesConfigurationSettings(
-            IDirectoryServicesConfigurationStore configurationDocumentStore,
-            IResourceMappingFactory factory) : base(configurationDocumentStore, factory)
+            IDirectoryServicesConfigurationStore configurationDocumentStore) : base(configurationDocumentStore)
         {
         }
 
@@ -32,9 +31,9 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
             yield return new ConfigurationValue("Octopus.WebPortal.ActiveDirectoryAllowAutoUserCreation", ConfigurationDocumentStore.GetAllowAutoUserCreation().ToString(), isEnabled, "Allow auto user creation");
         }
 
-        public override IEnumerable<IResourceMapping> GetMappings()
+        public override void BuildMappings(IResourceMappingsBuilder builder)
         {
-            return new[] { ResourceMappingFactory.Create<DirectoryServicesConfigurationResource, DirectoryServicesConfiguration>() };
+            builder.Map<DirectoryServicesConfigurationResource, DirectoryServicesConfiguration>();
         }
     }
 }

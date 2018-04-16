@@ -1,10 +1,8 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using Octopus.Data.Storage.Configuration;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.Extensions;
 using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
-using Octopus.Node.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
 {
@@ -12,7 +10,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
     {
         public static string SingletonId = "authentication-directoryservices";
 
-        public DirectoryServicesConfigurationStore(IConfigurationStore configurationStore, IResourceMappingFactory resourceMappingfactory) : base(configurationStore, resourceMappingfactory)
+        public DirectoryServicesConfigurationStore(IConfigurationStore configurationStore) : base(configurationStore)
         {
         }
 
