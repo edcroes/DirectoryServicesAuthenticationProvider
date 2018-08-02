@@ -61,7 +61,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configurat
         
         public bool GetAllowAutoUserCreation()
         {
-            return GetProperty(doc => doc.AllowAutoUserCreation.GetValueOrDefault(true));
+            return GetProperty(doc => doc.AllowAutoUserCreation);
         }
 
         public void SetAllowAutoUserCreation(bool allowAutoUserCreation)
