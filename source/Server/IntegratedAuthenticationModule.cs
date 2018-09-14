@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using Nancy;
+using Nancy.Cookies;
 using Nancy.Helpers;
 using Nancy.Responses;
 using Newtonsoft.Json;
@@ -42,7 +44,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 }
 
                 // Build the auth cookies to send back with the response
-                var authCookies = tokenIssuer.CreateAuthCookies(Context.Request, principal.IdentificationToken, SessionExpiry.TwentyDays, state?.UsingSecureConnection);
+                var authCookies = tokenIssuer.CreateAuthCookies(principal.IdentificationToken, SessionExpiry.TwentyDays, Context.Request.Url.IsSecure, state?.UsingSecureConnection);
+                var cookies = authCookies.Select(cookieOption => new NancyCookie(cookieOption.Name, cookieOption.Value,
+                    cookieOption.HttpOnly, cookieOption.Secure)
+                {
+                    Domain = cookieOption.Domain,
+                    Path = cookieOption.Path,
+                    Expires = cookieOption.Expires?.DateTime
+                }).ToArray();
 
                 // If the caller has provided a redirect after successful login, we need to check it is a local address - preventing Open Redirection attacks
                 if (!string.IsNullOrWhiteSpace(state?.RedirectAfterLoginTo))
@@ -51,7 +60,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     if (Requests.IsLocalUrl(state.RedirectAfterLoginTo, whitelist))
                     {
                         // This is a safe redirect, let's go!
-                        return new RedirectResponse(state.RedirectAfterLoginTo).WithCookies(authCookies);
+                        
+                        return new RedirectResponse(state.RedirectAfterLoginTo).WithCookies(cookies);
                     }
 
                     // Just log that we detected a non-local redirect URL, and fall through to the root of the local web site
@@ -61,7 +71,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 }
 
                 // By default, redirect to the root of the local web site
-                return new RedirectResponse(Request.Url.BasePath ?? "/").WithCookies(authCookies);
+                return new RedirectResponse(Request.Url.BasePath ?? "/").WithCookies(cookies);
             };
         }
     }
