@@ -1,40 +1,41 @@
 using System;
 using System.Linq;
-using Nancy;
-using Nancy.Cookies;
-using Nancy.Helpers;
-using Nancy.Responses;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
 using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Node.Extensibility.Authentication.HostServices;
 using Octopus.Node.Extensibility.Authentication.Resources;
+using Octopus.Node.Extensibility.HostServices.Web;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    public class IntegratedAuthenticationModule : NancyModule
+    public class IntegratedAuthenticationModule : RegisterEndpoint
     {
-        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IApiActionResponseCreator responseCreator, IAuthenticationConfigurationStore authenticationConfigurationStore)
+        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IAuthenticationConfigurationStore authenticationConfigurationStore, IUrlEncoder encoder)
         {
-            Get[DirectoryServicesConstants.ChallengePath] = c =>
+            Add("GET", DirectoryServicesConstants.ChallengePath, context =>
             {
-                if (Context.CurrentUser == null)
-                    return responseCreator.Unauthorized(Request);
+                if (context.User == null)
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                }
 
-                var principal = (IOctopusPrincipal)Context.CurrentUser;
+                //TODO: Need to use claims here! Talk to RobE
+                var principal = (IOctopusPrincipal)context.User;
 
                 // Decode the state object sent from the client (if there was one) so we can use those hints to build the most appropriate response
                 // If the state can't be interpreted, we will fall back to a safe-by-default behaviour, however:
                 //   1. Deep-links will not work because we don't know where the anonymous request originally wanted to go
                 //   2. Cookies may not have the Secure flag set properly when SSL Offloading is in play
                 LoginState state = null;
-                if (Request.Query["state"].HasValue)
+                if (context.Request.Query.TryGetValue("state", out var stateString))
                 {
                     try
                     {
-                        var stateString = HttpUtility.UrlDecode((string) Request.Query["state"].Value);
                         state = JsonConvert.DeserializeObject<LoginState>(stateString);
                     }
                     catch (Exception e)
@@ -44,14 +45,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 }
 
                 // Build the auth cookies to send back with the response
-                var authCookies = tokenIssuer.CreateAuthCookies(principal.IdentificationToken, SessionExpiry.TwentyDays, Context.Request.Url.IsSecure, state?.UsingSecureConnection);
-                var cookies = authCookies.Select(cookieOption => new NancyCookie(cookieOption.Name, cookieOption.Value,
-                    cookieOption.HttpOnly, cookieOption.Secure)
-                {
-                    Domain = cookieOption.Domain,
-                    Path = cookieOption.Path,
-                    Expires = cookieOption.Expires?.DateTime
-                }).ToArray();
+                var authCookies = tokenIssuer.CreateAuthCookies(principal.IdentificationToken, SessionExpiry.TwentyDays, context.Request.IsHttps, state?.UsingSecureConnection);
 
                 // If the caller has provided a redirect after successful login, we need to check it is a local address - preventing Open Redirection attacks
                 if (!string.IsNullOrWhiteSpace(state?.RedirectAfterLoginTo))
@@ -60,8 +54,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     if (Requests.IsLocalUrl(state.RedirectAfterLoginTo, whitelist))
                     {
                         // This is a safe redirect, let's go!
-                        
-                        return new RedirectResponse(state.RedirectAfterLoginTo).WithCookies(cookies);
+                        context.Response.Redirect(state.RedirectAfterLoginTo);
+                        foreach (var cookie in authCookies)
+                        {
+                            context.Response.WithCookie(cookie);
+                        }
+                        return Task.CompletedTask;
                     }
 
                     // Just log that we detected a non-local redirect URL, and fall through to the root of the local web site
@@ -71,8 +69,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 }
 
                 // By default, redirect to the root of the local web site
-                return new RedirectResponse(Request.Url.BasePath ?? "/").WithCookies(cookies);
-            };
+                context.Response.Redirect(context.Request.PathBase ?? "/");
+                foreach (var cookie in authCookies)
+                {
+                    context.Response.WithCookie(cookie);
+                }
+
+                return Task.CompletedTask;
+            });
         }
     }
 }

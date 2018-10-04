@@ -33,17 +33,15 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
             if (!configurationStore.GetIsEnabled())
                 return new ExternalUserLookupResult (DirectoryServicesAuthentication.ProviderName, Enumerable.Empty<IdentityResource>().ToArray());
 
-            string domain;
-            string partialName;
-            objectNameNormalizer.NormalizeName(searchTerm, out partialName, out domain);
+            objectNameNormalizer.NormalizeName(searchTerm, out var partialName, out var domain);
 
             using (var context = contextProvider.GetContext(domain))
             {
                 if (cancellationToken.IsCancellationRequested) return null;
 
-                var identities = new List<Principal>(SearchBy(domain, new UserPrincipal(context) { Name = "*" + partialName + "*" }));
-                identities.AddRange(SearchBy(domain, new UserPrincipal(context) { UserPrincipalName = "*" + partialName + "*" }));
-                identities.AddRange(SearchBy(domain, new UserPrincipal(context) { SamAccountName = "*" + partialName + "*" }));
+                var identities = new List<Principal>(SearchBy(new UserPrincipal(context) { Name = "*" + partialName + "*" }));
+                identities.AddRange(SearchBy(new UserPrincipal(context) { UserPrincipalName = "*" + partialName + "*" }));
+                identities.AddRange(SearchBy(new UserPrincipal(context) { SamAccountName = "*" + partialName + "*" }));
 
                 var identityResources = identities.Distinct(new PrincipalComparer())
                     .Select(u => identityCreator.Create("", u.UserPrincipalName, ConvertSamAccountName(u, domain),
@@ -54,7 +52,7 @@ namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryS
             }
         }
 
-        IEnumerable<Principal> SearchBy(string domain, UserPrincipal queryFilter)
+        IEnumerable<Principal> SearchBy(UserPrincipal queryFilter)
         {
             var searcher = new PrincipalSearcher
             {

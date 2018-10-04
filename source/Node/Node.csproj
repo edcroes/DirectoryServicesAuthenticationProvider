@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Octopus.Node.Extensibility.Authentication.DirectoryServices</RootNamespace>
     <AssemblyName>Octopus.Node.Extensibility.Authentication.DirectoryServices</AssemblyName>
     <Description>Implements the DirectoryServices authentication provider.</Description>
@@ -14,18 +14,13 @@
   <ItemGroup>
     <PackageReference Include="Octopus.Configuration" Version="1.0.11" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
-    <PackageReference Include="Octopus.Node.Extensibility" Version="5.0.0" />
-    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="8.0.0" />
-    <PackageReference Include="Octopus.Time" Version="1.1.2" />
-    <PackageReference Include="System.DirectoryServices" Version="4.5.0-preview2-25517-02" />
-    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0-preview2-25517-02" />
+    <PackageReference Include="Octopus.Node.Extensibility" Version="5.0.4-removing-nancy0010" />
+    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="8.0.1-more-nancy-work0002" />
+    <PackageReference Include="System.DirectoryServices" Version="4.5.0" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
   </ItemGroup>
   <Target Name="AfterBuildNetStd" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <Message Text="after build step for $(TargetFramework)" Importance="High" />
     <Exec Command="xcopy $(OutputPath)*DirectoryServices.* C:\Octopus\DataCenterManager\CustomExtensions /S /Y /I /D" />
-  </Target>
-  <Target Name="AfterBuildNet451" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net451'">
-    <Message Text="after build step for $(TargetFramework)" Importance="High" />
-    <Exec Command="xcopy $(OutputPath)*DirectoryServices.* C:\ProgramData\Octopus\CustomExtensions /S /Y /I /D" />
   </Target>
 </Project>
