@@ -22,7 +22,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             if (string.IsNullOrWhiteSpace(name))
             {
                 context.Response.BadRequest("Please provide the name of a user to search for");
-                return Task.CompletedTask;
+                return Task.FromResult(0);
             }
 
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
@@ -30,7 +30,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
                 context.Response.AsOctopusJson(userSearch.Search(name, cts.Token));
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
     }
 }

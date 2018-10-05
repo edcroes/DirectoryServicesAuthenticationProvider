@@ -23,7 +23,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             if (string.IsNullOrWhiteSpace(name))
             {
                 context.Response.BadRequest("Please provide the name of a group to search by, or a team");
-                return Task.CompletedTask;
+                return Task.FromResult(0);
             }
 
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
@@ -31,7 +31,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
                 context.Response.AsOctopusJson(SearchByName(name, cts.Token));
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         ExternalSecurityGroup[] SearchByName(string name, CancellationToken cancellationToken)

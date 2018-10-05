@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
     <RootNamespace>Octopus.Server.Extensibility.Authentication.DirectoryServices</RootNamespace>
     <AssemblyName>Octopus.Server.Extensibility.Authentication.DirectoryServices</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -15,15 +15,14 @@
     <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
     <PackageLicenseUrl>https://octopus.com/</PackageLicenseUrl>
     <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
-    <PostBuildEvent>xcopy "$(TargetDir)Octopus.Server.Extensibility.Authentication.DirectoryServices.*" "C:\ProgramData\Octopus\CustomExtensions" /S /Y /I /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
-    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="8.0.1-more-nancy-work0002" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="5.0.4-removing-nancy0010" />
-    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="8.0.1-more-nancy-work0002" />
+    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="8.0.1-more-nancy-work0004" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="5.0.4-removing-nancy0013" />
+    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="8.0.1-more-nancy-work0004" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Web\Static\images\directory_services_signin_buttons\microsoft-logo.svg" />

@@ -21,10 +21,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 if (context.User == null)
                 {
                     context.Response.StatusCode = 401;
-                    return Task.CompletedTask;
+                    return Task.FromResult(0);
                 }
 
-                //TODO: Need to use claims here! Talk to RobE
                 var principal = (IOctopusPrincipal)context.User;
 
                 // Decode the state object sent from the client (if there was one) so we can use those hints to build the most appropriate response
@@ -59,7 +58,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                         {
                             context.Response.WithCookie(cookie);
                         }
-                        return Task.CompletedTask;
+                        return Task.FromResult(0);
                     }
 
                     // Just log that we detected a non-local redirect URL, and fall through to the root of the local web site
@@ -75,7 +74,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                     context.Response.WithCookie(cookie);
                 }
 
-                return Task.CompletedTask;
+                return Task.FromResult(0);
             });
         }
     }

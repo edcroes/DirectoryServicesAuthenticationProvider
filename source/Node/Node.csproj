@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net451;netstandard2.0</TargetFrameworks>
     <RootNamespace>Octopus.Node.Extensibility.Authentication.DirectoryServices</RootNamespace>
     <AssemblyName>Octopus.Node.Extensibility.Authentication.DirectoryServices</AssemblyName>
     <Description>Implements the DirectoryServices authentication provider.</Description>
@@ -14,13 +14,9 @@
   <ItemGroup>
     <PackageReference Include="Octopus.Configuration" Version="1.0.11" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
-    <PackageReference Include="Octopus.Node.Extensibility" Version="5.0.4-removing-nancy0010" />
-    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="8.0.1-more-nancy-work0002" />
+    <PackageReference Include="Octopus.Node.Extensibility" Version="5.0.4-removing-nancy0013" />
+    <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="8.0.1-more-nancy-work0004" />
     <PackageReference Include="System.DirectoryServices" Version="4.5.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
   </ItemGroup>
-  <Target Name="AfterBuildNetStd" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <Message Text="after build step for $(TargetFramework)" Importance="High" />
-    <Exec Command="xcopy $(OutputPath)*DirectoryServices.* C:\Octopus\DataCenterManager\CustomExtensions /S /Y /I /D" />
-  </Target>
 </Project>
