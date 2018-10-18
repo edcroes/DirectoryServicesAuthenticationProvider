@@ -12,7 +12,7 @@
     <PackageProjectUrl>https://octopus.com/</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Octopus.Configuration" Version="1.0.11" />
+    <PackageReference Include="Octopus.Configuration" Version="2.0.0" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.0.12" />
     <PackageReference Include="Octopus.Node.Extensibility" Version="5.0.4-removing-nancy0015" />
     <PackageReference Include="Octopus.Node.Extensibility.Authentication" Version="8.1.1-more-nancy-work0004" />
