@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class PrincipalComparer : IEqualityComparer<Principal>
     {

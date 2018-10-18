@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Octopus.Data.Model;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities;
-using Octopus.Node.Extensibility.Authentication.Extensions;
-using Octopus.Node.Extensibility.Authentication.Extensions.Identities;
-using Octopus.Node.Extensibility.Authentication.Resources;
-using Octopus.Node.Extensibility.Authentication.Resources.Identities;
-using Octopus.Node.Extensibility.Extensions.Infrastructure.Web.Content;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
+using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.Extensions.Identities;
+using Octopus.Server.Extensibility.Authentication.Resources;
+using Octopus.Server.Extensibility.Authentication.Resources.Identities;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {

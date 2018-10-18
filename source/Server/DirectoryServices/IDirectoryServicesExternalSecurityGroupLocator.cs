@@ -1,7 +1,7 @@
 using System.Threading;
-using Octopus.Node.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.Extensions;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public interface IDirectoryServicesExternalSecurityGroupLocator : ICanSearchExternalGroups
     {

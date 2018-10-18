@@ -2,11 +2,11 @@ using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Threading;
 using Octopus.Data.Model.User;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities;
-using Octopus.Node.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
+using Octopus.Server.Extensibility.Authentication.Extensions;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class UserMatcher : ICanMatchExternalUser
     {

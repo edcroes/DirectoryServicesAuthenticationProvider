@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Net;
 using Octopus.Data.Resources.Attributes;
-using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
     public class DirectoryServicesConfigurationResource : ExtensionConfigurationResource
     {

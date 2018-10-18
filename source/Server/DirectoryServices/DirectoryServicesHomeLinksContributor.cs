@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Node.Extensibility.HostServices.Web;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.HostServices.Web;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesHomeLinksContributor : IHomeLinksContributor
     {

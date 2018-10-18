@@ -1,5 +1,5 @@
 ﻿using System;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Web;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 

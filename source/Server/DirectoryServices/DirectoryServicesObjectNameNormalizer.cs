@@ -2,7 +2,7 @@ using System;
 using System.DirectoryServices.AccountManagement;
 using Octopus.Diagnostics;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesObjectNameNormalizer : IDirectoryServicesObjectNameNormalizer
     {

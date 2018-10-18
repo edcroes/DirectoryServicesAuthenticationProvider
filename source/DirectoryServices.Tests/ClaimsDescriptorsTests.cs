@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities;
-using Octopus.Node.Extensibility.Authentication.Resources.Identities;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
+using Octopus.Server.Extensibility.Authentication.Resources.Identities;
 
 namespace DirectoryServices.Tests
 {

@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirectoryServices.Tests", "DirectoryServices.Tests\DirectoryServices.Tests.csproj", "{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Node", "Node\Node.csproj", "{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{65FC864D-6EB7-4155-B0F2-491490236FEF}"
 EndProject
 Global
@@ -31,10 +29,6 @@ Global
 		{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1E9500F-FCC4-45F2-A390-0EFDED19A7D1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDE3FFFD-DD3D-48FC-9A74-DA1E672F7CEB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{65FC864D-6EB7-4155-B0F2-491490236FEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{65FC864D-6EB7-4155-B0F2-491490236FEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65FC864D-6EB7-4155-B0F2-491490236FEF}.Release|Any CPU.ActiveCfg = Release|Any CPU

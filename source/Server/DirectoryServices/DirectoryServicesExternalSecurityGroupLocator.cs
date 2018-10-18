@@ -4,11 +4,11 @@ using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Threading;
 using Octopus.Diagnostics;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Node.Extensibility.Authentication.Extensions;
-using Octopus.Node.Extensibility.Authentication.HostServices;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Authentication.HostServices;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesExternalSecurityGroupLocator : IDirectoryServicesExternalSecurityGroupLocator
     {

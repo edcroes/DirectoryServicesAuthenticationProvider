@@ -6,13 +6,13 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Octopus.Data.Model.User;
 using Octopus.Diagnostics;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities;
-using Octopus.Node.Extensibility.Authentication.HostServices;
-using Octopus.Node.Extensibility.Authentication.Resources.Identities;
-using Octopus.Node.Extensibility.Authentication.Storage.User;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
+using Octopus.Server.Extensibility.Authentication.HostServices;
+using Octopus.Server.Extensibility.Authentication.Resources.Identities;
+using Octopus.Server.Extensibility.Authentication.Storage.User;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesCredentialValidator : IDirectoryServicesCredentialValidator
     {

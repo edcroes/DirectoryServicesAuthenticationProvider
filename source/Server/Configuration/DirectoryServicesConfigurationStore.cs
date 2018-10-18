@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using Octopus.Data.Storage.Configuration;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Node.Extensibility.Authentication.Extensions;
-using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
     public class DirectoryServicesConfigurationStore : ExtensionConfigurationStore<DirectoryServicesConfiguration>, IDirectoryServicesConfigurationStore, IAuthenticationSchemeProvider
     {

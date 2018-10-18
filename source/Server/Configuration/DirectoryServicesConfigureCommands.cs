@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Octopus.Diagnostics;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {

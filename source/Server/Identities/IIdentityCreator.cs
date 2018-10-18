@@ -1,6 +1,6 @@
 ﻿using Octopus.Data.Model.User;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities
 {
     public interface IIdentityCreator
     {

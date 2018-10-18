@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
-using Octopus.Node.Extensibility.HostServices.Mapping;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.HostServices.Mapping;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
     public class DirectoryServicesConfigurationSettings :
         ExtensionConfigurationSettings<DirectoryServicesConfiguration, DirectoryServicesConfigurationResource,

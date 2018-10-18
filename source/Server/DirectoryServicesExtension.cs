@@ -1,15 +1,15 @@
 ﻿using Autofac;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Configuration;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Node.Extensibility.Authentication.DirectoryServices.Identities;
-using Octopus.Node.Extensibility.Authentication.Extensions;
-using Octopus.Node.Extensibility.Extensions;
-using Octopus.Node.Extensibility.Extensions.Infrastructure;
-using Octopus.Node.Extensibility.Extensions.Infrastructure.Configuration;
-using Octopus.Node.Extensibility.Extensions.Mappings;
-using Octopus.Node.Extensibility.HostServices.Web;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
+using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Extensions;
+using Octopus.Server.Extensibility.Extensions.Infrastructure;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.Extensions.Mappings;
+using Octopus.Server.Extensibility.HostServices.Web;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
     [OctopusPlugin("Directory Services", "Octopus Deploy")]
     public abstract class DirectoryServicesExtension : IOctopusExtension

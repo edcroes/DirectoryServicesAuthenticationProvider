@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Octopus.Node.Extensibility.Authentication.DirectoryServices.DirectoryServices
+namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     public class DirectoryServicesExternalSecurityGroupLocatorResult
     {
