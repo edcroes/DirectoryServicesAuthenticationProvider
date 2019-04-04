@@ -24,7 +24,7 @@
     <PackageReference Include="Octopus.Configuration" Version="2.0.1" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.3.0" />
     <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="9.1.0" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="6.1.2" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="6.1.3" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Web\Static\images\directory_services_signin_buttons\microsoft-logo.svg" />
