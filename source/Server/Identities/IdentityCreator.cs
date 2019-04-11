@@ -11,7 +11,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Identiti
         public Identity Create(string email, string upn, string samAccountName, string displayName)
         {
             return new Identity(DirectoryServicesAuthentication.ProviderName)
-                .WithClaim(ClaimDescriptor.EmailClaimType, email, true)
+                .WithClaim(ClaimDescriptor.EmailClaimType, email, false)
                 .WithClaim(UpnClaimType, upn, true)
                 .WithClaim(SamAccountNameClaimType, samAccountName, true)
                 .WithClaim(ClaimDescriptor.DisplayNameClaimType, displayName, false);
