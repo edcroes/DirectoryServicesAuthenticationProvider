@@ -148,9 +148,21 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             var authenticatingIdentity = NewIdentity(emailAddress, userPrincipalName, samAccountName, displayName);
 
-            var user = userStore.GetByIdentity(authenticatingIdentity);
+            var users = userStore.GetByIdentity(authenticatingIdentity);
 
-            if (user != null)
+            var existingMatchingUser = users.SingleOrDefault(u => u.Identities != null && u.Identities.Any(identity => 
+                identity.IdentityProviderName == DirectoryServicesAuthentication.ProviderName &&
+                identity.Claims[ClaimDescriptor.EmailClaimType].Value == emailAddress &&
+                identity.Claims[IdentityCreator.UpnClaimType].Value == userPrincipalName &&
+                identity.Claims[IdentityCreator.SamAccountNameClaimType].Value == samAccountName));
+            
+            // if all identifiers match, nothing to see here, moving right along
+            if (existingMatchingUser != null)
+            {
+                return new AuthenticationUserCreateResult(existingMatchingUser);
+            }
+
+            foreach (var user in users)
             {
                 // if we haven't converted the old externalId into the new identity then set it up now
                 var identity = user.Identities.FirstOrDefault(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName);
@@ -159,12 +171,35 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity, cancellationToken));
                 }
 
-                identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
-                identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
-                identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
-                identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
+                if (identity.Claims[IdentityCreator.SamAccountNameClaimType].Value != samAccountName)
+                {
+                    // we found a single other user in our DB that wasn't an exact match, but matched on some fields, so see if that user is still
+                    // in AD
+                    var otherUserPrincipal = FindUserBySamAccountName(identity.Claims[IdentityCreator.SamAccountNameClaimType].Value);
 
-                return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
+                    if (otherUserPrincipal == null)
+                    {
+                        // we couldn't find a match for the existing DB user's SamAccountName in AD, assume their details have been updated in AD
+                        // and we need to modify the existing user in our DB.
+                        identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
+                        identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
+                        identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
+                        identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
+
+                        return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
+                    }
+                    
+                    // otherUserPrincipal still exists in AD, so what we have here is a new user
+                }
+                else 
+                {
+                    // if we partially matched but the samAccountName is the same then this is the same user.
+                    identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
+                    identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
+                    identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
+
+                    return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
+                }
             }
 
             if (!configurationStore.GetAllowAutoUserCreation())
@@ -177,6 +212,16 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 identities: new[] { authenticatingIdentity });
 
             return new AuthenticationUserCreateResult(userCreateResult);
+        }
+
+        UserPrincipal FindUserBySamAccountName(string samAccountName)
+        {
+            objectNameNormalizer.NormalizeName(samAccountName, out samAccountName, out var domain);
+
+            using (var context = contextProvider.GetContext(domain))
+            {
+                return UserPrincipal.FindByIdentity(context, samAccountName);
+            }
         }
 
         Identity NewIdentity(string emailAddress, string userPrincipalName, string samAccountName, string displayName)
