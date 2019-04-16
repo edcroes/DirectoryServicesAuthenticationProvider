@@ -152,9 +152,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             var existingMatchingUser = users.SingleOrDefault(u => u.Identities != null && u.Identities.Any(identity => 
                 identity.IdentityProviderName == DirectoryServicesAuthentication.ProviderName &&
-                identity.Claims[ClaimDescriptor.EmailClaimType].Value == emailAddress &&
-                identity.Claims[IdentityCreator.UpnClaimType].Value == userPrincipalName &&
-                identity.Claims[IdentityCreator.SamAccountNameClaimType].Value == samAccountName));
+                identity.Equals(authenticatingIdentity)));
             
             // if all identifiers match, nothing to see here, moving right along
             if (existingMatchingUser != null)
@@ -171,7 +169,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity, cancellationToken));
                 }
 
-                if (identity.Claims[IdentityCreator.SamAccountNameClaimType].Value != samAccountName)
+                if (identity.Claims[IdentityCreator.SamAccountNameClaimType].Value != samAccountName &&
+                    identity.Claims[IdentityCreator.UpnClaimType].Value != userPrincipalName)
                 {
                     // we found a single other user in our DB that wasn't an exact match, but matched on some fields, so see if that user is still
                     // in AD
@@ -193,7 +192,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 }
                 else 
                 {
-                    // if we partially matched but the samAccountName is the same then this is the same user.
+                    // if we partially matched but the samAccountName or UPN is the same then this is the same user.
                     identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
                     identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
                     identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
