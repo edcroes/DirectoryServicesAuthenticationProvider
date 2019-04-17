@@ -1,5 +1,4 @@
 using System;
-using System.DirectoryServices.AccountManagement;
 using Octopus.Diagnostics;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
@@ -28,12 +27,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             }
         }
 
-        public string ValidatedUserPrincipalName(UserPrincipal principal, string fallbackUsername, string fallbackDomain)
+        public string ValidatedUserPrincipalName(string userPrincipalName, string fallbackUsername, string fallbackDomain)
         {
-            var name = principal.UserPrincipalName;
+            var name = userPrincipalName;
             if (name == null)
             {
-                log.Warn($"The user name (UPN) could not be determined for principal {principal} - falling back to NT-style '{fallbackDomain}\\{fallbackUsername}'");
+                log.Warn($"The user name (UPN) could not be determined for principal - falling back to NT-style '{fallbackDomain}\\{fallbackUsername}'");
                 if (string.IsNullOrWhiteSpace(fallbackDomain))
                     throw new InvalidOperationException("No fallback domain was provided");
                 if (string.IsNullOrWhiteSpace(fallbackUsername))
