@@ -43,6 +43,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 .As<ICanSearchExternalGroups>()
                 .InstancePerDependency();
 
+            builder.RegisterType<DirectoryServicesService>()
+                .As<IDirectoryServicesService>()
+                .InstancePerDependency();
+
             builder.RegisterType<DirectoryServicesCredentialValidator>()
                 .As<IDirectoryServicesCredentialValidator>()
                 .As<IDoesBasicAuthentication>()

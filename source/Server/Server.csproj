@@ -17,6 +17,7 @@
     <PackageProjectUrl>https://github.com/OctopusDeploy/DirectoryServicesAuthenticationProvider</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Octopus.Data" Version="3.2.1-enh-email-not-un0004" />
     <PackageReference Include="System.DirectoryServices" Version="4.5.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
     <PackageReference Include="Autofac" Version="4.6.0" />
