@@ -77,6 +77,24 @@ namespace DirectoryServices.Tests
         }
 
         [Test]
+        public void ExistingUserWithMultipleIdentities()
+        {
+            directoryServicesService.ValidateCredentials("existingUser1@test.com", "testPassword", CancellationToken.None)
+                .Returns(new UserValidationResult("existingUser1@test.com", "\\existingUser1", "TestDomain", string.Empty, String.Empty));
+
+            var user = new User("Users-100", "existingUser", identityCreator.Create(string.Empty, string.Empty, "TestDomain\\existingUser", string.Empty));
+            user.Identities.Add(identityCreator.Create("existingUser@test.com", "existingUser1@test.com","TestDomain\\existingUser1", string.Empty));
+
+            updateableUserStore.GetByIdentity(Arg.Any<Identity>()).Returns(new [] { user });
+            directoryServicesService.FindByIdentity("TestDomain\\existingUser").Returns(new UserValidationResult("existingUser@test.com", "existingUser", "TestDomain", string.Empty, "tester@test.com"));
+
+            var result = validator.ValidateCredentials("existingUser1@test.com", "testPassword", CancellationToken.None);
+
+            result.Succeeded.ShouldBeTrue();
+            updateableUserStore.Received(1).UpdateIdentity(Arg.Any<string>(), Arg.Any<Identity>(), CancellationToken.None);
+        }
+
+        [Test]
         public void NewUserWithNoMatchingIdentity()
         {
             directoryServicesService.ValidateCredentials("newUser", "testPassword", CancellationToken.None)
