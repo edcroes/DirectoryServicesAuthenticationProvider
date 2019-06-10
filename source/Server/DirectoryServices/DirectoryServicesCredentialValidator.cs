@@ -94,11 +94,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             var users = userStore.GetByIdentity(authenticatingIdentity);
 
-            var existingMatchingUser = users.FirstOrDefault(u => u.Identities != null && u.Identities.Any(identity => 
+            var existingMatchingUser = users.SingleOrDefault(u => u.Identities != null && u.Identities.Any(identity => 
                 identity.IdentityProviderName == DirectoryServicesAuthentication.ProviderName &&
                 identity.Equals(authenticatingIdentity)));
             
-            // if all identifiers match, nothing to see here, moving right along
+            // if we can find a user where all identifiers match exactly then we know for sure that's the user
+            // who just logged in.
             if (existingMatchingUser != null)
             {
                 return new AuthenticationUserCreateResult(existingMatchingUser);
