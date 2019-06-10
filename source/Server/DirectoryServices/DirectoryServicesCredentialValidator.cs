@@ -98,7 +98,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 identity.IdentityProviderName == DirectoryServicesAuthentication.ProviderName &&
                 identity.Equals(authenticatingIdentity)));
             
-            // if all identifiers match, nothing to see here, moving right along
+            // if we can find a user where all identifiers match exactly then we know for sure that's the user
+            // who just logged in.
             if (existingMatchingUser != null)
             {
                 return new AuthenticationUserCreateResult(existingMatchingUser);
@@ -107,42 +108,45 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             foreach (var user in users)
             {
                 // if we haven't converted the old externalId into the new identity then set it up now
-                var identity = user.Identities.FirstOrDefault(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName);
-                if (identity == null)
+                var anyADIdentity = user.Identities.FirstOrDefault(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName);
+                if (anyADIdentity == null)
                 {
                     return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity, cancellationToken));
                 }
 
-                if (identity.Claims[IdentityCreator.SamAccountNameClaimType].Value != samAccountName &&
-                    identity.Claims[IdentityCreator.UpnClaimType].Value != userPrincipalName)
+                foreach (var identity in user.Identities.Where(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName))
                 {
-                    // we found a single other user in our DB that wasn't an exact match, but matched on some fields, so see if that user is still
-                    // in AD
-                    var otherUserPrincipal = directoryServicesService.FindByIdentity(identity.Claims[IdentityCreator.SamAccountNameClaimType].Value);
-
-                    if (!otherUserPrincipal.Success)
+                    if (identity.Claims[IdentityCreator.SamAccountNameClaimType].Value == samAccountName ||
+                        identity.Claims[IdentityCreator.UpnClaimType].Value == userPrincipalName)
                     {
-                        // we couldn't find a match for the existing DB user's SamAccountName in AD, assume their details have been updated in AD
-                        // and we need to modify the existing user in our DB.
-                        identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
+                        // if we partially matched but the samAccountName or UPN is the same then this is the same user.
                         identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
+                        identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
                         identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
                         identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
 
                         return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
                     }
-                    
-                    // otherUserPrincipal still exists in AD, so what we have here is a new user
-                }
-                else 
-                {
-                    // if we partially matched but the samAccountName or UPN is the same then this is the same user.
-                    identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
-                    identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
-                    identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
-                    identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
+                    else
+                    {
+                        // we found a single other user in our DB that wasn't an exact match, but matched on some fields, so see if that user is still
+                        // in AD
+                        var otherUserPrincipal = directoryServicesService.FindByIdentity(identity.Claims[IdentityCreator.SamAccountNameClaimType].Value);
 
-                    return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
+                        if (!otherUserPrincipal.Success)
+                        {
+                            // we couldn't find a match for the existing DB user's SamAccountName in AD, assume their details have been updated in AD
+                            // and we need to modify the existing user in our DB.
+                            identity.Claims[ClaimDescriptor.EmailClaimType].Value = emailAddress;
+                            identity.Claims[IdentityCreator.UpnClaimType].Value = userPrincipalName;
+                            identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
+                            identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
+
+                            return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
+                        }
+
+                        // otherUserPrincipal still exists in AD, so what we have here is a new user
+                    }
                 }
             }
 
