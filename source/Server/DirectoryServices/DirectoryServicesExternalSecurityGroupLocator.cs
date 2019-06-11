@@ -52,7 +52,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             using (var context = contextProvider.GetContext(domain))
             {
                 var searcher = new PrincipalSearcher();
-                searcher.QueryFilter = new GroupPrincipal(context) { Name = partialGroupName + "*" };
+                searcher.QueryFilter = new GroupPrincipal(context) { Name = "*" + partialGroupName + "*" };
 
                 var iterGroup = searcher.FindAll().GetEnumerator();
                 using (iterGroup)
