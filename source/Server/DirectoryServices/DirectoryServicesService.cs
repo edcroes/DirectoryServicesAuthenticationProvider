@@ -52,9 +52,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     log.Info($"A principal identifiable by '{username}' was not found in '{searchedContext}'");
                     if (username.Contains("@"))
                     {
-                        return new UserValidationResult("Username not found.  UPN format may not be supported for your domain configuration.");
+                        return new UserValidationResult("Invalid username or password.  UPN format may not be supported for your domain configuration.");
                     }
-                    return new UserValidationResult("Username not found");
+                    return new UserValidationResult("Invalid username or password.");
                 }
 
                 var hToken = IntPtr.Zero;
@@ -68,7 +68,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         var error = new Win32Exception();
                         log.Warn(error, $"Principal '{logon}' (Domain: '{domain}') could not be logged on via WIN32: 0x{error.NativeErrorCode:X8}.");
 
-                        return new UserValidationResult("Active directory login error");
+                        return new UserValidationResult("Invalid username or password.");
                     }
                 }
                 finally
