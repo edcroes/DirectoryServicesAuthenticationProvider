@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
@@ -19,7 +20,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 
         public Task ExecuteAsync(OctoContext context)
         {
-            var name = context.Request.Query["partialName"];
+            var name = context.Request.Query["partialName"]?.FirstOrDefault();
             if (string.IsNullOrWhiteSpace(name))
             {
                 context.Response.BadRequest("Please provide the name of a group to search by, or a team");

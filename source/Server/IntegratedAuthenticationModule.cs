@@ -34,7 +34,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
                 {
                     try
                     {
-                        state = JsonConvert.DeserializeObject<LoginState>(stateString);
+                        state = JsonConvert.DeserializeObject<LoginState>(stateString.FirstOrDefault());
                     }
                     catch (Exception e)
                     {
