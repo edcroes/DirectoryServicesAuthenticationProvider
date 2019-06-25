@@ -21,7 +21,7 @@ var publishDir = "./publish";
 var localPackagesDir = "../LocalPackages";
 var artifactsDir = "./artifacts";
 var assetDir = "./BuildAssets";
-var bin462 = "/bin/Release/net462/";
+var bin452 = "/bin/Release/net452/";
 var std20 = "/bin/Release/netstandard2.0/";
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
@@ -116,7 +116,7 @@ Task("__Pack")
         CreateDirectory(odNugetPackDir);
         CopyFileToDirectory(Path.Combine(assetDir, nuspecFile), odNugetPackDir);
 
-		CopyFileToDirectory(solutionDir + "Server" + bin462 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
+		CopyFileToDirectory(solutionDir + "Server" + bin452 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
         // files = new [] {
             // solutionDir + "Server" + bin452 + "Octopus.Node.Extensibility.Authentication.DirectoryServices.dll",
             // solutionDir + "Server" + bin452 + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll"
