@@ -73,8 +73,6 @@ Task("__Restore")
         {
             ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
         });
-        
-        NuGetRestore("./source/DirectoryServicesAuthenticationProvider.sln");
     });
 	
 Task("__Build")
