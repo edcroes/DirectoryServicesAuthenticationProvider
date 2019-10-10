@@ -16,17 +16,20 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesConfigurationStore configurationStore;
+        readonly IUserPrincipalFinder userPrincipalFinder;
 
         public DirectoryServicesExternalSecurityGroupLocator(
             ILog log,
             IDirectoryServicesContextProvider contextProvider,
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
-            IDirectoryServicesConfigurationStore configurationStore)
+            IDirectoryServicesConfigurationStore configurationStore,
+            IUserPrincipalFinder userPrincipalFinder)
         {
             this.log = log;
             this.contextProvider = contextProvider;
             this.objectNameNormalizer = objectNameNormalizer;
             this.configurationStore = configurationStore;
+            this.userPrincipalFinder = userPrincipalFinder;
         }
 
         public ExternalSecurityGroupResult Search(string name, CancellationToken cancellationToken)
@@ -96,7 +99,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
                 using (var context = contextProvider.GetContext(domain))
                 {
-                    var principal = UserPrincipal.FindByIdentity(context, samAccountName);
+                    var principal = userPrincipalFinder.FindByIdentity(context, samAccountName);
                     if (principal == null)
                     {
                         var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
@@ -142,17 +145,17 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
         }
 
-        static void ReadAuthorizationGroups(UserPrincipal principal, ICollection<string> groups, CancellationToken cancellationToken)
+        static void ReadAuthorizationGroups(IUserPrincipalWrapper principal, ICollection<string> groups, CancellationToken cancellationToken)
         {
             ReadGroups(principal.GetAuthorizationGroups(), groups, cancellationToken);
         }
 
-        static void ReadUserGroups(Principal principal, ICollection<string> groups, CancellationToken cancellationToken)
+        static void ReadUserGroups(IUserPrincipalWrapper principal, ICollection<string> groups, CancellationToken cancellationToken)
         {
             ReadGroups(principal.GetGroups(), groups, cancellationToken);
         }
 
-        static void ReadGroups(IEnumerable<Principal> groupPrincipals, ICollection<string> groups, CancellationToken cancellationToken)
+        static void ReadGroups(IEnumerable<IPrincipalWrapper> groupPrincipals, ICollection<string> groups, CancellationToken cancellationToken)
         {
             var iterGroup = groupPrincipals.GetEnumerator();
             using (iterGroup)
