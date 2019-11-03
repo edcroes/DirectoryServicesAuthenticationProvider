@@ -99,50 +99,49 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
                 using (var context = contextProvider.GetContext(domain))
                 {
-                    var principal = userPrincipalFinder.FindByIdentity(context, samAccountName);
-                    if (principal == null)
-                    {
-                        var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
-                        log.Trace(
-                            $"While loading security groups, a principal identifiable by '{samAccountName}' was not found in '{searchedContext}'");
-                        return new DirectoryServicesExternalSecurityGroupLocatorResult();
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    try
+                    using (var principal = userPrincipalFinder.FindByIdentity(context, samAccountName))
                     {
-                        // Reads inherited groups - this fails in some situations
-                        ReadAuthorizationGroups(principal, groups, cancellationToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Don't log it as an Error, it's expected to fail in some situations
-                        log.Verbose(ex);
+                        if (principal == null)
+                        {
+                            var searchedContext = domain ?? context.Name ?? context.ConnectedServer;
+                            log.Trace(
+                                $"While loading security groups, a principal identifiable by '{samAccountName}' was not found in '{searchedContext}'");
+                            return new DirectoryServicesExternalSecurityGroupLocatorResult();
+                        }
 
                         try
                         {
-                            // Reads just the groups they are a member of - more reliable but not ideal
-                            ReadUserGroups(principal, groups, cancellationToken);
+                            // Reads inherited groups - this fails in some situations
+                            ReadAuthorizationGroups(principal, groups, cancellationToken);
+                            return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
                         }
-                        catch (Exception ex2)
+                        catch (Exception ex) when (!(ex is PrincipalServerDownException))
                         {
-                            // Only log an error if both methods fail to read the groups
-                            log.Error(ex2);
-
-                            return new DirectoryServicesExternalSecurityGroupLocatorResult();
+                            // Don't log it as an Error, it's expected to fail in some situations
+                            log.Verbose(ex);
                         }
                     }
-                }
 
-                if (cancellationToken.IsCancellationRequested)
-                    return new DirectoryServicesExternalSecurityGroupLocatorResult();
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    // Reads just the groups they are a member of - more reliable but not ideal
+                    using (var principal = userPrincipalFinder.FindByIdentity(context, samAccountName))
+                        ReadUserGroups(principal, groups, cancellationToken);
+                    
+                    return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return new DirectoryServicesExternalSecurityGroupLocatorResult();
             }
             catch (Exception ex)
             {
                 log.ErrorFormat(ex, "Active Directory search for {0} failed.", samAccountName);
                 return new DirectoryServicesExternalSecurityGroupLocatorResult();
             }
-
-            return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
         }
 
         static void ReadAuthorizationGroups(IUserPrincipalWrapper principal, ICollection<string> groups, CancellationToken cancellationToken)

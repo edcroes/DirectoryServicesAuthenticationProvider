@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public interface IUserPrincipalWrapper : IPrincipalWrapper
+    public interface IUserPrincipalWrapper : IPrincipalWrapper, IDisposable
     {
         IEnumerable<IPrincipalWrapper> GetAuthorizationGroups();
         IEnumerable<IPrincipalWrapper> GetGroups();
@@ -18,6 +19,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             : base(userPrincipal)
         {
             this.userPrincipal = userPrincipal;
+        }
+
+        public void Dispose()
+        {
+            userPrincipal?.Dispose();
         }
 
         public IEnumerable<IPrincipalWrapper> GetAuthorizationGroups()
