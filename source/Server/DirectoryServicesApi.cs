@@ -11,8 +11,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
         public const string ApiExternalUsersSearch = "/api/externalusers/directoryServices{?partialName}";
 
         public DirectoryServicesApi(
-            Func<SecuredAsyncActionInvoker<ListSecurityGroupsAction, IDirectoryServicesConfigurationStore>> listSecurityGroupsActionInvokerFactory,
-            Func<SecuredAsyncActionInvoker<UserLookupAction, IDirectoryServicesConfigurationStore>> userLookupActionInvokerFactory)
+            Func<SecuredWhenEnabledAsyncActionInvoker<ListSecurityGroupsAction, IDirectoryServicesConfigurationStore>> listSecurityGroupsActionInvokerFactory,
+            Func<SecuredWhenEnabledAsyncActionInvoker<UserLookupAction, IDirectoryServicesConfigurationStore>> userLookupActionInvokerFactory)
         {
             Add("GET", ApiExternalGroupsSearch, listSecurityGroupsActionInvokerFactory().ExecuteAsync);
             Add("GET", ApiExternalUsersSearch, userLookupActionInvokerFactory().ExecuteAsync);
