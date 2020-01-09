@@ -5,10 +5,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     public class DirectoryServicesObjectNameNormalizer : IDirectoryServicesObjectNameNormalizer
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         const string NTAccountUsernamePrefix = "nt:";
 
-        public DirectoryServicesObjectNameNormalizer(ILog log)
+        public DirectoryServicesObjectNameNormalizer(ISystemLog log)
         {
             this.log = log;
         }

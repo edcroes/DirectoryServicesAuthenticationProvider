@@ -13,7 +13,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
     public class IntegratedAuthenticationModule : RegisterEndpoint
     {
-        public IntegratedAuthenticationModule(ILog log, IAuthCookieCreator tokenIssuer, IAuthenticationConfigurationStore authenticationConfigurationStore, IUrlEncoder encoder)
+        public IntegratedAuthenticationModule(ISystemLog log, IAuthCookieCreator tokenIssuer, IAuthenticationConfigurationStore authenticationConfigurationStore, IUrlEncoder encoder)
         {
             Add("GET", DirectoryServicesConstants.ChallengePath, context =>
             {

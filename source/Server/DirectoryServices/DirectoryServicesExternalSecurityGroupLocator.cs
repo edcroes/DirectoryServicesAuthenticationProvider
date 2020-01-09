@@ -12,13 +12,13 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     public class DirectoryServicesExternalSecurityGroupLocator : IDirectoryServicesExternalSecurityGroupLocator
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesConfigurationStore configurationStore;
 
         public DirectoryServicesExternalSecurityGroupLocator(
-            ILog log,
+            ISystemLog log,
             IDirectoryServicesContextProvider contextProvider,
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesConfigurationStore configurationStore)

@@ -8,11 +8,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
 {
     public class DirectoryServicesConfigureCommands : IContributeToConfigureCommand
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly Lazy<IDirectoryServicesConfigurationStore> activeDirectoryConfiguration;
 
         public DirectoryServicesConfigureCommands(
-            ILog log,
+            ISystemLog log,
             Lazy<IDirectoryServicesConfigurationStore> activeDirectoryConfiguration)
         {
             this.log = log;

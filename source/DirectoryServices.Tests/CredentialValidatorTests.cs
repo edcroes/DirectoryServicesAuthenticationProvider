@@ -37,7 +37,7 @@ namespace DirectoryServices.Tests
 
             directoryServicesService = Substitute.For<IDirectoryServicesService>();
             
-            var log = Substitute.For<ILog>();
+            var log = Substitute.For<ISystemLog>();
 
             identityCreator = new IdentityCreator();
 

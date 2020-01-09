@@ -12,7 +12,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     public class DirectoryServicesCredentialValidator : IDirectoryServicesCredentialValidator
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IUpdateableUserStore userStore;
         readonly IDirectoryServicesConfigurationStore configurationStore;
@@ -22,7 +22,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         internal static string EnvironmentUserDomainName = Environment.UserDomainName;
 
         public DirectoryServicesCredentialValidator(
-            ILog log, 
+            ISystemLog log, 
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IUpdateableUserStore userStore,
             IDirectoryServicesConfigurationStore configurationStore,

@@ -9,7 +9,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     public class DirectoryServicesService : IDirectoryServicesService
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;
         readonly IDirectoryServicesContextProvider contextProvider;
 
@@ -27,7 +27,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         /// </summary>
         const int LOGON32_PROVIDER_DEFAULT = 0;
 
-        public DirectoryServicesService(ILog log, 
+        public DirectoryServicesService(ISystemLog log, 
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IDirectoryServicesContextProvider contextProvider)
         {
