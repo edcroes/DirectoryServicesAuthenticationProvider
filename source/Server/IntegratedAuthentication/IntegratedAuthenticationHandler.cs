@@ -8,30 +8,26 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Resources;
-using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
-    class IntegratedAuthenticationHandler
+    class IntegratedAuthenticationHandler : IIntegratedAuthenticationHandler
     {
         readonly ILog log;
         readonly IAuthCookieCreator tokenIssuer;
         readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
-        readonly IUrlEncoder encoder;
         readonly DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals;
         readonly IUserStore userStore;
 
         public IntegratedAuthenticationHandler(ILog log, 
             IAuthCookieCreator tokenIssuer,
             IAuthenticationConfigurationStore authenticationConfigurationStore, 
-            IUrlEncoder encoder,
             DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals,
             IUserStore userStore)
         {
             this.log = log;
             this.tokenIssuer = tokenIssuer;
             this.authenticationConfigurationStore = authenticationConfigurationStore;
-            this.encoder = encoder;
             this.supportsAutoUserCreationFromPrincipals = supportsAutoUserCreationFromPrincipals;
             this.userStore = userStore;
         }

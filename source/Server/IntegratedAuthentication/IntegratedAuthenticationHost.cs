@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.HttpSys;
-using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web;
 using Octopus.Server.Extensibility.HostServices.Web;
 
@@ -19,30 +17,18 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
     {
         readonly ILog log;
         readonly IWebPortalConfigurationStore configuration;
-        readonly IAuthCookieCreator tokenIssuer;
-        readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
-        readonly IUrlEncoder encoder;
-        readonly IUserStore userStore;
-        readonly DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals;
         readonly IDirectoryServicesConfigurationStore configurationStore;
+        readonly IntegratedAuthenticationHandler handler;
 
         public IntegratedAuthenticationHost(ILog log,
             IWebPortalConfigurationStore configuration,
-            IAuthCookieCreator tokenIssuer,
-            IAuthenticationConfigurationStore authenticationConfigurationStore,
-            IUrlEncoder encoder,
-            IUserStore userStore,
-            DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals,
-            IDirectoryServicesConfigurationStore configurationStore)
+            IDirectoryServicesConfigurationStore configurationStore,
+            IntegratedAuthenticationHandler handler)
         {
             this.log = log;
             this.configuration = configuration;
-            this.tokenIssuer = tokenIssuer;
-            this.authenticationConfigurationStore = authenticationConfigurationStore;
-            this.encoder = encoder;
-            this.userStore = userStore;
-            this.supportsAutoUserCreationFromPrincipals = supportsAutoUserCreationFromPrincipals;
             this.configurationStore = configurationStore;
+            this.handler = handler;
         }
 
         public void OnHostStarting() {}
@@ -84,7 +70,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                          return Task.CompletedTask;
                      }
             
-                     var handler = new IntegratedAuthenticationHandler(log, tokenIssuer, authenticationConfigurationStore, encoder, supportsAutoUserCreationFromPrincipals, userStore);
                      handler.HandleRequest(context);
                      return Task.CompletedTask;
                  });
