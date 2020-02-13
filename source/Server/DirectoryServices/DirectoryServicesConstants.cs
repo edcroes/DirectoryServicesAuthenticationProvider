@@ -1,7 +1,9 @@
 ﻿namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesConstants
+    internal class DirectoryServicesConstants
     {
-        public const string ChallengePath = "/integrated-challenge";
+        public static string IntegratedAuthVirtualDirectory = "/ad-auth";
+
+        public static string ChallengePath = IntegratedAuthVirtualDirectory + "/integrated-challenge";
     }
 }
