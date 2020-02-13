@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -34,6 +35,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
 
         public void HandleRequest(HttpContext context)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                // HttpSys is only supported on Windows, and we're not planning to support Negotiate on Kestrel at this point
+                return;
+            }
+            
             var result = TryAuthenticateRequest(context);
             
             var principal = result.User;
