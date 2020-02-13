@@ -18,12 +18,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         readonly ILog log;
         readonly IWebPortalConfigurationStore configuration;
         readonly IDirectoryServicesConfigurationStore configurationStore;
-        readonly IntegratedAuthenticationHandler handler;
+        readonly IIntegratedAuthenticationHandler handler;
 
         public IntegratedAuthenticationHost(ILog log,
             IWebPortalConfigurationStore configuration,
             IDirectoryServicesConfigurationStore configurationStore,
-            IntegratedAuthenticationHandler handler)
+            IIntegratedAuthenticationHandler handler)
         {
             this.log = log;
             this.configuration = configuration;
