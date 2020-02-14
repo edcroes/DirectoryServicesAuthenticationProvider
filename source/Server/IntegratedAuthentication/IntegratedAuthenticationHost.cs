@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,15 +36,18 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
 
         public void OnHostStarted()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                // HttpSys is only supported on Windows, and we're not planning to support Negotiate on Kestrel at this point
+                return;
+            }
+
             var prefixes = GetListenPrefixes();
 
             var builder = new WebHostBuilder();
             
             builder.UseHttpSys(options =>
             {
-                options.AllowSynchronousIO = true;
-                options.MaxRequestBodySize = null;
-            
                 options.Authentication.Schemes = MapAuthenticationScheme();
                 options.Authentication.AllowAnonymous = false;
             
