@@ -2,8 +2,8 @@
 {
     internal class DirectoryServicesConstants
     {
-        public static string IntegratedAuthVirtualDirectory = "/ad-auth";
+        public static string IntegratedAuthVirtualDirectory = "/integrated-challenge";
 
-        public static string ChallengePath = IntegratedAuthVirtualDirectory + "/integrated-challenge";
+        public static string ChallengePath = IntegratedAuthVirtualDirectory;
     }
 }
