@@ -14,12 +14,13 @@ using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
-    class IntegratedAuthenticationHost : IExecuteWhenServerStarts
+    class IntegratedAuthenticationHost : IExecuteWhenWebHostStarts
     {
         readonly ILog log;
         readonly IWebPortalConfigurationStore configuration;
         readonly IDirectoryServicesConfigurationStore configurationStore;
         readonly IIntegratedAuthenticationHandler handler;
+        IWebHost host;
 
         public IntegratedAuthenticationHost(ILog log,
             IWebPortalConfigurationStore configuration,
@@ -32,14 +33,17 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             this.handler = handler;
         }
 
-        public void OnHostStarting() {}
+        public Task OnWebHostStarting()
+        {
+            return Task.CompletedTask;
+        }
 
-        public void OnHostStarted()
+        public Task OnWebHostStarted()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // HttpSys is only supported on Windows, and we're not planning to support Negotiate on Kestrel at this point
-                return;
+                return Task.CompletedTask;
             }
 
             var prefixes = GetListenPrefixes();
@@ -74,13 +78,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                          return Task.CompletedTask;
                      }
             
-                     handler.HandleRequest(context);
-                     return Task.CompletedTask;
+                     return handler.HandleRequest(context);
                  });
              });
             
-            var host = builder.Build();
+            host = builder.Build();
             host.Start();
+            
+            return Task.CompletedTask;
         }
 
         AuthenticationSchemes MapAuthenticationScheme()
@@ -123,13 +128,17 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 }
             }
 
-            if (prefixes.Count == 0)
-            {
-                log.Trace("No HTTP listen prefixes were provided; defaulting to http://localhost:8050" + DirectoryServicesConstants.IntegratedAuthVirtualDirectory);
-                prefixes.Add(new Uri("http://localhost:8050" + DirectoryServicesConstants.IntegratedAuthVirtualDirectory, UriKind.Absolute));
-            }
-
             return prefixes.ToArray();
+        }
+
+        public async Task OnWebHostStopping()
+        {
+            if (host == null)
+                return;
+
+            await host.StopAsync();
+            host.Dispose();
+            host = null;
         }
     }
 }

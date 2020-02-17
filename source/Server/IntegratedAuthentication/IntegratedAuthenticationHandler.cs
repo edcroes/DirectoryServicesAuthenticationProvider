@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Octopus.Data.Storage.User;
@@ -32,7 +33,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             this.userStore = userStore;
         }
 
-        public void HandleRequest(HttpContext context)
+        public Task HandleRequest(HttpContext context)
         {
             var result = TryAuthenticateRequest(context);
             
@@ -71,7 +72,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                     {
                         context.Response.Cookies.Append(cookie.Name, cookie.Value);
                     }
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 // Just log that we detected a non-local redirect URL, and fall through to the root of the local web site
@@ -86,6 +87,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             {
                 context.Response.Cookies.Append(cookie.Name, cookie.Value);
             }
+            
+            return Task.CompletedTask;
         }
         
         OctopusAuthenticationResult TryAuthenticateRequest(HttpContext context)
