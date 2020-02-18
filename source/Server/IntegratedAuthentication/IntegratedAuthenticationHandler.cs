@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Resources;
@@ -15,18 +17,21 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
     class IntegratedAuthenticationHandler : IIntegratedAuthenticationHandler
     {
         readonly ILog log;
+        readonly IDirectoryServicesConfigurationStore directoryServicesConfigurationStore;
         readonly IAuthCookieCreator tokenIssuer;
         readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
         readonly DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals;
         readonly IUserStore userStore;
 
-        public IntegratedAuthenticationHandler(ILog log, 
+        public IntegratedAuthenticationHandler(ILog log,
+            IDirectoryServicesConfigurationStore directoryServicesConfigurationStore,
             IAuthCookieCreator tokenIssuer,
             IAuthenticationConfigurationStore authenticationConfigurationStore, 
             DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals,
             IUserStore userStore)
         {
             this.log = log;
+            this.directoryServicesConfigurationStore = directoryServicesConfigurationStore;
             this.tokenIssuer = tokenIssuer;
             this.authenticationConfigurationStore = authenticationConfigurationStore;
             this.supportsAutoUserCreationFromPrincipals = supportsAutoUserCreationFromPrincipals;
@@ -35,6 +40,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
 
         public Task HandleRequest(HttpContext context)
         {
+            if (!directoryServicesConfigurationStore.GetIsEnabled())
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Task.CompletedTask;
+            }
+            
             var result = TryAuthenticateRequest(context);
             
             var principal = result.User;

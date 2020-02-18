@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web;
 using Octopus.Server.Extensibility.HostServices.Web;
+using AuthenticationSchemes = Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
@@ -69,7 +70,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                  {
                      if (string.IsNullOrWhiteSpace(context.User.Identity.Name))
                      {
-                         context.Response.StatusCode = 401;
+                         context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                          return Task.CompletedTask;
                      }
             
