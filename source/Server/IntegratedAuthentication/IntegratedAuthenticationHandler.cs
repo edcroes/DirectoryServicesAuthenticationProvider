@@ -112,7 +112,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             if (string.IsNullOrWhiteSpace(principal.Identity.Name))
                 return OctopusAuthenticationResult.Anonymous;
 
-            using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
+            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token))
             {
                 // Attempt to create the user based on the provided System.Security.Principal.IPrincipal
                 var userResult = supportsAutoUserCreationFromPrincipals.GetOrCreateUser(principal, cts.Token);
