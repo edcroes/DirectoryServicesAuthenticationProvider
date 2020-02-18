@@ -83,9 +83,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
              });
             
             host = builder.Build();
-            host.Start();
-            
-            return Task.CompletedTask;
+            return host.StartAsync();
         }
 
         AuthenticationSchemes MapAuthenticationScheme()
