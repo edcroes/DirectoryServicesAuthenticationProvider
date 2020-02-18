@@ -68,6 +68,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
              {
                  app.Use((context, func) =>
                  {
+                     if (!configurationStore.GetIsEnabled())
+                     {
+                         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                         return Task.CompletedTask;
+                     }
+
                      if (string.IsNullOrWhiteSpace(context.User.Identity.Name))
                      {
                          context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
