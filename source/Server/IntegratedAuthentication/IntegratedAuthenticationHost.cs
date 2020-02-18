@@ -14,7 +14,7 @@ using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
-    class IntegratedAuthenticationHost : IExecuteWhenWebHostStarts
+    class IntegratedAuthenticationHost : IShareWebHostLifetime
     {
         readonly ILog log;
         readonly IWebPortalConfigurationStore configuration;
@@ -33,12 +33,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             this.handler = handler;
         }
 
-        public Task OnWebHostStarting()
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task OnWebHostStarted()
+        public Task StartAsync()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -129,7 +124,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             return prefixes.ToArray();
         }
 
-        public async Task OnWebHostStopping()
+        public async Task StopAsync()
         {
             if (host == null)
                 return;
