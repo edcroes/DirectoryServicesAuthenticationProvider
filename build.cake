@@ -53,9 +53,9 @@ Task("__Default")
     .IsDependentOn("__Clean")
     .IsDependentOn("__Restore")
     .IsDependentOn("__Build")
-	.IsDependentOn("__Test")
+    .IsDependentOn("__Test")
     .IsDependentOn("__Pack")
-	.IsDependentOn("__CopyToLocalPackages");
+    .IsDependentOn("__CopyToLocalPackages");
 
 Task("__Clean")
     .Does(() =>
@@ -73,7 +73,7 @@ Task("__Restore")
             ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
         });
     });
-	
+
 Task("__Build")
     .Does(() =>
 {
@@ -87,33 +87,33 @@ Task("__Build")
 Task("__Test")
     .IsDependentOn("__Build")
     .Does(() => {
-		var projects = GetFiles("./source/**/*Tests.csproj");
-		foreach(var project in projects)
-			DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
-			{
-				Configuration = configuration,
-				NoBuild = true,
-				ArgumentCustomization = args => {
-					if(!string.IsNullOrEmpty(testFilter)) {
-						args = args.Append("--where").AppendQuoted(testFilter);
-					}
-					return args.Append("--logger:trx")
+        var projects = GetFiles("./source/**/*Tests.csproj");
+        foreach(var project in projects)
+            DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
+            {
+                Configuration = configuration,
+                NoBuild = true,
+                ArgumentCustomization = args => {
+                    if(!string.IsNullOrEmpty(testFilter)) {
+                        args = args.Append("--where").AppendQuoted(testFilter);
+                    }
+                    return args.Append("--logger:trx")
                         .Append($"--verbosity normal");
-				}
-			});
-	});
+                }
+            });
+    });
 
 Task("__Pack")
     .Does(() => {
         var solutionDir = "./source/";
         var odNugetPackDir = Path.Combine(publishDir, "od");
         var nuspecFile = "Octopus.Server.Extensibility.Authentication.DirectoryServices.nuspec";
-		var files = new string[0];
-		
+        var files = new string[0];
+
         CreateDirectory(odNugetPackDir);
         CopyFileToDirectory(Path.Combine(assetDir, nuspecFile), odNugetPackDir);
 
-		CopyFileToDirectory(solutionDir + "Server" + netstd + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
+        CopyFileToDirectory(solutionDir + "Server" + netstd + "Octopus.Server.Extensibility.Authentication.DirectoryServices.dll", odNugetPackDir);
         
         NuGetPack(Path.Combine(odNugetPackDir, nuspecFile), new NuGetPackSettings {
             Version = nugetVersion,
