@@ -15,6 +15,25 @@ using AuthenticationSchemes = Microsoft.AspNetCore.Server.HttpSys.Authentication
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
+    /// <summary>
+    /// This class is used to start up a second WebHost, which is used to host the integrated challenge endpoint.
+    ///
+    /// Background:
+    /// HttpSys only allows a single authentication scheme. To support our cookies based authentication, and the
+    /// ability for users to log in/out and have multiple authentication providers enabled at once, we need to
+    /// support multiple authentication schemes.
+    ///
+    /// We considered a number of options but after going through https://github.com/dotnet/aspnetcore/issues/5888
+    /// we decided to follow the advice there and use 2 hosts.
+    ///
+    /// Notes:
+    /// This host is configure to look/behave like a virtual directory off the main API site's root, I.e. `/integrate-challenge`,
+    /// and is therefore consistent with the location in earlier versions of server. The host only has that one route
+    /// and it initiates the challenge, using a 401 response, when the user isn't already authenticated.
+    ///
+    /// Changing the authentication scheme in this world requires a restart of all nodes, as the setting has to be set
+    /// when the WebHost starts. 
+    /// </summary>
     class IntegratedAuthenticationHost : IShareWebHostLifetime
     {
         readonly ILog log;
