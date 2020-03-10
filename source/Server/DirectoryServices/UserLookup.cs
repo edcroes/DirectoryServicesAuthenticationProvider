@@ -9,7 +9,7 @@ using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class UserSearch : ICanSearchActiveDirectoryUsers
+    class UserSearch : ICanSearchActiveDirectoryUsers
     {
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;

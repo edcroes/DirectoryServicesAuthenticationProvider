@@ -2,7 +2,7 @@ using System.DirectoryServices.AccountManagement;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public interface IDirectoryServicesContextProvider
+    interface IDirectoryServicesContextProvider
     {
         PrincipalContext GetContext(string domain);
     }

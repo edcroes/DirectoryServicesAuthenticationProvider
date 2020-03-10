@@ -3,7 +3,7 @@ using Octopus.Diagnostics;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesObjectNameNormalizer : IDirectoryServicesObjectNameNormalizer
+    class DirectoryServicesObjectNameNormalizer : IDirectoryServicesObjectNameNormalizer
     {
         readonly ILog log;
         const string NTAccountUsernamePrefix = "nt:";

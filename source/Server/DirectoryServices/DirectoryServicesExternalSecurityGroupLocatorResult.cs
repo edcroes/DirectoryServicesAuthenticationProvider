@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesExternalSecurityGroupLocatorResult
+    class DirectoryServicesExternalSecurityGroupLocatorResult
     {
         public DirectoryServicesExternalSecurityGroupLocatorResult()
         {

@@ -3,7 +3,7 @@ using System.DirectoryServices.AccountManagement;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class PrincipalComparer : IEqualityComparer<Principal>
+    class PrincipalComparer : IEqualityComparer<Principal>
     {
         public bool Equals(Principal x, Principal y)
         {

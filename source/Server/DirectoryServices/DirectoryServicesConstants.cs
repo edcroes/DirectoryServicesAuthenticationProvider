@@ -1,6 +1,6 @@
 ﻿namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    internal class DirectoryServicesConstants
+    class DirectoryServicesConstants
     {
         public static string IntegratedAuthVirtualDirectory = "/integrated-challenge";
 

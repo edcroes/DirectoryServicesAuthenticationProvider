@@ -5,7 +5,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    public class DirectoryServicesApi : RegisterEndpoint
+    class DirectoryServicesApi : RegisterEndpoint
     {
         public const string ApiExternalGroupsSearch = "/api/externalgroups/directoryServices{?partialName}";
         public const string ApiExternalUsersSearch = "/api/externalusers/directoryServices{?partialName}";

@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {
-    public class DirectoryServicesStaticContentFolders : IContributesStaticContentFolders
+    class DirectoryServicesStaticContentFolders : IContributesStaticContentFolders
     {
         public IEnumerable<StaticContentEmbeddedResourcesFolder> GetStaticContentFolders()
         {

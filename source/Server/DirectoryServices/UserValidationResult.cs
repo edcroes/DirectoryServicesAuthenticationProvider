@@ -2,7 +2,7 @@ using System.DirectoryServices.AccountManagement;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class UserValidationResult
+    class UserValidationResult
     {
         public UserValidationResult(UserPrincipal userPrincipal, string domain)
             :this(userPrincipal.UserPrincipalName,

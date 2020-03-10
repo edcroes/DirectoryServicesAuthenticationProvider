@@ -4,12 +4,12 @@ using System.Security.Principal;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public interface IPrincipalWrapper
+    interface IPrincipalWrapper
     {
         SecurityIdentifier Sid { get; }
     }
     
-    public class PrincipalWrapper : IPrincipalWrapper
+    class PrincipalWrapper : IPrincipalWrapper
     {
         readonly Principal principal;
 

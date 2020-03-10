@@ -3,7 +3,7 @@ using Octopus.Data.Model.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
-    public class OctopusAuthenticationResult
+    class OctopusAuthenticationResult
     {
         OctopusAuthenticationResult(IUser user, HttpResponse rejectionResponse)
         {

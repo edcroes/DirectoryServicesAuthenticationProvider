@@ -8,7 +8,7 @@ using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class UserMatcher : ICanMatchExternalUser
+    class UserMatcher : ICanMatchExternalUser
     {
         readonly IDirectoryServicesContextProvider contextProvider;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;

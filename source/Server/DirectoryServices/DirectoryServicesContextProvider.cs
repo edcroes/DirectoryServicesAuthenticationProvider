@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuratio
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesContextProvider : IDirectoryServicesContextProvider
+    class DirectoryServicesContextProvider : IDirectoryServicesContextProvider
     {
         readonly Lazy<IDirectoryServicesConfigurationStore> adConfiguration;
 

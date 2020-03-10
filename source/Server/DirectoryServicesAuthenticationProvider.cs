@@ -12,7 +12,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Content;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 {
-    public class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport,
+    class DirectoryServicesAuthenticationProvider : IAuthenticationProviderWithGroupSupport,
         IUseAuthenticationIdentities,
         IContributesCSS,
         IContributesJavascript

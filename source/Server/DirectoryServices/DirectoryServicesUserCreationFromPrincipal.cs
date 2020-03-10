@@ -6,7 +6,7 @@ using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesUserCreationFromPrincipal : ISupportsAutoUserCreationFromPrincipal
+    class DirectoryServicesUserCreationFromPrincipal : ISupportsAutoUserCreationFromPrincipal
     {
         readonly IDirectoryServicesConfigurationStore configurationStore;
         readonly IDirectoryServicesCredentialValidator credentialValidator;

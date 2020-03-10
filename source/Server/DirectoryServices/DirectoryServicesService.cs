@@ -7,7 +7,7 @@ using Octopus.Diagnostics;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesService : IDirectoryServicesService
+    class DirectoryServicesService : IDirectoryServicesService
     {
         readonly ILog log;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;

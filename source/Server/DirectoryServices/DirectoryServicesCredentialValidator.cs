@@ -10,7 +10,7 @@ using Octopus.Server.Extensibility.Authentication.Storage.User;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesCredentialValidator : IDirectoryServicesCredentialValidator
+    class DirectoryServicesCredentialValidator : IDirectoryServicesCredentialValidator
     {
         readonly ILog log;
         readonly IDirectoryServicesObjectNameNormalizer objectNameNormalizer;

@@ -8,7 +8,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {
-    public class ListSecurityGroupsAction : IAsyncApiAction
+    class ListSecurityGroupsAction : IAsyncApiAction
     {
         readonly IDirectoryServicesExternalSecurityGroupLocator externalSecurityGroupLocator;
 

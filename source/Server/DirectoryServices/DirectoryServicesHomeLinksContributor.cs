@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class DirectoryServicesHomeLinksContributor : IHomeLinksContributor
+    class DirectoryServicesHomeLinksContributor : IHomeLinksContributor
     {
         readonly IDirectoryServicesConfigurationStore configurationStore;
 

@@ -7,7 +7,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {
-    public class UserLookupAction : IAsyncApiAction
+    class UserLookupAction : IAsyncApiAction
     {
         readonly ICanSearchActiveDirectoryUsers userSearch;
 

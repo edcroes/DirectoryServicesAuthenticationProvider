@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public interface IDirectoryServicesExternalSecurityGroupLocator : ICanSearchExternalGroups
+    interface IDirectoryServicesExternalSecurityGroupLocator : ICanSearchExternalGroups
     {
         DirectoryServicesExternalSecurityGroupLocatorResult GetGroupIdsForUser(string samAccountName, CancellationToken cancellationToken);
     }

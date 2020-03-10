@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.Authentication.Resources.Identities;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities
 {
-    public class IdentityCreator : IIdentityCreator
+    class IdentityCreator : IIdentityCreator
     {
         public const string UpnClaimType = "upn";
         public const string SamAccountNameClaimType = "sam";

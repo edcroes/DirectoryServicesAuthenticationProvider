@@ -5,13 +5,13 @@ using System.Linq;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public interface IUserPrincipalWrapper : IPrincipalWrapper, IDisposable
+    interface IUserPrincipalWrapper : IPrincipalWrapper, IDisposable
     {
         IEnumerable<IPrincipalWrapper> GetAuthorizationGroups();
         IEnumerable<IPrincipalWrapper> GetGroups();
     }
 
-    public class UserPrincipalWrapper : PrincipalWrapper, IUserPrincipalWrapper
+    class UserPrincipalWrapper : PrincipalWrapper, IUserPrincipalWrapper
     {
         readonly UserPrincipal userPrincipal;
 

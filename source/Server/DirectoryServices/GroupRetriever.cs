@@ -9,7 +9,7 @@ using Octopus.Server.Extensibility.Authentication.Extensions;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
-    public class GroupRetriever : IExternalGroupRetriever
+    class GroupRetriever : IExternalGroupRetriever
     {
         readonly ILog log;
         readonly IDirectoryServicesConfigurationStore configurationStore;
