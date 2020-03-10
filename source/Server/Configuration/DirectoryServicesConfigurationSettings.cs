@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DirectoryServicesConfigurationSettings :
+    class DirectoryServicesConfigurationSettings :
         ExtensionConfigurationSettings<DirectoryServicesConfiguration, DirectoryServicesConfigurationResource,
             IDirectoryServicesConfigurationStore>, IDirectoryServicesConfigurationSettings
     {

@@ -8,7 +8,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DatabaseInitializer : ExecuteWhenDatabaseInitializes
+    class DatabaseInitializer : ExecuteWhenDatabaseInitializes
     {
         readonly ILog log;
         readonly IConfigurationStore configurationStore;

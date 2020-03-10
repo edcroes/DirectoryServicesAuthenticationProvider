@@ -2,6 +2,6 @@
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public interface IDirectoryServicesConfigurationSettings : IHasConfigurationSettings
+    interface IDirectoryServicesConfigurationSettings : IHasConfigurationSettings
     { }
 }

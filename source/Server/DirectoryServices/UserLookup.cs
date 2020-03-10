@@ -68,6 +68,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         }
     }
 
-    public interface ICanSearchActiveDirectoryUsers : ICanSearchExternalUsers
+    interface ICanSearchActiveDirectoryUsers : ICanSearchExternalUsers
     { }
 }

@@ -6,7 +6,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DirectoryServicesConfigureCommands : IContributeToConfigureCommand
+    class DirectoryServicesConfigureCommands : IContributeToConfigureCommand
     {
         readonly ILog log;
         readonly Lazy<IDirectoryServicesConfigurationStore> activeDirectoryConfiguration;

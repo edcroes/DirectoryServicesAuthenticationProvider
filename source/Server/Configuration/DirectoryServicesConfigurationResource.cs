@@ -5,7 +5,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
-    public class DirectoryServicesConfigurationResource : ExtensionConfigurationResource
+    class DirectoryServicesConfigurationResource : ExtensionConfigurationResource
     {
 
         public const string ActiveDirectoryContainerDescription = "Set the active directory container used for authentication.";
