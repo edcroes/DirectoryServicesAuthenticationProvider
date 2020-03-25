@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Net;
-using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -51,13 +50,26 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                     // if we've seen this connection before and the user still isn't set then something has gone
                     // wrong with the challenge. Most likely due to cross domains now we're NETCore, https://github.com/OctopusDeploy/Issues/issues/6265
                     var stateRedirectAfterLoginTo = state.RedirectAfterLoginTo;
-                    // if (!stateRedirectAfterLoginTo.Contains("?"))
-                    //     stateRedirectAfterLoginTo += "?";
-                    // else
-                    //     stateRedirectAfterLoginTo += "&";
-                    var errorMessage = "An error occurred with Windows authentication, possibly due to [a known issue](https://github.com/OctopusDeploy/Issues/issues/6265), please try using forms authentication.";
-                    stateRedirectAfterLoginTo += "?error=" + UrlEncoder.Default.Encode(errorMessage);
+
+                    // this matches an error structure that the portal currently uses. It is not something the server it
+                    // currently knows directly about. We may make it a 1st error object at some point to help consistency.
+                    var errorObj = new
+                    {
+                        ErrorMessage = "Authentication Error",
+                        Errors = new [] {"An error occurred with Windows authentication, possibly due to a known issue, please try using forms authentication."},
+                        DetailLinks = new[] {"https://g.octopushq.com/TroubleshootingAD#Integrated"}
+                    };
+                    
+                    // we used to use the query string to pass errors back to the portal but that was quite problematic when it came to not interfering
+                    // with deep links etc. The portal sign in page now checks for this cookie to see if an external 
+                    // auth provider is trying to return an error.
+                    context.Response.Cookies.Append("Octopus-Error", JsonConvert.SerializeObject(errorObj), new CookieOptions { MaxAge = TimeSpan.FromSeconds(15) });
+                    
+                    // we pass back to the original link here (e.g. the deep link that originally triggered the sign in)
+                    // we normally wouldn't do this without the user being authenticated, but given we know they aren't
+                    // authenticated we'll redirect back and rely on the sign in page kicking in again and seeing the cookie.
                     context.Response.Redirect(stateRedirectAfterLoginTo);
+                    
                     // count this as complete, if the browser comes back on the same connection we'll start over 
                     integratedChallengeTracker.SetConnectionChallengeCompleted(context.Connection.Id);
                 }
