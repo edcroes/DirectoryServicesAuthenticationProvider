@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Net;
+using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -19,42 +21,62 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
         readonly DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals;
         readonly IUserStore userStore;
+        readonly IIntegratedChallengeTracker integratedChallengeTracker;
 
         public IntegratedAuthenticationHandler(ILog log,
             IAuthCookieCreator tokenIssuer,
             IAuthenticationConfigurationStore authenticationConfigurationStore, 
             DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals,
-            IUserStore userStore)
+            IUserStore userStore,
+            IIntegratedChallengeTracker integratedChallengeTracker)
         {
             this.log = log;
             this.tokenIssuer = tokenIssuer;
             this.authenticationConfigurationStore = authenticationConfigurationStore;
             this.supportsAutoUserCreationFromPrincipals = supportsAutoUserCreationFromPrincipals;
             this.userStore = userStore;
+            this.integratedChallengeTracker = integratedChallengeTracker;
         }
 
         public Task HandleRequest(HttpContext context)
         {
+            var state = GetLoginState(context);
+
+            // Based on https://github.com/dotnet/runtime/blob/cf63e732fc6fb57c0ea97c1b4ca965acce46343a/src/libraries/System.Net.Security/src/System/Net/Security/NegotiateStreamPal.Windows.cs#L52
+            // we're being a bit cautious about using IsAuthenticated
+            if (string.IsNullOrWhiteSpace(context.User.Identity.Name))
+            {
+                if (integratedChallengeTracker.IsConnectionKnown(context.Connection.Id))
+                {
+                    // if we've seen this connection before and the user still isn't set then something has gone
+                    // wrong with the challenge. Most likely due to cross domains now we're NETCore, https://github.com/OctopusDeploy/Issues/issues/6265
+                    var stateRedirectAfterLoginTo = state.RedirectAfterLoginTo;
+                    // if (!stateRedirectAfterLoginTo.Contains("?"))
+                    //     stateRedirectAfterLoginTo += "?";
+                    // else
+                    //     stateRedirectAfterLoginTo += "&";
+                    var errorMessage = "An error occurred with Windows authentication, possibly due to [a known issue](https://github.com/OctopusDeploy/Issues/issues/6265), please try using forms authentication.";
+                    stateRedirectAfterLoginTo += "?error=" + UrlEncoder.Default.Encode(errorMessage);
+                    context.Response.Redirect(stateRedirectAfterLoginTo);
+                    // count this as complete, if the browser comes back on the same connection we'll start over 
+                    integratedChallengeTracker.SetConnectionChallengeCompleted(context.Connection.Id);
+                }
+                else
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    integratedChallengeTracker.SetConnectionChallengeInitiated(context.Connection.Id);
+                }
+                return Task.CompletedTask;
+            }
+
+            if (integratedChallengeTracker.IsConnectionKnown(context.Connection.Id))
+            {
+                integratedChallengeTracker.SetConnectionChallengeCompleted(context.Connection.Id);
+            }
+
             var result = TryAuthenticateRequest(context);
             
             var principal = result.User;
-
-            // Decode the state object sent from the client (if there was one) so we can use those hints to build the most appropriate response
-            // If the state can't be interpreted, we will fall back to a safe-by-default behaviour, however:
-            //   1. Deep-links will not work because we don't know where the anonymous request originally wanted to go
-            //   2. Cookies may not have the Secure flag set properly when SSL Offloading is in play
-            LoginState state = null;
-            if (context.Request.Query.TryGetValue("state", out var stateString))
-            {
-                try
-                {
-                    state = JsonConvert.DeserializeObject<LoginState>(stateString.FirstOrDefault());
-                }
-                catch (Exception e)
-                {
-                    log.Warn(e, "Invalid login state object passed to the server when setting up the NTLM challenge. Falling back to the default behaviour.");
-                }
-            }
 
             // Build the auth cookies to send back with the response
             var authCookies = tokenIssuer.CreateAuthCookies(principal.IdentificationToken, SessionExpiry.TwentyDays, context.Request.IsHttps, state?.UsingSecureConnection);
@@ -90,7 +112,29 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             
             return Task.CompletedTask;
         }
-        
+
+        LoginState GetLoginState(HttpContext context)
+        {
+            // Decode the state object sent from the client (if there was one) so we can use those hints to build the most appropriate response
+            // If the state can't be interpreted, we will fall back to a safe-by-default behaviour, however:
+            //   1. Deep-links will not work because we don't know where the anonymous request originally wanted to go
+            //   2. Cookies may not have the Secure flag set properly when SSL Offloading is in play
+            LoginState state = null;
+            if (context.Request.Query.TryGetValue("state", out var stateString))
+            {
+                try
+                {
+                    state = JsonConvert.DeserializeObject<LoginState>(stateString.FirstOrDefault());
+                }
+                catch (Exception e)
+                {
+                    log.Warn(e, "Invalid login state object passed to the server when setting up the NTLM challenge. Falling back to the default behaviour.");
+                }
+            }
+
+            return state;
+        }
+
         OctopusAuthenticationResult TryAuthenticateRequest(HttpContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));

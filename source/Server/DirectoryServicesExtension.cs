@@ -86,6 +86,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
 
             builder.RegisterType<IntegratedAuthenticationHandler>().As<IIntegratedAuthenticationHandler>().InstancePerDependency();
             builder.RegisterType<IntegratedAuthenticationHost>().As<IShareWebHostLifetime>().SingleInstance();
+            builder.RegisterType<IntegratedChallengeTracker>().As<IIntegratedChallengeTracker>().SingleInstance();
         }
     }
 }
