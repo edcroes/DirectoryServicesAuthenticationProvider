@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Resources;
@@ -19,42 +20,38 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
         readonly DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals;
         readonly IUserStore userStore;
+        readonly IIntegratedChallengeCoordinator integratedChallengeCoordinator;
 
         public IntegratedAuthenticationHandler(ILog log,
             IAuthCookieCreator tokenIssuer,
             IAuthenticationConfigurationStore authenticationConfigurationStore, 
             DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals,
-            IUserStore userStore)
+            IUserStore userStore,
+            IIntegratedChallengeCoordinator integratedChallengeCoordinator)
         {
             this.log = log;
             this.tokenIssuer = tokenIssuer;
             this.authenticationConfigurationStore = authenticationConfigurationStore;
             this.supportsAutoUserCreationFromPrincipals = supportsAutoUserCreationFromPrincipals;
             this.userStore = userStore;
+            this.integratedChallengeCoordinator = integratedChallengeCoordinator;
         }
 
         public Task HandleRequest(HttpContext context)
         {
+            var state = GetLoginState(context);
+
+            if (integratedChallengeCoordinator.SetupResponseIfChallengeHasNotSucceededYet(context, state) != IntegratedChallengeTrackerStatus.ChallengeSucceeded)
+            {
+                // the coordinator will configure the Response object in the correct way for incomplete challenges
+                return Task.CompletedTask;
+            }
+            
+            // Challenge has succeeded!!
+
             var result = TryAuthenticateRequest(context);
             
             var principal = result.User;
-
-            // Decode the state object sent from the client (if there was one) so we can use those hints to build the most appropriate response
-            // If the state can't be interpreted, we will fall back to a safe-by-default behaviour, however:
-            //   1. Deep-links will not work because we don't know where the anonymous request originally wanted to go
-            //   2. Cookies may not have the Secure flag set properly when SSL Offloading is in play
-            LoginState state = null;
-            if (context.Request.Query.TryGetValue("state", out var stateString))
-            {
-                try
-                {
-                    state = JsonConvert.DeserializeObject<LoginState>(stateString.FirstOrDefault());
-                }
-                catch (Exception e)
-                {
-                    log.Warn(e, "Invalid login state object passed to the server when setting up the NTLM challenge. Falling back to the default behaviour.");
-                }
-            }
 
             // Build the auth cookies to send back with the response
             var authCookies = tokenIssuer.CreateAuthCookies(principal.IdentificationToken, SessionExpiry.TwentyDays, context.Request.IsHttps, state?.UsingSecureConnection);
@@ -77,7 +74,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
 
                 // Just log that we detected a non-local redirect URL, and fall through to the root of the local web site
                 log.WarnFormat(
-                    "Prevented potential Open Redirection attack on an NTLM challenge, to the non-local url {0}",
+                    "Prevented potential Open Redirection attack on an integrated authentication challenge, to the non-local url {0}",
                     redirectAfterLoginTo);
             }
 
@@ -90,7 +87,29 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             
             return Task.CompletedTask;
         }
-        
+
+        LoginState GetLoginState(HttpContext context)
+        {
+            // Decode the state object sent from the client (if there was one) so we can use those hints to build the most appropriate response
+            // If the state can't be interpreted, we will fall back to a safe-by-default behaviour, however:
+            //   1. Deep-links will not work because we don't know where the anonymous request originally wanted to go
+            //   2. Cookies may not have the Secure flag set properly when SSL Offloading is in play
+            LoginState state = null;
+            if (context.Request.Query.TryGetValue("state", out var stateString))
+            {
+                try
+                {
+                    state = JsonConvert.DeserializeObject<LoginState>(stateString.FirstOrDefault());
+                }
+                catch (Exception e)
+                {
+                    log.Warn(e, "Invalid login state object passed to the server when setting up the integrated authentication challenge. Falling back to the default behaviour.");
+                }
+            }
+
+            return state;
+        }
+
         OctopusAuthenticationResult TryAuthenticateRequest(HttpContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));

@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Server.HttpSys" Version="2.1.1" />
+    <PackageReference Include="Octopus.Time" Version="1.1.6" />
     <PackageReference Include="System.DirectoryServices" Version="4.5.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
     <PackageReference Include="Octopus.Configuration" Version="2.0.1" />
