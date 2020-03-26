@@ -32,6 +32,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 if (IsNewChallengeRequest(context.Connection.Id))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    RevokeAuthErrorCookie(context);
                     SetChallengeInitiated(context.Connection.Id);
                     return IntegratedChallengeTrackerStatus.ChallengeIssued;
                 }
@@ -68,12 +69,19 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 
                 // count this as complete, if the browser comes back on the same connection we'll start over 
                 SetChallengeCompleted(context.Connection.Id);
-                
                 return IntegratedChallengeTrackerStatus.ChallengeFailed;
             }
 
+            RevokeAuthErrorCookie(context);
             SetChallengeCompleted(context.Connection.Id);
             return IntegratedChallengeTrackerStatus.ChallengeSucceeded;
+        }
+
+        void RevokeAuthErrorCookie(HttpContext context)
+        {
+            context.Response.Cookies.Append(
+                "Octopus-Auth-Error",
+                string.Empty);
         }
 
         internal bool IsNewChallengeRequest(string connectionId)
