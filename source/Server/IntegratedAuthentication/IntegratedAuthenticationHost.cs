@@ -68,6 +68,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             builder.UseHttpSys(options =>
             {
                 options.Authentication.Schemes = MapAuthenticationScheme();
+                
+                // IMPORTANT: we need AllowAnonymous to be true here. If it is false then the ASPNET Core internals
+                // will automatically issue the 401 challenge and we don't get a chance to report meaningful errors
+                // if the challenge fails (the user will get the challenge popup dialog in the browser).
                 options.Authentication.AllowAnonymous = true;
             
                 foreach (var baseUri in prefixes)
