@@ -5,9 +5,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
 {
     class DirectoryServicesConfiguration : ExtensionConfigurationDocument
     {
-        public DirectoryServicesConfiguration() : base("DirectoryServices", "Octopus Deploy", "1.0")
+        public DirectoryServicesConfiguration() : base(DirectoryServicesConfigurationStore.SingletonId, "DirectoryServices", "Octopus Deploy", "1.0")
         {
-            Id = DirectoryServicesConfigurationStore.SingletonId;
             AllowFormsAuthenticationForDomainUsers = true;
             AreSecurityGroupsEnabled = true;
             AllowAutoUserCreation = true;
