@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
-using System.Linq;
+using System.Threading;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
     interface IUserPrincipalWrapper : IPrincipalWrapper, IDisposable
     {
-        IEnumerable<IPrincipalWrapper> GetAuthorizationGroups();
-        IEnumerable<IPrincipalWrapper> GetGroups();
+        IEnumerable<IPrincipalWrapper> GetAuthorizationGroups(CancellationToken cancellationToken);
+        IEnumerable<IPrincipalWrapper> GetGroups(CancellationToken cancellationToken);
     }
 
     class UserPrincipalWrapper : PrincipalWrapper, IUserPrincipalWrapper
@@ -26,10 +26,38 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             userPrincipal?.Dispose();
         }
 
-        public IEnumerable<IPrincipalWrapper> GetAuthorizationGroups()
-            => userPrincipal.GetAuthorizationGroups().Select(p => new PrincipalWrapper(p));
+        public IEnumerable<IPrincipalWrapper> GetAuthorizationGroups(CancellationToken cancellationToken)
+            => GetList(userPrincipal.GetAuthorizationGroups(), cancellationToken);
 
-        public IEnumerable<IPrincipalWrapper> GetGroups()
-            => userPrincipal.GetGroups().Select(p => new PrincipalWrapper(p));
+        public IEnumerable<IPrincipalWrapper> GetGroups(CancellationToken cancellationToken)
+            => GetList(userPrincipal.GetGroups(), cancellationToken);
+
+        static IEnumerable<IPrincipalWrapper> GetList(PrincipalSearchResult<Principal> principalResult,
+            CancellationToken cancellationToken)
+        {
+            var results = new List<IPrincipalWrapper>();
+
+            var iterGroup = principalResult.GetEnumerator();
+            using (iterGroup)
+            {
+                while (iterGroup.MoveNext())
+                {
+                    try
+                    {
+                        var p = iterGroup.Current;
+                        results.Add(new PrincipalWrapper(p));
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            break;
+                        }
+                    }
+                    catch (NoMatchingPrincipalException)
+                    {
+                    }
+                }
+            }
+
+            return results;
+        }
     }
 }
