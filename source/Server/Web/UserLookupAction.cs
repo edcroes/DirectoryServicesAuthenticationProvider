@@ -28,7 +28,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
             {
-                context.Response.AsOctopusJson(userSearch.Search(name, cts.Token));
+                var externalUserLookupResult = userSearch.Search(name, cts.Token);
+                if (externalUserLookupResult != null)
+                    context.Response.AsOctopusJson(externalUserLookupResult);
+                else
+                    context.Response.BadRequest($"The {DirectoryServicesAuthenticationProvider.ProviderName} is currently disable");
             }
 
             return Task.FromResult(0);

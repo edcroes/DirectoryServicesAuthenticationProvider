@@ -46,7 +46,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices
             return authenticationProviderElement;
         }
 
-        public AuthenticationProviderThatSupportsGroups GetGroupLookupElement()
+        public AuthenticationProviderThatSupportsGroups? GetGroupLookupElement()
         {
             if (!configurationStore.GetAreSecurityGroupsEnabled())
                 return null;

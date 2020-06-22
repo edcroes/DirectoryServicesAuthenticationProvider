@@ -72,7 +72,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return GetOrCreateUser(result, result.UserPrincipalName, result.Domain ?? EnvironmentUserDomainName, cancellationToken);
         }
 
-        internal AuthenticationUserCreateResult GetOrCreateUser(UserValidationResult principal, string fallbackUsername, string fallbackDomain, CancellationToken cancellationToken)
+        internal AuthenticationUserCreateResult GetOrCreateUser(UserValidationResult principal, string? fallbackUsername, string? fallbackDomain, CancellationToken cancellationToken)
         {
             var userPrincipalName = objectNameNormalizer.ValidatedUserPrincipalName(principal.UserPrincipalName, fallbackUsername, fallbackDomain);
 

@@ -2,7 +2,6 @@
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Threading;
-using Octopus.Data.Resources.Users;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
@@ -28,23 +27,23 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.identityCreator = identityCreator;
         }
 
-        public ExternalUserLookupResult Search(string searchTerm, CancellationToken cancellationToken)
+        public ExternalUserLookupResult? Search(string searchTerm, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled())
-                return new ExternalUserLookupResult (DirectoryServicesAuthentication.ProviderName, Enumerable.Empty<IdentityResource>().ToArray());
+                return null;
 
-            objectNameNormalizer.NormalizeName(searchTerm, out var partialName, out var domain);
+            var domainUser = objectNameNormalizer.NormalizeName(searchTerm);
 
-            using (var context = contextProvider.GetContext(domain))
+            using (var context = contextProvider.GetContext(domainUser.Domain))
             {
                 if (cancellationToken.IsCancellationRequested) return null;
 
-                var identities = new List<Principal>(SearchBy(new UserPrincipal(context) { Name = "*" + partialName + "*" }));
-                identities.AddRange(SearchBy(new UserPrincipal(context) { UserPrincipalName = "*" + partialName + "*" }));
-                identities.AddRange(SearchBy(new UserPrincipal(context) { SamAccountName = "*" + partialName + "*" }));
+                var identities = new List<Principal>(SearchBy(new UserPrincipal(context) { Name = "*" + domainUser.NormalizedName + "*" }));
+                identities.AddRange(SearchBy(new UserPrincipal(context) { UserPrincipalName = "*" + domainUser.NormalizedName + "*" }));
+                identities.AddRange(SearchBy(new UserPrincipal(context) { SamAccountName = "*" + domainUser.NormalizedName + "*" }));
 
                 var identityResources = identities.Distinct(new PrincipalComparer())
-                    .Select(u => identityCreator.Create("", u.UserPrincipalName, ConvertSamAccountName(u, domain),
+                    .Select(u => identityCreator.Create("", u.UserPrincipalName, ConvertSamAccountName(u, domainUser.Domain),
                         u.DisplayName).ToResource())
                     .ToArray();
                 
@@ -62,7 +61,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return searcher.FindAll();
         }
 
-        static string ConvertSamAccountName(Principal u, string domain)
+        static string ConvertSamAccountName(Principal u, string? domain)
         {
             return !string.IsNullOrWhiteSpace(domain) ? $"{domain}\\{u.SamAccountName}" : u.SamAccountName;
         }
