@@ -32,7 +32,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
                 if (result != null)
                     context.Response.AsOctopusJson(result);
                 else
-                    context.Response.BadRequest($"The {DirectoryServicesAuthenticationProvider.ProviderName} is currently disable");
+                    context.Response.BadRequest($"The {DirectoryServicesAuthentication.ProviderName} is currently disable");
             }
 
             return Task.FromResult(0);

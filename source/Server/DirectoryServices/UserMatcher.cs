@@ -27,6 +27,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.identityCreator = identityCreator;
         }
 
+        public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
+
         public Identity? Match(string name, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled())

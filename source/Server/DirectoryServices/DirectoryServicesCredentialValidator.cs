@@ -38,6 +38,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.directoryServicesService = directoryServicesService;
         }
 
+        public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
+
         public int Priority => 100;
 
         public ResultFromExtension<IUser> ValidateCredentials(string username, string password, CancellationToken cancellationToken)
@@ -77,14 +79,14 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         {
             var userPrincipalName = objectNameNormalizer.ValidatedUserPrincipalName(principal.UserPrincipalName, fallbackUsername, fallbackDomain);
 
-            var samAccountName = principal.SamAccountName;
+            var samAccountName = principal.SamAccountName ?? string.Empty;
             if (!string.IsNullOrWhiteSpace(fallbackDomain) && !samAccountName.Contains("\\"))
             {
                 samAccountName = fallbackDomain + @"\" + samAccountName;
             }
 
-            var displayName = principal.DisplayName;
-            var emailAddress = principal.EmailAddress;
+            var displayName = principal.DisplayName ?? string.Empty;
+            var emailAddress = principal.EmailAddress ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(samAccountName))
             {

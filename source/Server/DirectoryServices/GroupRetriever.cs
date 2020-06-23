@@ -26,6 +26,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.groupLocator = groupLocator;
         }
 
+        public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
+
         public ResultFromExtension<ExternalGroupResult> Read(IUser user, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() ||

@@ -28,6 +28,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.identityCreator = identityCreator;
         }
 
+        public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
+
         public ResultFromExtension<ExternalUserLookupResult> Search(string searchTerm, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled())
@@ -37,7 +39,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             using (var context = contextProvider.GetContext(domainUser.Domain))
             {
-                if (cancellationToken.IsCancellationRequested) return null;
+                if (cancellationToken.IsCancellationRequested) return ResultFromExtension<ExternalUserLookupResult>.Failed("Cancellation requested.");
 
                 var identities = new List<Principal>(SearchBy(new UserPrincipal(context) { Name = "*" + domainUser.NormalizedName + "*" }));
                 identities.AddRange(SearchBy(new UserPrincipal(context) { UserPrincipalName = "*" + domainUser.NormalizedName + "*" }));
@@ -48,7 +50,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         u.DisplayName).ToResource())
                     .ToArray();
                 
-                return ResultFromExtension<ExternalUserLookupResult>.Success(new ExternalUserLookupResult(DirectoryServicesAuthentication.ProviderName, identityResources));
+                return ResultFromExtension<ExternalUserLookupResult>.Success(new ExternalUserLookupResult(identityResources));
             }
         }
 

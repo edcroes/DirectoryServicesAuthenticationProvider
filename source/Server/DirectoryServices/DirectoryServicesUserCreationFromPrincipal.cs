@@ -20,6 +20,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.credentialValidator = credentialValidator;
         }
 
+        public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
+
         public ResultFromExtension<IUser> GetOrCreateUser(IPrincipal principal, CancellationToken cancellationToken)
         {
             return !configurationStore.GetIsEnabled() ? 

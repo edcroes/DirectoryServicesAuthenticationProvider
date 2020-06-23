@@ -33,13 +33,15 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.userPrincipalFinder = userPrincipalFinder;
         }
 
+        public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
+
         public ResultFromExtension<ExternalSecurityGroupResult> Search(string name, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
                 return ResultFromExtension<ExternalSecurityGroupResult>.ExtensionDisabled();
 
             var groups = FindGroups(name, cancellationToken);
-            var result = new ExternalSecurityGroupResult(DirectoryServicesAuthentication.ProviderName, groups);
+            var result = new ExternalSecurityGroupResult(groups);
 
             return ResultFromExtension<ExternalSecurityGroupResult>.Success(result);
         }
