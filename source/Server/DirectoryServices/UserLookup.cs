@@ -5,6 +5,7 @@ using System.Threading;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
@@ -27,10 +28,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.identityCreator = identityCreator;
         }
 
-        public ExternalUserLookupResult? Search(string searchTerm, CancellationToken cancellationToken)
+        public ResultFromExtension<ExternalUserLookupResult> Search(string searchTerm, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled())
-                return null;
+                return ResultFromExtension<ExternalUserLookupResult>.ExtensionDisabled();
 
             var domainUser = objectNameNormalizer.NormalizeName(searchTerm);
 
@@ -47,7 +48,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         u.DisplayName).ToResource())
                     .ToArray();
                 
-                return new ExternalUserLookupResult(DirectoryServicesAuthentication.ProviderName, identityResources);
+                return ResultFromExtension<ExternalUserLookupResult>.Success(new ExternalUserLookupResult(DirectoryServicesAuthentication.ProviderName, identityResources));
             }
         }
 

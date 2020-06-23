@@ -6,6 +6,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.Extensions;
+using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
@@ -25,15 +26,15 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.groupLocator = groupLocator;
         }
 
-        public ExternalGroupResult Read(IUser user, CancellationToken cancellationToken)
+        public ResultFromExtension<ExternalGroupResult> Read(IUser user, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() ||
                 !configurationStore.GetAreSecurityGroupsEnabled())
-                return new ExternalGroupResult(DirectoryServicesAuthentication.ProviderName, "Not enabled");
+                return ResultFromExtension<ExternalGroupResult>.ExtensionDisabled();
             if (user.Username == User.GuestLogin)
-                return new ExternalGroupResult(DirectoryServicesAuthentication.ProviderName, "Not valid for Guest user");
+                return ResultFromExtension<ExternalGroupResult>.Failed("Not valid for Guest user");
             if (user.Identities.All(p => p.IdentityProviderName != DirectoryServicesAuthentication.ProviderName))
-                return new ExternalGroupResult(DirectoryServicesAuthentication.ProviderName, "No identities matching this provider");
+                return ResultFromExtension<ExternalGroupResult>.Failed("No identities matching this provider");
 
             // if the user has multiple, unique identities assigned then the group list should be the distinct union of the groups from
             // all of the identities
@@ -62,10 +63,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             if (!wasAbleToRetrieveSomeGroups)
             {
                 log.ErrorFormat("Couldn't retrieve groups for user {0}", user.Username);
-                return new ExternalGroupResult(DirectoryServicesAuthentication.ProviderName, $"Couldn't retrieve groups for user {user.Username}");
+                return ResultFromExtension<ExternalGroupResult>.Failed($"Couldn't retrieve groups for user {user.Username}");
             }
 
-            return new ExternalGroupResult(DirectoryServicesAuthentication.ProviderName, newGroups.Select(g => g).ToArray());
+            return ResultFromExtension<ExternalGroupResult>.Success(new ExternalGroupResult(DirectoryServicesAuthentication.ProviderName, newGroups.Select(g => g).ToArray()));
         }
     }
 }

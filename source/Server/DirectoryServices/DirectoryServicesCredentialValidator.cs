@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading;
+using Octopus.Data.Model.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Resources.Identities;
-using Octopus.Server.Extensibility.Authentication.Storage.User;
+using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
@@ -39,12 +40,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public int Priority => 100;
 
-        public AuthenticationUserCreateResult ValidateCredentials(string username, string password, CancellationToken cancellationToken)
+        public ResultFromExtension<IUser> ValidateCredentials(string username, string password, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() || 
                 !configurationStore.GetAllowFormsAuthenticationForDomainUsers())
             {
-                return new AuthenticationUserCreateResult();
+                return ResultFromExtension<IUser>.ExtensionDisabled();
             }
 
             if (username == null) throw new ArgumentNullException(nameof(username));
@@ -54,13 +55,13 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             var validatedUser = directoryServicesService.ValidateCredentials(username, password, cancellationToken);
             if (!string.IsNullOrWhiteSpace(validatedUser.ValidationMessage))
             {
-                return new AuthenticationUserCreateResult(validatedUser.ValidationMessage);
+                return ResultFromExtension<IUser>.Failed(validatedUser.ValidationMessage);
             }
 
             return GetOrCreateUser(validatedUser, validatedUser.UserPrincipalName, validatedUser.Domain, cancellationToken);
         }
 
-        public AuthenticationUserCreateResult GetOrCreateUser(string username, CancellationToken cancellationToken)
+        public ResultFromExtension<IUser> GetOrCreateUser(string username, CancellationToken cancellationToken)
         {
             var result = directoryServicesService.FindByIdentity(username);
 
@@ -72,7 +73,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return GetOrCreateUser(result, result.UserPrincipalName, result.Domain ?? EnvironmentUserDomainName, cancellationToken);
         }
 
-        internal AuthenticationUserCreateResult GetOrCreateUser(UserValidationResult principal, string? fallbackUsername, string? fallbackDomain, CancellationToken cancellationToken)
+        internal ResultFromExtension<IUser> GetOrCreateUser(UserValidationResult principal, string? fallbackUsername, string? fallbackDomain, CancellationToken cancellationToken)
         {
             var userPrincipalName = objectNameNormalizer.ValidatedUserPrincipalName(principal.UserPrincipalName, fallbackUsername, fallbackDomain);
 
@@ -102,7 +103,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             // who just logged in.
             if (existingMatchingUser != null)
             {
-                return new AuthenticationUserCreateResult(existingMatchingUser);
+                return ResultFromExtension<IUser>.Success(existingMatchingUser);
             }
 
             foreach (var user in users)
@@ -111,7 +112,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 var anyADIdentity = user.Identities.FirstOrDefault(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName);
                 if (anyADIdentity == null)
                 {
-                    return new AuthenticationUserCreateResult(userStore.AddIdentity(user.Id, authenticatingIdentity, cancellationToken));
+                    return ResultFromExtension<IUser>.Success(userStore.AddIdentity(user.Id, authenticatingIdentity, cancellationToken));
                 }
 
                 foreach (var identity in user.Identities.Where(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName))
@@ -125,7 +126,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                         identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
                         identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
 
-                        return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
+                        return ResultFromExtension<IUser>.Success(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
                     }
                     else
                     {
@@ -142,7 +143,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                             identity.Claims[IdentityCreator.SamAccountNameClaimType].Value = samAccountName;
                             identity.Claims[ClaimDescriptor.DisplayNameClaimType].Value = displayName;
 
-                            return new AuthenticationUserCreateResult(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
+                            return ResultFromExtension<IUser>.Success(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
                         }
 
                         // otherUserPrincipal still exists in AD, so what we have here is a new user
@@ -151,7 +152,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             }
 
             if (!configurationStore.GetAllowAutoUserCreation())
-                return new AuthenticationUserCreateResult("User could not be located and auto user creation is not enabled.");
+                return ResultFromExtension<IUser>.Failed("User could not be located and auto user creation is not enabled.");
             var userCreateResult = userStore.Create(
                 userPrincipalName,
                 displayName,
@@ -159,7 +160,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 cancellationToken,
                 identities: new[] { authenticatingIdentity });
 
-            return new AuthenticationUserCreateResult(userCreateResult);
+            return ResultFromExtension<IUser>.Success(userCreateResult.Value);
         }
     }
 }

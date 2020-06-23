@@ -7,6 +7,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Authentication.HostServices;
+using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices
 {
@@ -32,15 +33,15 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             this.userPrincipalFinder = userPrincipalFinder;
         }
 
-        public ExternalSecurityGroupResult? Search(string name, CancellationToken cancellationToken)
+        public ResultFromExtension<ExternalSecurityGroupResult> Search(string name, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
-                return null;
+                return ResultFromExtension<ExternalSecurityGroupResult>.ExtensionDisabled();
 
             var groups = FindGroups(name, cancellationToken);
             var result = new ExternalSecurityGroupResult(DirectoryServicesAuthentication.ProviderName, groups);
 
-            return result;
+            return ResultFromExtension<ExternalSecurityGroupResult>.Success(result);
         }
 
         ExternalSecurityGroup[] FindGroups(string name, CancellationToken cancellationToken)

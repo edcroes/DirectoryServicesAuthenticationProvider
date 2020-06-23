@@ -130,10 +130,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 var userResult = supportsAutoUserCreationFromPrincipals.GetOrCreateUser(principal, cts.Token);
 
                 // If we couldn't create the user account we also can't authenticate this request
-                if (userResult == null || !userResult.Succeeded) return null;
+                if (userResult == null || userResult.WasFailure) return null;
 
                 // Otherwise we should be good to go!
-                var user = userStore.GetByIdentificationToken(userResult.User.IdentificationToken);
+                var user = userStore.GetByIdentificationToken(userResult.Value.IdentificationToken);
 
                 return Result<IUser>.Success(user);
             }
