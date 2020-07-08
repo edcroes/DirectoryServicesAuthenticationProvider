@@ -68,7 +68,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 return ResultFromExtension<ExternalGroupResult>.Failed($"Couldn't retrieve groups for user {user.Username}");
             }
 
-            return ResultFromExtension<ExternalGroupResult>.Success(new ExternalGroupResult(DirectoryServicesAuthentication.ProviderName, newGroups.Select(g => g).ToArray()));
+            return ResultFromExtension<ExternalGroupResult>.Success(new ExternalGroupResult(newGroups.Select(g => g).ToArray()));
         }
     }
 }
