@@ -10,6 +10,7 @@ using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuratio
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Resources;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
@@ -67,7 +68,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                     context.Response.Redirect(redirectAfterLoginTo);
                     foreach (var cookie in authCookies)
                     {
-                        context.Response.Cookies.Append(cookie.Name, cookie.Value);
+                        //We don't want to include the custom cookie domain for a local redirect as that will result in the authentication failing.
+                        context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie, false));
                     }
                     return Task.CompletedTask;
                 }
@@ -77,15 +79,29 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                     "Prevented potential Open Redirection attack on an integrated authentication challenge, to the non-local url {0}",
                     redirectAfterLoginTo);
             }
-
             // By default, redirect to the root of the local web site
             context.Response.Redirect(context.Request.PathBase.Value ?? "/");
             foreach (var cookie in authCookies)
             {
-                context.Response.Cookies.Append(cookie.Name, cookie.Value);
+                context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie, true));
             }
             
             return Task.CompletedTask;
+        }
+
+        CookieOptions ConvertOctoCookieToCookieOptions(OctoCookie cookie, bool includeDomain)
+        {
+            var result = new CookieOptions
+            {
+                Domain = includeDomain ? cookie.Domain : null,
+                Expires = cookie.Expires, 
+                Path = cookie.Path, 
+                HttpOnly = cookie.HttpOnly,
+                Secure = cookie.Secure,
+                MaxAge = cookie.MaxAge,
+            };
+            
+            return result;
         }
 
         LoginState GetLoginState(HttpContext context)
