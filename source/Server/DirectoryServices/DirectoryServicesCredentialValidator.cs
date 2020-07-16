@@ -23,7 +23,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
         internal static string EnvironmentUserDomainName = Environment.UserDomainName;
 
         public DirectoryServicesCredentialValidator(
-            ILog log, 
+            ILog log,
             IDirectoryServicesObjectNameNormalizer objectNameNormalizer,
             IUpdateableUserStore userStore,
             IDirectoryServicesConfigurationStore configurationStore,
@@ -44,7 +44,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public ResultFromExtension<IUser> ValidateCredentials(string username, string password, CancellationToken cancellationToken)
         {
-            if (!configurationStore.GetIsEnabled() || 
+            if (!configurationStore.GetIsEnabled() ||
                 !configurationStore.GetAllowFormsAuthenticationForDomainUsers())
             {
                 return ResultFromExtension<IUser>.ExtensionDisabled();
@@ -97,10 +97,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
             var users = userStore.GetByIdentity(authenticatingIdentity);
 
-            var existingMatchingUser = users.SingleOrDefault(u => u.Identities != null && u.Identities.Any(identity => 
+            var existingMatchingUser = users.SingleOrDefault(u => u.Identities != null && u.Identities.Any(identity =>
                 identity.IdentityProviderName == DirectoryServicesAuthentication.ProviderName &&
                 identity.Equals(authenticatingIdentity)));
-            
+
             // if we can find a user where all identifiers match exactly then we know for sure that's the user
             // who just logged in.
             if (existingMatchingUser != null)
@@ -119,7 +119,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
                 foreach (var identity in user.Identities.Where(p => p.IdentityProviderName == DirectoryServicesAuthentication.ProviderName))
                 {
-                    if (identity.Claims[IdentityCreator.SamAccountNameClaimType].Value == samAccountName ||
+                    var samAccountNameFromClaims = identity.Claims[IdentityCreator.SamAccountNameClaimType].Value;
+                    if (samAccountNameFromClaims == samAccountName ||
                         identity.Claims[IdentityCreator.UpnClaimType].Value == userPrincipalName)
                     {
                         // if we partially matched but the samAccountName or UPN is the same then this is the same user.
@@ -130,11 +131,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
                         return ResultFromExtension<IUser>.Success(userStore.UpdateIdentity(user.Id, identity, cancellationToken));
                     }
-                    else
+                    else if (!string.IsNullOrWhiteSpace(samAccountNameFromClaims))
                     {
                         // we found a single other user in our DB that wasn't an exact match, but matched on some fields, so see if that user is still
                         // in AD
-                        var otherUserPrincipal = directoryServicesService.FindByIdentity(identity.Claims[IdentityCreator.SamAccountNameClaimType].Value);
+                        var otherUserPrincipal = directoryServicesService.FindByIdentity(samAccountNameFromClaims);
 
                         if (!otherUserPrincipal.Success)
                         {
@@ -162,7 +163,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 cancellationToken,
                 identities: new[] { authenticatingIdentity });
 
-            return ResultFromExtension<IUser>.Success(userCreateResult.Value);
+            if (userCreateResult.WasFailure)
+                throw new ApplicationException($"Error creating user. {userCreateResult.ErrorString}");
+
+            return ResultFromExtension<IUser>.Success(userCreateResult.Value!);
         }
     }
 }

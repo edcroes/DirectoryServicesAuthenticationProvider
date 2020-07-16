@@ -18,7 +18,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public GroupRetriever(
             ILog log,
-            IDirectoryServicesConfigurationStore configurationStore, 
+            IDirectoryServicesConfigurationStore configurationStore,
             IDirectoryServicesExternalSecurityGroupLocator groupLocator)
         {
             this.log = log;
@@ -47,6 +47,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             {
                 var samAccountName = adIdentity.Claims[IdentityCreator.SamAccountNameClaimType].Value;
 
+                if (string.IsNullOrWhiteSpace(samAccountName))
+                    continue;
+
                 var result = groupLocator.GetGroupIdsForUser(samAccountName, cancellationToken);
                 if (result.WasAbleToRetrieveGroups)
                 {
@@ -54,7 +57,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     {
                         newGroups.Add(groupId);
                     }
+
                     wasAbleToRetrieveSomeGroups = true;
+
                 }
                 else
                 {

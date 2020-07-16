@@ -25,7 +25,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
 
         public IntegratedAuthenticationHandler(ILog log,
             IAuthCookieCreator tokenIssuer,
-            IAuthenticationConfigurationStore authenticationConfigurationStore, 
+            IAuthenticationConfigurationStore authenticationConfigurationStore,
             DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals,
             IUserStore userStore,
             IIntegratedChallengeCoordinator integratedChallengeCoordinator)
@@ -47,17 +47,19 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 // the coordinator will configure the Response object in the correct way for incomplete challenges
                 return Task.CompletedTask;
             }
-            
+
             // Challenge has succeeded!!
 
             var result = TryAuthenticateRequest(context);
             if (result == null)
                 return Task.CompletedTask;
-            
-            var principal = result.Value;
+
+            var principalIdentificationToken = result.Value?.IdentificationToken;
+            if (principalIdentificationToken == null)
+                throw new InvalidOperationException("The user principal's identification token was ");
 
             // Build the auth cookies to send back with the response
-            var authCookies = tokenIssuer.CreateAuthCookies(principal.IdentificationToken, SessionExpiry.TwentyDays, context.Request.IsHttps, state?.UsingSecureConnection);
+            var authCookies = tokenIssuer.CreateAuthCookies(principalIdentificationToken.Value, SessionExpiry.TwentyDays, context.Request.IsHttps, state?.UsingSecureConnection);
 
             // If the caller has provided a redirect after successful login, we need to check it is a local address - preventing Open Redirection attacks
             if (!string.IsNullOrWhiteSpace(state?.RedirectAfterLoginTo))
@@ -87,7 +89,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             {
                 context.Response.Cookies.Append(cookie.Name, cookie.Value);
             }
-            
+
             return Task.CompletedTask;
         }
 
@@ -118,7 +120,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (context.Request == null) throw new ArgumentNullException($"{nameof(context)}.{nameof(context.Request)}");
-            
+
             // If there is no "RequestPrincipal" in the Context.Items it's not our job to authenticate this request
             var principal = context.User;
             if (string.IsNullOrWhiteSpace(principal.Identity.Name))
@@ -130,7 +132,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 var userResult = supportsAutoUserCreationFromPrincipals.GetOrCreateUser(principal, cts.Token);
 
                 // If we couldn't create the user account we also can't authenticate this request
-                if (userResult == null || userResult.WasFailure) return null;
+                if (userResult == null || userResult.WasFailure || userResult.Value == null) return null;
 
                 // Otherwise we should be good to go!
                 var user = userStore.GetByIdentificationToken(userResult.Value.IdentificationToken);
