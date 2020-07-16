@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading;
+using Octopus.Data;
 using Octopus.Data.Model.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
@@ -42,7 +43,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public int Priority => 100;
 
-        public ResultFromExtension<IUser> ValidateCredentials(string username, string password, CancellationToken cancellationToken)
+        public IResultFromExtension<IUser> ValidateCredentials(string username, string password, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() ||
                 !configurationStore.GetAllowFormsAuthenticationForDomainUsers())
@@ -63,7 +64,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return GetOrCreateUser(validatedUser, validatedUser.UserPrincipalName, validatedUser.Domain, cancellationToken);
         }
 
-        public ResultFromExtension<IUser> GetOrCreateUser(string username, CancellationToken cancellationToken)
+        public IResultFromExtension<IUser> GetOrCreateUser(string username, CancellationToken cancellationToken)
         {
             var result = directoryServicesService.FindByIdentity(username);
 
@@ -75,7 +76,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
             return GetOrCreateUser(result, result.UserPrincipalName, result.Domain ?? EnvironmentUserDomainName, cancellationToken);
         }
 
-        internal ResultFromExtension<IUser> GetOrCreateUser(UserValidationResult principal, string? fallbackUsername, string? fallbackDomain, CancellationToken cancellationToken)
+        internal IResultFromExtension<IUser> GetOrCreateUser(UserValidationResult principal, string? fallbackUsername, string? fallbackDomain, CancellationToken cancellationToken)
         {
             var userPrincipalName = objectNameNormalizer.ValidatedUserPrincipalName(principal.UserPrincipalName, fallbackUsername, fallbackDomain);
 
@@ -163,10 +164,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 cancellationToken,
                 identities: new[] { authenticatingIdentity });
 
-            if (userCreateResult.WasFailure)
-                throw new ApplicationException($"Error creating user. {userCreateResult.ErrorString}");
+            if (userCreateResult is FailureResult failure)
+                throw new ApplicationException($"Error creating user. {failure.ErrorString}");
 
-            return ResultFromExtension<IUser>.Success(userCreateResult.Value!);
+            var successResult = ((Result<IUser>) userCreateResult);
+            return ResultFromExtension<IUser>.Success(successResult.Value);
         }
     }
 }

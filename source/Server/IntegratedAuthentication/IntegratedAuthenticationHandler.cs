@@ -11,6 +11,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Resources;
+using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
@@ -132,10 +133,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 var userResult = supportsAutoUserCreationFromPrincipals.GetOrCreateUser(principal, cts.Token);
 
                 // If we couldn't create the user account we also can't authenticate this request
-                if (userResult == null || userResult.WasFailure || userResult.Value == null) return null;
+                if (userResult is FailureResult) return null;
 
                 // Otherwise we should be good to go!
-                var user = userStore.GetByIdentificationToken(userResult.Value.IdentificationToken);
+                var user = userStore.GetByIdentificationToken(((ResultFromExtension<IUser>)userResult).Value.IdentificationToken);
 
                 return Result<IUser>.Success(user);
             }

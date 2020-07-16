@@ -35,7 +35,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
 
-        public ResultFromExtension<ExternalSecurityGroupResult> Search(string name, CancellationToken cancellationToken)
+        public IResultFromExtension<ExternalSecurityGroupResult> Search(string name, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled() || !configurationStore.GetAreSecurityGroupsEnabled())
                 return ResultFromExtension<ExternalSecurityGroupResult>.ExtensionDisabled();
@@ -130,7 +130,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     // Reads just the groups they are a member of - more reliable but not ideal
                     using (var principal = userPrincipalFinder.FindByIdentity(context, samAccountName))
                         ReadUserGroups(principal, groups, cancellationToken);
-                    
+
                     return new DirectoryServicesExternalSecurityGroupLocatorResult(groups);
                 }
             }

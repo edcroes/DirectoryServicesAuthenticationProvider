@@ -22,10 +22,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
 
-        public ResultFromExtension<IUser> GetOrCreateUser(IPrincipal principal, CancellationToken cancellationToken)
+        public IResultFromExtension<IUser> GetOrCreateUser(IPrincipal principal, CancellationToken cancellationToken)
         {
-            return !configurationStore.GetIsEnabled() ? 
-                ResultFromExtension<IUser>.ExtensionDisabled() : 
+            return !configurationStore.GetIsEnabled() ?
+                ResultFromExtension<IUser>.ExtensionDisabled() :
                 credentialValidator.GetOrCreateUser(principal.Identity.Name, cancellationToken);
         }
     }

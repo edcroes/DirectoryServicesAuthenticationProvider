@@ -30,7 +30,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 
         public string IdentityProviderName => DirectoryServicesAuthentication.ProviderName;
 
-        public ResultFromExtension<ExternalUserLookupResult> Search(string searchTerm, CancellationToken cancellationToken)
+        public IResultFromExtension<ExternalUserLookupResult> Search(string searchTerm, CancellationToken cancellationToken)
         {
             if (!configurationStore.GetIsEnabled())
                 return ResultFromExtension<ExternalUserLookupResult>.ExtensionDisabled();
@@ -49,7 +49,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                     .Select(u => identityCreator.Create("", u.UserPrincipalName, ConvertSamAccountName(u, domainUser.Domain),
                         u.DisplayName).ToResource())
                     .ToArray();
-                
+
                 return ResultFromExtension<ExternalUserLookupResult>.Success(new ExternalUserLookupResult(identityResources));
             }
         }

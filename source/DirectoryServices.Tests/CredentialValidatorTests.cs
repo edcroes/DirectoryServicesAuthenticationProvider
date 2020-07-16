@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using NSubstitute;
 using NUnit.Framework;
+using Octopus.Data;
 using Octopus.Data.Model;
 using Octopus.Data.Model.User;
 using Octopus.Data.Storage.User;
@@ -36,7 +37,7 @@ namespace DirectoryServices.Tests
             updateableUserStore = Substitute.For<IUpdateableUserStore>();
 
             directoryServicesService = Substitute.For<IDirectoryServicesService>();
-            
+
             var log = Substitute.For<ILog>();
 
             identityCreator = new IdentityCreator();
@@ -55,8 +56,8 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("invalidUser", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeFalse();
-            result.ErrorString.ShouldBe("User not found");
+            result.ShouldBeAssignableTo<FailureResult>();
+            ((FailureResult)result).ErrorString.ShouldBe("User not found");
             updateableUserStore.DidNotReceive().Create(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None);
         }
 
@@ -72,7 +73,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("existingUser", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.DidNotReceive().UpdateIdentity(Arg.Any<string>(), Arg.Any<Identity>(), CancellationToken.None);
         }
 
@@ -90,7 +91,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("existingUser1@test.com", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.Received(1).UpdateIdentity(Arg.Any<string>(), Arg.Any<Identity>(), CancellationToken.None);
         }
 
@@ -108,7 +109,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("newUser", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.Received(1).Create("newUser@test.com", Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None, Arg.Any<ProviderUserGroups>(), Arg.Any<IEnumerable<Identity>>());
         }
 
@@ -129,7 +130,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("newUser", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.Received(1).Create("newUser@test.com", Arg.Any<string>(), "tester@test.com", CancellationToken.None, Arg.Any<ProviderUserGroups>(), Arg.Any<IEnumerable<Identity>>());
         }
 
@@ -146,7 +147,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("existingUser2", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.DidNotReceive().Create(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None);
         }
 
@@ -162,8 +163,8 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("newUser", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeFalse();
-            result.ErrorString.ShouldBe("User could not be located and auto user creation is not enabled.");
+            result.ShouldBeAssignableTo<FailureResult>();
+            ((FailureResult)result).ErrorString.ShouldBe("User could not be located and auto user creation is not enabled.");
         }
 
         [Test]
@@ -180,7 +181,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("Domain2\\newUser", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.Received(1).Create("newUser@domain2.com", Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None, Arg.Any<ProviderUserGroups>(), Arg.Any<IEnumerable<Identity>>());
         }
 
@@ -196,7 +197,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("existingUser", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.Received(1).UpdateIdentity("Users-100", Arg.Any<Identity>(), CancellationToken.None);
             updateableUserStore.DidNotReceive().Create(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None);
         }
@@ -213,7 +214,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("existingUserWithNewSam", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.Received(1).UpdateIdentity("Users-100", Arg.Any<Identity>(), CancellationToken.None);
             updateableUserStore.DidNotReceive().Create(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None);
         }
@@ -232,7 +233,7 @@ namespace DirectoryServices.Tests
 
             var result = validator.ValidateCredentials("existingUserWithNewSam", "testPassword", CancellationToken.None);
 
-            result.WasSuccessful.ShouldBeTrue();
+            result.ShouldBeOfType<ResultFromExtension<IUser>>();
             updateableUserStore.Received(1).UpdateIdentity("Users-100", Arg.Any<Identity>(), CancellationToken.None);
             updateableUserStore.DidNotReceive().Create(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None);
         }

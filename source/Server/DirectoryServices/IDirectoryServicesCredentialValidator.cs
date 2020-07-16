@@ -7,6 +7,6 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     interface IDirectoryServicesCredentialValidator : IDoesBasicAuthentication
     {
-        ResultFromExtension<IUser> GetOrCreateUser(string username, CancellationToken cancellationToken);
+        IResultFromExtension<IUser> GetOrCreateUser(string username, CancellationToken cancellationToken);
     }
 }
