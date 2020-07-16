@@ -68,8 +68,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                     context.Response.Redirect(redirectAfterLoginTo);
                     foreach (var cookie in authCookies)
                     {
-                        //We don't want to include the custom cookie domain for a local redirect as that will result in the authentication failing.
-                        context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie, false));
+                        context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie));
                     }
                     return Task.CompletedTask;
                 }
@@ -83,17 +82,17 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             context.Response.Redirect(context.Request.PathBase.Value ?? "/");
             foreach (var cookie in authCookies)
             {
-                context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie, true));
+                context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie));
             }
             
             return Task.CompletedTask;
         }
 
-        CookieOptions ConvertOctoCookieToCookieOptions(OctoCookie cookie, bool includeDomain)
+        CookieOptions ConvertOctoCookieToCookieOptions(OctoCookie cookie)
         {
             var result = new CookieOptions
             {
-                Domain = includeDomain ? cookie.Domain : null,
+                Domain = cookie.Domain,
                 Expires = cookie.Expires, 
                 Path = cookie.Path, 
                 HttpOnly = cookie.HttpOnly,
