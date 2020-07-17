@@ -23,7 +23,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             if (string.IsNullOrWhiteSpace(name))
             {
                 context.Response.BadRequest("Please provide the name of a group to search by, or a team");
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
@@ -32,10 +32,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
                 if (result != null)
                     context.Response.AsOctopusJson(result);
                 else
-                    context.Response.BadRequest($"The {DirectoryServicesAuthentication.ProviderName} is currently disable");
+                    context.Response.BadRequest($"The {DirectoryServicesAuthentication.ProviderName} is currently disabled");
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }
