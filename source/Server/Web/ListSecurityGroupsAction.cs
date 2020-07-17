@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
-using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
@@ -24,20 +23,19 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             if (string.IsNullOrWhiteSpace(name))
             {
                 context.Response.BadRequest("Please provide the name of a group to search by, or a team");
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
             {
-                context.Response.AsOctopusJson(SearchByName(name, cts.Token));
+                var result = externalSecurityGroupLocator.Search(name, cts.Token);
+                if (result != null)
+                    context.Response.AsOctopusJson(result);
+                else
+                    context.Response.BadRequest($"The {DirectoryServicesAuthentication.ProviderName} is currently disabled");
             }
 
-            return Task.FromResult(0);
-        }
-
-        ExternalSecurityGroup[] SearchByName(string name, CancellationToken cancellationToken)
-        {
-            return externalSecurityGroupLocator.Search(name, cancellationToken).Groups;
+            return Task.CompletedTask;
         }
     }
 }
