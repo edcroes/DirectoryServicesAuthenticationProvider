@@ -32,7 +32,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             {
                 var result = externalSecurityGroupLocator.Search(name, cts.Token);
                 if (result is ISuccessResult<ExternalSecurityGroupResult> successResult)
-                    context.Response.AsOctopusJson(successResult.Value);
+                    context.Response.AsOctopusJson(successResult.Value.Groups);
                 else
                     context.Response.BadRequest($"The {DirectoryServicesAuthentication.ProviderName} is currently disabled");
             }
