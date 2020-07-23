@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Octopus.Data;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
+using Octopus.Server.Extensibility.Authentication.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
@@ -29,8 +31,8 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
             {
                 var result = externalSecurityGroupLocator.Search(name, cts.Token);
-                if (result != null)
-                    context.Response.AsOctopusJson(result);
+                if (result is ISuccessResult<ExternalSecurityGroupResult> successResult)
+                    context.Response.AsOctopusJson(successResult.Value);
                 else
                     context.Response.BadRequest($"The {DirectoryServicesAuthentication.ProviderName} is currently disabled");
             }

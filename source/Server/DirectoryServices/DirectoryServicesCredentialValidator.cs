@@ -164,10 +164,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
                 cancellationToken,
                 identities: new[] { authenticatingIdentity });
 
-            if (userCreateResult is FailureResult failure)
+            if (userCreateResult is IFailureResult failure)
                 throw new ApplicationException($"Error creating user. {failure.ErrorString}");
 
-            var successResult = ((Result<IUser>) userCreateResult);
+            var successResult = ((ISuccessResult<IUser>) userCreateResult);
             return ResultFromExtension<IUser>.Success(successResult.Value);
         }
     }
