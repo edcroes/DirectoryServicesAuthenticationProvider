@@ -63,7 +63,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
             context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
             context.Response.Headers.Add("Access-Control-Expose-Headers", $"{ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.OctopusNode}");
-            context.Response.Headers.Add("Access-Control-Expose-Headers",$"cache-control, content-type, x-http-method-override, {ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.ApiKeyHttpHeaderName}, {ApiConstants.AntiforgeryTokenHttpHeaderName}, {ApiConstants.OctopusUserAgentHeaderName}" );
+            context.Response.Headers.Add("Access-Control-Allow-Headers",$"cache-control, content-type, x-http-method-override, {ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.ApiKeyHttpHeaderName}, {ApiConstants.AntiforgeryTokenHttpHeaderName}, {ApiConstants.OctopusUserAgentHeaderName}" );
             context.Request.Headers.TryGetValue("Access-Control-Request-Method", out var accessControlRequestMethod);
             context.Response.Headers.Add("Allow", accessControlRequestMethod.Any() ? accessControlRequestMethod.FirstOrDefault() ?? "GET" : "GET");
         }
