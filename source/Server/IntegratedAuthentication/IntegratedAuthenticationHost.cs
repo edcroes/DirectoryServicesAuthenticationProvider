@@ -87,8 +87,9 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 }
             });
             
-             builder.Configure(app =>
+            builder.Configure(app =>
              {
+                 //This short-circuits the .net core pipeline and other middleware, so don't expect any favours from other middleware. 
                  app.Use((context, func) =>
                  {
                      if (!configurationStore.GetIsEnabled())
