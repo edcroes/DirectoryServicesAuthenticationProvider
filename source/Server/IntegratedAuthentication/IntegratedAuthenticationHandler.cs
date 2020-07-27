@@ -6,16 +6,34 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
-using Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Authentication.Resources;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
+using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
+    public static class ApiConstants
+    {
+        public const string OctopusNode = "Octopus-Node";
+        public const string ApiKeyHttpHeaderName = "X-Octopus-ApiKey";
+        public const string AntiforgeryTokenHttpHeaderName = "X-Octopus-Csrf-Token";
+        public const string OctopusUserAgentHeaderName = "X-Octopus-User-Agent";
+        public const string OctopusDataVersionHeaderName = "X-Octopus-Data-Version";
+        public const string OctopusAuthorizationHashHeaderName = "X-Octopus-Authorization-Hash";
+    }
+
+    public enum DomainCookieOptions
+    {
+        CustomDomain = 0,
+        OriginDomain = 1,
+    }
+    
     class IntegratedAuthenticationHandler : IIntegratedAuthenticationHandler
     {
         readonly ILog log;
+        readonly IWebPortalConfigurationStore configuration;
         readonly IAuthCookieCreator tokenIssuer;
         readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
         readonly DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals;
@@ -23,6 +41,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         readonly IIntegratedChallengeCoordinator integratedChallengeCoordinator;
 
         public IntegratedAuthenticationHandler(ILog log,
+            IWebPortalConfigurationStore configuration,
             IAuthCookieCreator tokenIssuer,
             IAuthenticationConfigurationStore authenticationConfigurationStore, 
             DirectoryServicesUserCreationFromPrincipal supportsAutoUserCreationFromPrincipals,
@@ -30,6 +49,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             IIntegratedChallengeCoordinator integratedChallengeCoordinator)
         {
             this.log = log;
+            this.configuration = configuration;
             this.tokenIssuer = tokenIssuer;
             this.authenticationConfigurationStore = authenticationConfigurationStore;
             this.supportsAutoUserCreationFromPrincipals = supportsAutoUserCreationFromPrincipals;
@@ -37,10 +57,21 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             this.integratedChallengeCoordinator = integratedChallengeCoordinator;
         }
 
+        void AddCorsHeaders(HttpContext context)
+        {
+            context.Response.Headers.Add("Access-Control-Allow-Origin", configuration.GetCorsWhitelist());
+            context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+            context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            context.Response.Headers.Add("Access-Control-Expose-Headers", $"{ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.OctopusNode}");
+            context.Response.Headers.Add("Access-Control-Allow-Headers",$"cache-control, content-type, x-http-method-override, {ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.ApiKeyHttpHeaderName}, {ApiConstants.AntiforgeryTokenHttpHeaderName}, {ApiConstants.OctopusUserAgentHeaderName}" );
+            context.Request.Headers.TryGetValue("Access-Control-Request-Method", out var accessControlRequestMethod);
+            context.Response.Headers.Add("Allow", accessControlRequestMethod.Any() ? accessControlRequestMethod.FirstOrDefault() ?? "GET" : "GET");
+        }
+
         public Task HandleRequest(HttpContext context)
         {
             var state = GetLoginState(context);
-
+            AddCorsHeaders(context);
             if (integratedChallengeCoordinator.SetupResponseIfChallengeHasNotSucceededYet(context, state) != IntegratedChallengeTrackerStatus.ChallengeSucceeded)
             {
                 // the coordinator will configure the Response object in the correct way for incomplete challenges
@@ -65,9 +96,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                 {
                     // This is a safe redirect, let's go!
                     context.Response.Redirect(redirectAfterLoginTo);
+                    var isLocalhost = String.Compare(context.Request.Host.Value, "localhost", StringComparison.OrdinalIgnoreCase) == 0;
                     foreach (var cookie in authCookies)
                     {
-                        context.Response.Cookies.Append(cookie.Name, cookie.Value);
+                        //If the current host happens to be localhost, then we don't want to set the cookie domain as this will result in being unable to log in using AD credentials when using localhost
+                        context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie, isLocalhost ? DomainCookieOptions.OriginDomain : DomainCookieOptions.CustomDomain));
                     }
                     return Task.CompletedTask;
                 }
@@ -82,10 +115,25 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             context.Response.Redirect(context.Request.PathBase.Value ?? "/");
             foreach (var cookie in authCookies)
             {
-                context.Response.Cookies.Append(cookie.Name, cookie.Value);
+                context.Response.Cookies.Append(cookie.Name, cookie.Value, ConvertOctoCookieToCookieOptions(cookie, DomainCookieOptions.CustomDomain));
             }
             
             return Task.CompletedTask;
+        }
+        
+        CookieOptions ConvertOctoCookieToCookieOptions(OctoCookie cookie, DomainCookieOptions options)
+        {
+            var result = new CookieOptions
+            {
+                Domain = options == DomainCookieOptions.CustomDomain ? cookie.Domain: null,
+                Expires = cookie.Expires, 
+                Path = cookie.Path, 
+                HttpOnly = cookie.HttpOnly,
+                Secure = cookie.Secure,
+                MaxAge = cookie.MaxAge,
+            };
+            
+            return result;
         }
 
         LoginState GetLoginState(HttpContext context)
