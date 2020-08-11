@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Octopus.Data;
@@ -11,6 +10,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
 {
     internal class UserLookupAction : IAsyncApiAction
     {
+        static readonly IRequiredParameter<string> PartialName = new RequiredQueryParameterProperty<string>("partialName", "Partial username to lookup");
+        static readonly BadRequestRegistration Disabled = new BadRequestRegistration($"The {DirectoryServicesAuthentication.ProviderName} is currently disabled");
+        static readonly OctopusJsonRegistration<ExternalUserLookupResult> SearchResults = new OctopusJsonRegistration<ExternalUserLookupResult>();
+
         readonly ICanSearchActiveDirectoryUsers userSearch;
 
         public UserLookupAction(ICanSearchActiveDirectoryUsers userSearch)
@@ -18,25 +21,19 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Web
             this.userSearch = userSearch;
         }
 
-        public Task ExecuteAsync(OctoContext context)
+        public Task<IOctoResponseProvider> ExecuteAsync(IOctoRequest request)
         {
-            var name = context.Request.Query["partialName"]?.FirstOrDefault();
-            if (string.IsNullOrWhiteSpace(name))
+            return request
+                .HandleAsync(PartialName, name =>
             {
-                context.Response.BadRequest("Please provide the name of a user to search for");
-                return Task.CompletedTask;
-            }
-
-            using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
-            {
-                var externalUserLookupResult = userSearch.Search(name, cts.Token);
-                if (externalUserLookupResult is ISuccessResult<ExternalUserLookupResult> successResult)
-                    context.Response.AsOctopusJson(successResult.Value);
-                else
-                    context.Response.BadRequest($"The {DirectoryServicesAuthentication.ProviderName} is currently disabled");
-            }
-
-            return Task.CompletedTask;
+                using (var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1)))
+                {
+                    var externalUserLookupResult = userSearch.Search(name, cts.Token);
+                    if (externalUserLookupResult is ISuccessResult<ExternalUserLookupResult> successResult)
+                        return Task.FromResult(SearchResults.Response(successResult.Value));
+                    return Task.FromResult(Disabled.Response());
+                }
+            });
         }
     }
 }
