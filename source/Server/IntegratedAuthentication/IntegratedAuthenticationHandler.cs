@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Octopus.Data;
 using Octopus.Data.Model.User;
+using Octopus.CoreUtilities;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
@@ -59,22 +61,49 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             this.userStore = userStore;
             this.integratedChallengeCoordinator = integratedChallengeCoordinator;
         }
+        
+        static Maybe<string> GetCorsOrigin(IEnumerable<string> originHeaders, string whitelist)
+        {
+            if (string.IsNullOrWhiteSpace(whitelist))
+                return Maybe<string>.None;
+
+            IEnumerable<string> headersArray = originHeaders == null ? new string[0] : originHeaders.ToArray();
+
+            if (whitelist.Equals("*"))
+            {
+                var firstHeader = headersArray.FirstOrDefault();
+                return Maybe<string>.Some(firstHeader ?? "*");
+            }
+
+            var originHeader = headersArray.FirstOrDefault() ?? "";
+            var allowedDomains = whitelist.Split(',');
+            return allowedDomains.Contains(originHeader, StringComparer.OrdinalIgnoreCase) ? Maybe<string>.Some(originHeader) : Maybe<string>.None;
+        }
 
         void AddCorsHeaders(HttpContext context)
         {
-            context.Response.Headers.Add("Access-Control-Allow-Origin", configuration.GetCorsWhitelist());
+            context.Request.Headers.TryGetValue("Origin", out var originHeaders);
+            var maybeAllowOrigin = GetCorsOrigin(originHeaders, configuration.GetCorsWhitelist());
+            if (!maybeAllowOrigin.Some()) return;
+            
+            context.Response.Headers.Add("Access-Control-Allow-Origin", maybeAllowOrigin.Value);
             context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
             context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
-            context.Response.Headers.Add("Access-Control-Expose-Headers", $"{ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.OctopusNode}");
-            context.Response.Headers.Add("Access-Control-Allow-Headers",$"cache-control, content-type, x-http-method-override, {ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.ApiKeyHttpHeaderName}, {ApiConstants.AntiforgeryTokenHttpHeaderName}, {ApiConstants.OctopusUserAgentHeaderName}" );
-            context.Request.Headers.TryGetValue("Access-Control-Request-Method", out var accessControlRequestMethod);
-            context.Response.Headers.Add("Allow", accessControlRequestMethod.Any() ? accessControlRequestMethod.FirstOrDefault() ?? "GET" : "GET");
+            context.Response.Headers.Add("Access-Control-Expose-Headers",
+                $"{ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.OctopusNode}");
+            context.Response.Headers.Add("Access-Control-Allow-Headers",
+                $"cache-control, content-type, x-http-method-override, {ApiConstants.OctopusDataVersionHeaderName}, {ApiConstants.OctopusAuthorizationHashHeaderName}, {ApiConstants.ApiKeyHttpHeaderName}, {ApiConstants.AntiforgeryTokenHttpHeaderName}, {ApiConstants.OctopusUserAgentHeaderName}");
+            context.Request.Headers.TryGetValue("Access-Control-Request-Method",
+                out var accessControlRequestMethod);
+            context.Response.Headers.Add("Allow",
+                accessControlRequestMethod.Any() ? accessControlRequestMethod.FirstOrDefault() ?? "GET" : "GET");
         }
 
         public Task HandleRequest(HttpContext context)
         {
-            var state = GetLoginState(context);
             AddCorsHeaders(context);
+            var state = GetLoginState(context);
+            
             if (integratedChallengeCoordinator.SetupResponseIfChallengeHasNotSucceededYet(context, state) != IntegratedChallengeTrackerStatus.ChallengeSucceeded)
             {
                 // the coordinator will configure the Response object in the correct way for incomplete challenges
