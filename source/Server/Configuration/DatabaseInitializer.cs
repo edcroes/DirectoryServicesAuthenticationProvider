@@ -12,11 +12,11 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
     {
         readonly ILog log;
         readonly IConfigurationStore configurationStore;
-        readonly IKeyValueStore settings;
+        readonly IWritableKeyValueStore settings;
 
         bool cleanupRequired = false;
 
-        public DatabaseInitializer(ILog log, IConfigurationStore configurationStore, IKeyValueStore settings)
+        public DatabaseInitializer(ILog log, IConfigurationStore configurationStore, IWritableKeyValueStore settings)
         {
             this.log = log;
             this.configurationStore = configurationStore;
