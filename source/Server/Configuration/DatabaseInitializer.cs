@@ -10,13 +10,13 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
 {
     class DatabaseInitializer : ExecuteWhenDatabaseInitializes
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IConfigurationStore configurationStore;
         readonly IWritableKeyValueStore settings;
 
         bool cleanupRequired = false;
 
-        public DatabaseInitializer(ILog log, IConfigurationStore configurationStore, IWritableKeyValueStore settings)
+        public DatabaseInitializer(ISystemLog log, IConfigurationStore configurationStore, IWritableKeyValueStore settings)
         {
             this.log = log;
             this.configurationStore = configurationStore;

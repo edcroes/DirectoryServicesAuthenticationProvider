@@ -14,7 +14,7 @@ namespace DirectoryServices.Tests
         [TestCase("EXAMPLE\\joe", "joe", "EXAMPLE")]
         public void CredentialsAreNormalized(string rawUsername, string usedUsername, string usedDomain)
         {
-            var log = Substitute.For<ILog>();
+            var log = Substitute.For<ISystemLog>();
             var credentialNormalizer = new DirectoryServicesObjectNameNormalizer(log);
             var domainUser = credentialNormalizer.NormalizeName(rawUsername);
             Assert.AreEqual(usedUsername, domainUser.NormalizedName);

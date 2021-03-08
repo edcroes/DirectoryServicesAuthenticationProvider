@@ -32,17 +32,17 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
     /// and it initiates the challenge, using a 401 response, when the user isn't already authenticated.
     ///
     /// Changing the authentication scheme in this world requires a restart of all nodes, as the setting has to be set
-    /// when the WebHost starts. 
+    /// when the WebHost starts.
     /// </summary>
     class IntegratedAuthenticationHost : IShareWebHostLifetime
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IWebPortalConfigurationStore configuration;
         readonly IDirectoryServicesConfigurationStore configurationStore;
         readonly IIntegratedAuthenticationHandler handler;
         IWebHost? host;
 
-        public IntegratedAuthenticationHost(ILog log,
+        public IntegratedAuthenticationHost(ISystemLog log,
             IWebPortalConfigurationStore configuration,
             IDirectoryServicesConfigurationStore configurationStore,
             IIntegratedAuthenticationHandler handler)
@@ -64,29 +64,29 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             var prefixes = GetListenPrefixes();
 
             var builder = new WebHostBuilder();
-            
+
             builder.UseHttpSys(options =>
             {
                 options.Authentication.Schemes = MapAuthenticationScheme();
-                
+
                 // IMPORTANT: we need AllowAnonymous to be true here. If it is false then the ASPNET Core internals
                 // will automatically issue the 401 challenge and we don't get a chance to report meaningful errors
                 // if the challenge fails (the user will get the challenge popup dialog in the browser).
                 options.Authentication.AllowAnonymous = true;
-            
+
                 foreach (var baseUri in prefixes)
                 {
                     var prefix = baseUri.ToString();
-            
+
                     if (!baseUri.Host.Contains("."))
                     {
                         prefix = prefix.Replace("localhost", "+");
                     }
-            
+
                     options.UrlPrefixes.Add(prefix);
                 }
             });
-            
+
              builder.Configure(app =>
              {
                  app.Use((context, func) =>
@@ -100,7 +100,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
                      return handler.HandleRequest(context);
                  });
              });
-            
+
             host = builder.Build();
             return host.StartAsync();
         }

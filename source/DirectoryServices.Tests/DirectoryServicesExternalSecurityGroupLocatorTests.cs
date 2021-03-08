@@ -18,12 +18,12 @@ namespace DirectoryServices.Tests
 
         DirectoryServicesExternalSecurityGroupLocator locator;
         IUserPrincipalFinder userPrincipalFinder;
-        ILog log;
+        ISystemLog log;
 
         [SetUp]
         public void SetUp()
         {
-            log = Substitute.For<ILog>();
+            log = Substitute.For<ISystemLog>();
             var configurationStore = Substitute.For<IDirectoryServicesConfigurationStore>();
 
             var contextProvider = Substitute.For<IDirectoryServicesContextProvider>();

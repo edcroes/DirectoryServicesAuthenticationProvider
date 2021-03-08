@@ -36,7 +36,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
 
     class IntegratedAuthenticationHandler : IIntegratedAuthenticationHandler
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IWebPortalConfigurationStore configuration;
         readonly IAuthCookieCreator tokenIssuer;
         readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
@@ -44,7 +44,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         readonly IUserStore userStore;
         readonly IIntegratedChallengeCoordinator integratedChallengeCoordinator;
 
-        public IntegratedAuthenticationHandler(ILog log,
+        public IntegratedAuthenticationHandler(ISystemLog log,
             IWebPortalConfigurationStore configuration,
             IAuthCookieCreator tokenIssuer,
             IAuthenticationConfigurationStore authenticationConfigurationStore,
