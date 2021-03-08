@@ -18,12 +18,12 @@ namespace DirectoryServices.Tests
 
         DirectoryServicesExternalSecurityGroupLocator locator;
         IUserPrincipalFinder userPrincipalFinder;
-        InMemoryLog log;
+        ILog log;
 
         [SetUp]
         public void SetUp()
         {
-            log = new InMemoryLog();
+            log = Substitute.For<ILog>();
             var configurationStore = Substitute.For<IDirectoryServicesConfigurationStore>();
 
             var contextProvider = Substitute.For<IDirectoryServicesContextProvider>();
@@ -33,7 +33,7 @@ namespace DirectoryServices.Tests
             var directoryServicesObjectNameNormalizer = Substitute.For<IDirectoryServicesObjectNameNormalizer>();
             directoryServicesObjectNameNormalizer.NormalizeName(Arg.Any<string>())
                 .Returns(x => new DomainUser(null, ((string)x.Args()[0])));
-            
+
             locator = new DirectoryServicesExternalSecurityGroupLocator(
                 log,
                 contextProvider,
@@ -41,40 +41,42 @@ namespace DirectoryServices.Tests
                 configurationStore,
                 userPrincipalFinder
             );
-            
+
             configurationStore.GetAreSecurityGroupsEnabled().Returns(true);
             contextProvider.GetContext(null).ReturnsForAnyArgs(new PrincipalContext(ContextType.Machine));
-
         }
-        
+
         [Test]
         public void GetGroupIdsForUser_NotFound()
         {
             userPrincipalFinder.FindByIdentity(null, null).ReturnsForAnyArgs((IUserPrincipalWrapper) null);
-                
+
             var result = locator.GetGroupIdsForUser("Bob", CancellationToken.None);
             result.WasAbleToRetrieveGroups.ShouldBeFalse();
-            
-            log.Logs.ShouldContain((LogCategory.Trace, null, $"While loading security groups, a principal identifiable by 'Bob' was not found in '{Environment.MachineName}'"));
+
+            log.Received().Trace($"While loading security groups, a principal identifiable by 'Bob' was not found in '{Environment.MachineName}'");
         }
-        
+
         [Test]
         public void GetGroupIdsForUser_ErrorGettingAuthorizationGroups()
         {
-            
+
             var userPrincipal = Substitute.For<IUserPrincipalWrapper>();
             userPrincipalFinder.FindByIdentity(null, null).ReturnsForAnyArgs(userPrincipal);
 
             var authGroupsException = new Exception("AuthorizationGroups Exception");
             userPrincipal.GetAuthorizationGroups(CancellationToken.None).ThrowsForAnyArgs(authGroupsException);
             userPrincipal.GetGroups(CancellationToken.None).Returns(new[] {new FakeGroupPrincipal(groupSid)});
-                
+
             var result = locator.GetGroupIdsForUser("Bob", CancellationToken.None);
             result.WasAbleToRetrieveGroups.ShouldBeTrue();
             result.GroupsIds.ShouldBe(new[] { groupSid});
-     
-            log.Logs.ShouldContain(l => l.category == LogCategory.Verbose && l.exception == authGroupsException);
-            log.Logs.ShouldNotContain(l => l.category == LogCategory.Error || l.category == LogCategory.Fatal);
+
+            log.Received().Verbose(authGroupsException);
+            log.DidNotReceive().Error(Arg.Any<string>());
+            log.DidNotReceive().Error(Arg.Any<Exception>());
+            log.DidNotReceive().Fatal(Arg.Any<string>());
+            log.DidNotReceive().Fatal(Arg.Any<Exception>());
         }
 
         [Test]
@@ -85,34 +87,37 @@ namespace DirectoryServices.Tests
 
             var authGroupsException = new Exception("AuthorizationGroups Exception");
             userPrincipal.GetAuthorizationGroups(CancellationToken.None).ThrowsForAnyArgs(authGroupsException);
-            
+
             var groupsException = new Exception("Groups Exception");
             userPrincipal.GetGroups(CancellationToken.None).ThrowsForAnyArgs(groupsException);
-                
+
             var result = locator.GetGroupIdsForUser("Bob", CancellationToken.None);
-            
+
             result.WasAbleToRetrieveGroups.ShouldBeFalse();
             result.GroupsIds.ShouldBeNull();
-     
-            log.Logs.ShouldContain(l => l.category == LogCategory.Verbose && l.exception == authGroupsException);
-            log.Logs.ShouldContain(l => l.category == LogCategory.Error && l.exception == groupsException);
+
+            log.Received().Verbose(authGroupsException);
+            log.Received().ErrorFormat(groupsException, "Active Directory search for {0} failed.", "Bob");
         }
-        
+
         [Test]
         public void GetGroupIdsForUser_Success()
         {
-            
+
             var userPrincipal = Substitute.For<IUserPrincipalWrapper>();
             userPrincipalFinder.FindByIdentity(null, null).ReturnsForAnyArgs(userPrincipal);
 
             userPrincipal.GetAuthorizationGroups(CancellationToken.None).ReturnsForAnyArgs(new[] {new FakeGroupPrincipal(groupSid)});
-            
+
             var result = locator.GetGroupIdsForUser("Bob", CancellationToken.None);
-            
+
             result.WasAbleToRetrieveGroups.ShouldBeTrue();
             result.GroupsIds.ShouldBe(new[] { groupSid});
-            log.Logs.ShouldNotContain(l => l.category == LogCategory.Error || l.category == LogCategory.Fatal);
 
+            log.DidNotReceive().Error(Arg.Any<string>());
+            log.DidNotReceive().Error(Arg.Any<Exception>());
+            log.DidNotReceive().Fatal(Arg.Any<string>());
+            log.DidNotReceive().Fatal(Arg.Any<Exception>());
         }
 
         class FakeGroupPrincipal : IPrincipalWrapper
