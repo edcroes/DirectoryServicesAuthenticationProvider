@@ -12,12 +12,12 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Director
 {
     class GroupRetriever : IExternalGroupRetriever
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IDirectoryServicesConfigurationStore configurationStore;
         readonly IDirectoryServicesExternalSecurityGroupLocator groupLocator;
 
         public GroupRetriever(
-            ILog log,
+            ISystemLog log,
             IDirectoryServicesConfigurationStore configurationStore,
             IDirectoryServicesExternalSecurityGroupLocator groupLocator)
         {

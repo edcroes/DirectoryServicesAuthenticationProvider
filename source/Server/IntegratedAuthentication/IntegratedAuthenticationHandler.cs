@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Octopus.Data;
 using Octopus.Data.Model.User;
-using Octopus.CoreUtilities;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectoryServices;
@@ -34,10 +33,10 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         CustomDomain = 0,
         OriginDomain = 1,
     }
-    
+
     class IntegratedAuthenticationHandler : IIntegratedAuthenticationHandler
     {
-        readonly ILog log;
+        readonly ISystemLog log;
         readonly IWebPortalConfigurationStore configuration;
         readonly IAuthCookieCreator tokenIssuer;
         readonly IAuthenticationConfigurationStore authenticationConfigurationStore;
@@ -45,7 +44,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         readonly IUserStore userStore;
         readonly IIntegratedChallengeCoordinator integratedChallengeCoordinator;
 
-        public IntegratedAuthenticationHandler(ILog log,
+        public IntegratedAuthenticationHandler(ISystemLog log,
             IWebPortalConfigurationStore configuration,
             IAuthCookieCreator tokenIssuer,
             IAuthenticationConfigurationStore authenticationConfigurationStore,
@@ -61,32 +60,32 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             this.userStore = userStore;
             this.integratedChallengeCoordinator = integratedChallengeCoordinator;
         }
-        
-        static Maybe<string> GetCorsOrigin(IEnumerable<string> originHeaders, string whitelist)
+
+        static string? GetCorsOrigin(IEnumerable<string> originHeaders, string whitelist)
         {
             if (string.IsNullOrWhiteSpace(whitelist))
-                return Maybe<string>.None;
+                return null;
 
             IEnumerable<string> headersArray = originHeaders == null ? new string[0] : originHeaders.ToArray();
 
             if (whitelist.Equals("*"))
             {
                 var firstHeader = headersArray.FirstOrDefault();
-                return Maybe<string>.Some(firstHeader ?? "*");
+                return firstHeader ?? "*";
             }
 
             var originHeader = headersArray.FirstOrDefault() ?? "";
             var allowedDomains = whitelist.Split(',');
-            return allowedDomains.Contains(originHeader, StringComparer.OrdinalIgnoreCase) ? Maybe<string>.Some(originHeader) : Maybe<string>.None;
+            return allowedDomains.Contains(originHeader, StringComparer.OrdinalIgnoreCase) ? originHeader : null;
         }
 
         void AddCorsHeaders(HttpContext context)
         {
             context.Request.Headers.TryGetValue("Origin", out var originHeaders);
             var maybeAllowOrigin = GetCorsOrigin(originHeaders, configuration.GetCorsWhitelist());
-            if (!maybeAllowOrigin.Some()) return;
-            
-            context.Response.Headers.Add("Access-Control-Allow-Origin", maybeAllowOrigin.Value);
+            if (maybeAllowOrigin == null) return;
+
+            context.Response.Headers.Add("Access-Control-Allow-Origin", maybeAllowOrigin);
             context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
             context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
             context.Response.Headers.Add("Access-Control-Expose-Headers",
@@ -103,7 +102,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
         {
             AddCorsHeaders(context);
             var state = GetLoginState(context);
-            
+
             if (integratedChallengeCoordinator.SetupResponseIfChallengeHasNotSucceededYet(context, state) != IntegratedChallengeTrackerStatus.ChallengeSucceeded)
             {
                 // the coordinator will configure the Response object in the correct way for incomplete challenges
@@ -156,19 +155,19 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
 
             return Task.CompletedTask;
         }
-        
+
         CookieOptions ConvertOctoCookieToCookieOptions(OctoCookie cookie, DomainCookieOptions options)
         {
             var result = new CookieOptions
             {
                 Domain = options == DomainCookieOptions.CustomDomain ? cookie.Domain: null,
-                Expires = cookie.Expires, 
-                Path = cookie.Path, 
+                Expires = cookie.Expires,
+                Path = cookie.Path,
                 HttpOnly = cookie.HttpOnly,
                 Secure = cookie.Secure,
                 MaxAge = cookie.MaxAge,
             };
-            
+
             return result;
         }
 
