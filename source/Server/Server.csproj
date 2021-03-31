@@ -21,8 +21,8 @@
     <PackageReference Include="Octopus.Configuration" Version="3.0.0" />
     <PackageReference Include="Octopus.Data" Version="5.3.1-enh-mediatorcontracts.1" />
     <PackageReference Include="Octopus.Diagnostics" Version="2.1.1" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="13.0.1-enh-mediatorcont0021" />
-    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="10.0.2-enh-mediatorcont0002" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="13.0.1-enh-mediatorcont0022" />
+    <PackageReference Include="Octopus.Server.Extensibility.Authentication" Version="10.0.2-enh-mediatorcont0004" />
     <PackageReference Include="Octopus.Time" Version="1.1.6" />
     <PackageReference Include="System.DirectoryServices" Version="4.5.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
