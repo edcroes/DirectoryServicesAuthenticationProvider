@@ -4,7 +4,6 @@ using System.Threading;
 using NSubstitute;
 using NUnit.Framework;
 using Octopus.Data;
-using Octopus.Data.Model;
 using Octopus.Data.Model.User;
 using Octopus.Data.Storage.User;
 using Octopus.Diagnostics;
@@ -13,6 +12,7 @@ using Octopus.Server.Extensibility.Authentication.DirectoryServices.DirectorySer
 using Octopus.Server.Extensibility.Authentication.DirectoryServices.Identities;
 using Octopus.Server.Extensibility.Authentication.HostServices;
 using Octopus.Server.Extensibility.Results;
+using Octopus.Server.MessageContracts;
 using Shouldly;
 
 namespace DirectoryServices.Tests

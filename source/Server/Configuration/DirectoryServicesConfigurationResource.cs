@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Net;
-using Octopus.Data.Resources.Attributes;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.MessageContracts.Attributes;
 
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configuration
 {
@@ -9,7 +9,7 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Configur
     {
 
         public const string ActiveDirectoryContainerDescription = "Set the active directory container used for authentication.";
-        
+
         public const string AuthenticationSchemeDescription = "When Domain authentication is used, specifies the scheme (Basic, Digest, IntegratedWindowsAuthentication, Negotiate, Ntlm). You will need to restart all Octopus Server nodes in your cluster for these changes to take effect. Please note that using Negotiate or IntegratedWindowsAuthentication [may require additional server configuration](https://g.octopushq.com/AuthAD) in order to work correctly.";
 
         public const string AllowFormsAuthenticationForDomainUsersDescription = "When Domain authentication is used, specifies whether the HTML-based username/password form can be used to sign in.";
