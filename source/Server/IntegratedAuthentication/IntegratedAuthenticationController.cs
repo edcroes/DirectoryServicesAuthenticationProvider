@@ -10,6 +10,7 @@ using Octopus.Server.Extensibility.Web.Extensions;
 namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.IntegratedAuthentication
 {
     [ApiController]
+    [Route("")]
     public class IntegratedAuthenticationController : SystemScopedApiController
     {
         readonly IIntegratedAuthenticationHandler integratedAuthenticationHandler;
