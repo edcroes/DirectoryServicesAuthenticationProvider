@@ -32,13 +32,13 @@ jobs:
         env:
           OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head branch
           OCTOVERSION_Patch: ${{ github.run_number }}
-        shell: bash
-        run: ./build.sh --verbosity verbose
+        shell: pwsh
+        run: ./build.ps1 --verbosity verbose
 
       - name: Push package to feed 🐙
         id: push-feed
         if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]' && github.event_name != 'schedule'
-        shell: bash
+        shell: pwsh
         env:
           FEED_API_KEY: ${{ secrets.FEED_API_KEY }}
           FEED_SOURCE: ${{ secrets.FEED_SOURCE }}
