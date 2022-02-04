@@ -1,3 +1,4 @@
+using System;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.IO;
@@ -39,7 +40,6 @@ class Build : NukeBuild
     static AbsolutePath LocalPackagesDir => RootDirectory / ".." / "LocalPackages";
 
     Target Clean => _ => _
-        .Before(Restore)
         .Executes(() =>
         {
             SourceDirectory.GlobDirectories("**/bin", "**/obj", "**/TestResults").ForEach(DeleteDirectory);
@@ -56,11 +56,14 @@ class Build : NukeBuild
         });
 
     Target Compile => _ => _
-        .DependsOn(Clean)
         .DependsOn(Restore)
         .Executes(() =>
         {
             Logger.Info("Building Directory Services Authentication Provider v{0}", OctoVersionInfo.FullSemVer);
+            
+            // This is done to pass the data to github actions
+            Console.Out.WriteLine($"::set-output name=semver::{OctoVersionInfo.FullSemVer}");
+            Console.Out.WriteLine($"::set-output name=prerelease_tag::{OctoVersionInfo.PreReleaseTagWithDash}");
 
             DotNetBuild(_ => _
                 .SetProjectFile(Solution)
@@ -76,7 +79,7 @@ class Build : NukeBuild
             DotNetTest(_ => _
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .SetNoBuild(true)
+                .EnableNoBuild()
                 .EnableNoRestore());
         });
 
@@ -88,25 +91,24 @@ class Build : NukeBuild
             Logger.Info("Packing Directory Services Authentication Provider v{0}", OctoVersionInfo.FullSemVer);
 
             DotNetPack(_ => _
-                .SetProject(Solution)
+                .SetProject(SourceDirectory / "Server" / "Server.csproj")
                 .SetVersion(OctoVersionInfo.FullSemVer)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
                 .EnableNoBuild()
                 .DisableIncludeSymbols()
                 .SetVerbosity(DotNetVerbosity.Normal)
-                .SetProperty("NuspecFile", RootDirectory / "build/Octopus.Server.Extensibility.Authentication.DirectoryServices.nuspec")
+                .SetProperty("NuspecFile", BuildProjectDirectory / "Octopus.Server.Extensibility.Authentication.DirectoryServices.nuspec")
                 .SetProperty("NuspecProperties", $"Version={OctoVersionInfo.NuGetVersion}"));
 
             DotNetPack(_ => _
-                .SetProject(RootDirectory / "source/Client/Client.csproj")
+                .SetProject(SourceDirectory / "Client" / "Client.csproj")
                 .SetVersion(OctoVersionInfo.FullSemVer)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
                 .EnableNoBuild()
                 .DisableIncludeSymbols()
-                .SetVerbosity(DotNetVerbosity.Normal)
-                .SetProperty("NuspecProperties", $"Version={OctoVersionInfo.NuGetVersion}"));
+                .SetVerbosity(DotNetVerbosity.Normal));
         });
 
     Target CopyToLocalPackages => _ => _
@@ -116,11 +118,12 @@ class Build : NukeBuild
         {
             EnsureExistingDirectory(LocalPackagesDir);
             ArtifactsDirectory.GlobFiles("*.nupkg")
-                .ForEach(package => CopyFileToDirectory(package, LocalPackagesDir));
+                .ForEach(package => CopyFileToDirectory(package, LocalPackagesDir, FileExistsPolicy.Overwrite));
         });
 
     Target Default => _ => _
-        .DependsOn(Pack);
+        .DependsOn(Pack)
+        .DependsOn(CopyToLocalPackages);
 
     /// Support plugins are available for:
     /// - JetBrains ReSharper        https://nuke.build/resharper
