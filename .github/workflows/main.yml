@@ -42,7 +42,7 @@ jobs:
         env:
           FEED_API_KEY: ${{ secrets.FEED_API_KEY }}
           FEED_SOURCE: ${{ secrets.FEED_SOURCE }}
-        run: dotnet nuget push artifacts/**/*.nupkg --source "$FEED_SOURCE" --api-key "$FEED_API_KEY"
+        run: dotnet nuget push artifacts/**/*.nupkg --source $FEED_SOURCE --api-key $FEED_API_KEY
 
       - name: GitHub Tag 🏷
         id: github-tag
