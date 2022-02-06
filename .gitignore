@@ -68,3 +68,4 @@ TestResult.xml
 !packages.config
 .idea
 **/launchSettings.json
+**/*.DS_Store
