@@ -39,10 +39,7 @@ jobs:
         id: push-feed
         if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]' && github.event_name != 'schedule'
         shell: pwsh
-        env:
-          FEED_API_KEY: ${{ secrets.FEED_API_KEY }}
-          FEED_SOURCE: ${{ secrets.FEED_SOURCE }}
-        run: dotnet nuget push artifacts/**/*.nupkg --source $FEED_SOURCE --api-key $FEED_API_KEY
+        run: dotnet nuget push artifacts/**/*.nupkg --source ${{ secrets.FEED_SOURCE }} --api-key ${{ secrets.FEED_API_KEY }}
 
       - name: GitHub Tag 🏷
         id: github-tag
