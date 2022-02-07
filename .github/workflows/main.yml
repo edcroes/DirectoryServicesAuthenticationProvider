@@ -1,12 +1,17 @@
 name: Build, Test, Package and Push
 
 # Controls when the action will run. 
-on: 
-  # Triggers the workflow on push or pull request events
+on:
+  # Triggers the workflow on pull request events and merges/pushes to main
   push:
-  pull_request:
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  schedule:
+    # Daily 5am australian/brisbane time
+    - cron: '19 0 * * *'
+    # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -16,52 +21,36 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # all
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
-          
+
       - name: Nuke Build 🏗
         id: build
+        env:
+          OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head branch
+          OCTOVERSION_Patch: ${{ github.run_number }}
         shell: pwsh
-        run: ./build.ps1 --OctoVersionBranch ${{ github.head_ref || github.ref }} --OctoVersionPatch ${{ github.run_number }}
+        run: ./build.ps1 --verbosity verbose
 
-      - name: Tag release (when not pre-release) 🏷️
-        if: ${{ !contains( steps.build.outputs.octoversion_fullsemver, '-' ) }}
+      - name: Push package to feed 🐙
+        id: push-feed
+        if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]' && github.event_name != 'schedule'
+        shell: pwsh
+        run: dotnet nuget push artifacts/**/*.nupkg --source ${{ secrets.FEED_SOURCE }} --api-key ${{ secrets.FEED_API_KEY }}
+
+      - name: GitHub Tag 🏷
+        id: github-tag
         uses: actions/github-script@v3
+        if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]' && github.event_name != 'schedule' && steps.build.outputs.prerelease_tag == ''
         with:
-          github-token: ${{ github.token }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "refs/tags/${{ steps.build.outputs.octoversion_fullsemver }}",
+              ref: "refs/tags/${{ steps.build.outputs.semver }}",
               sha: context.sha
             })
-
-      - name: Install Octopus CLI 🐙
-        uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
-        with:
-          version: latest
-      
-      - name: Push to Octopus 🐙
-        uses: OctopusDeploy/push-package-action@v1.1.1
-        with:
-          server: https://deploy.octopus.app
-          space: Integrations
-          api_key: ${{ secrets.DEPLOY_API_KEY }}
-          packages: |
-            ./artifacts/Octopus.Client.Extensibility.Authentication.DirectoryServices.${{ steps.build.outputs.octoversion_fullsemver }}.nupkg
-            ./artifacts/Octopus.Server.Extensibility.Authentication.DirectoryServices.${{ steps.build.outputs.octoversion_fullsemver }}.nupkg
-
-      - name: Create Release in Octopus 🐙
-        uses: OctopusDeploy/create-release-action@v1.1.1
-        with:
-          server: https://deploy.octopus.app
-          space: Integrations
-          api_key: ${{ secrets.DEPLOY_API_KEY }}
-          project: "DirectoryServicesAuthenticationProvider"
-          packages: |
-            Octopus.Client.Extensibility.Authentication.DirectoryServices:${{ steps.build.outputs.octoversion_fullsemver }}
-            Octopus.Server.Extensibility.Authentication.DirectoryServices:${{ steps.build.outputs.octoversion_fullsemver }}

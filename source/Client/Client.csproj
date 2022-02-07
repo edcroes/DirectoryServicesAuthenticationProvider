@@ -10,13 +10,18 @@
     <Product>Octopus Deploy Client Extensibility</Product>
     <Description>Octopus Deploy Client Extensibility for Directory Services</Description>
     <PackageId>Octopus.Client.Extensibility.Authentication.DirectoryServices</PackageId>
-    <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
-    <PackageLicenseUrl>https://github.com/OctopusDeploy/DirectoryServicesAuthenticationProvider/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/OctopusDeploy/DirectoryServicesAuthenticationProvider</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Octopus.Server.Client" Version="11.2.3319" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE.txt" Pack="true" PackagePath=""/>
+    <None Include="..\..\build\icon.png" Pack="true" PackagePath=""/>
   </ItemGroup>
 
 </Project>
