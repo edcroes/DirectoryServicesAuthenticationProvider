@@ -118,9 +118,13 @@ namespace Octopus.Server.Extensibility.Authentication.DirectoryServices.Integrat
             var principalIdentificationToken = result.Value?.IdentificationToken;
             if (principalIdentificationToken == null)
                 throw new InvalidOperationException("The user principal's identification token was ");
+            
+            var principalSessionsToken = result.Value?.SessionsToken;
+            if (principalSessionsToken == null)
+                throw new InvalidOperationException("The user principal's sessions token was ");
 
             // Build the auth cookies to send back with the response
-            var authCookies = tokenIssuer.CreateAuthCookies(principalIdentificationToken.Value, TimeSpan.FromDays(20), context.Request.IsHttps, state?.UsingSecureConnection);
+            var authCookies = tokenIssuer.CreateAuthCookies(principalIdentificationToken.Value, principalSessionsToken.Value, TimeSpan.FromDays(20), context.Request.IsHttps, state?.UsingSecureConnection);
 
             // If the caller has provided a redirect after successful login, we need to check it is a local address - preventing Open Redirection attacks
             if (!string.IsNullOrWhiteSpace(state?.RedirectAfterLoginTo))
