@@ -251,6 +251,7 @@ namespace DirectoryServices.Tests
             public UserId Id { get; }
             public string Username { get; }
             public Guid IdentificationToken { get; }
+            public Guid SessionsToken { get; }
             public string DisplayName { get; set; }
             public string EmailAddress { get; set; }
             public bool IsService { get; set; }
@@ -258,6 +259,11 @@ namespace DirectoryServices.Tests
             public ReferenceCollection ExternalIdentifiers { get; }
             public HashSet<Identity> Identities { get; }
 
+            public void SetSessionsToken(Guid token)
+            {
+                throw new NotImplementedException();
+            }
+            
             public void SetPassword(string plainTextPassword)
             {
                 throw new NotImplementedException();
