@@ -259,11 +259,11 @@ namespace DirectoryServices.Tests
             public ReferenceCollection ExternalIdentifiers { get; }
             public HashSet<Identity> Identities { get; }
 
-            public void SetSessionsToken(Guid token)
+            public void RevokeSessions()
             {
                 throw new NotImplementedException();
             }
-            
+
             public void SetPassword(string plainTextPassword)
             {
                 throw new NotImplementedException();
